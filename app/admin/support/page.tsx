@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, MessageCircle, Send, ShieldCheck } from "lucide-react";
+import { ArrowLeft, LogOut, MessageCircle, Send, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { signOut } from "@/app/auth/actions";
 import { adminReplySupport, updateSupportStatus } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export default async function AdminSupportPage({searchParams}:Props){
   const selected=(tickets??[]).find(t=>t.id===params.ticket)??(tickets??[])[0];
   const {data:messages}=selected?await supabase.from("support_messages").select("id,sender_role,body,created_at").eq("conversation_id",selected.id).order("created_at"):{data:[]};
   const answers=(selected?.intake_answers??{}) as {urgency?:string;account_number?:string|null};
-  return <main className="admin-shell"><aside className="admin-sidebar"><Link className="admin-brand" href="/admin"><span>N</span>NEXORA <i>ADMIN</i></Link><div className="admin-side-label">CONTROL CENTRE</div><nav><Link href="/admin">Overview</Link><Link href="/admin/reviews">Security reviews</Link><Link className="selected" href="/admin/support">Support inbox</Link></nav><div className="admin-sidebar-foot"><ShieldCheck size={16}/> Administrator session</div></aside>
+  return <main className="admin-shell"><aside className="admin-sidebar"><Link className="admin-brand" href="/admin"><span>N</span>NEXORA <i>ADMIN</i></Link><div className="admin-side-label">CONTROL CENTRE</div><nav><Link href="/admin">Overview</Link><Link href="/admin/reviews">Security reviews</Link><Link className="selected" href="/admin/support">Support inbox</Link></nav><div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>Administrator session</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> Sign out</button></form></div></aside>
     <section className="admin-main"><header className="admin-topbar"><div><span>ADMINISTRATION / CUSTOMER CARE</span><h1>Support inbox</h1></div><Link href="/admin"><ArrowLeft size={15}/> Overview</Link></header>
       {params.message&&<div className={params.kind==="error"?"admin-alert error":"admin-alert success"}>{params.message}</div>}
       <div className="admin-support-layout"><section className="admin-panel"><div className="admin-panel-heading"><div><span>INCOMING REQUESTS</span><h2>Customer conversations</h2></div><span>{tickets?.length??0}</span></div>{!tickets?.length?<p className="admin-empty">No support requests yet.</p>:<div className="admin-ticket-list">{tickets.map(t=><Link href={`/admin/support?ticket=${t.id}`} key={t.id} className={selected?.id===t.id?"admin-ticket selected":"admin-ticket"}><strong>{t.subject}</strong><span>{t.category} · {t.status}</span><small>{new Date(t.updated_at).toLocaleString()} · {t.user_id.slice(0,8)}…</small></Link>)}</div>}</section>
