@@ -179,13 +179,13 @@ export default async function DashboardPage() {
                 const synthetic = (transaction.metadata as { synthetic_demo?: boolean } | null)?.synthetic_demo === true;
                 return <article className="dashboard-recent-row" key={transaction.id}>
                   <span className={incoming ? "recent-transaction-icon incoming" : "recent-transaction-icon"}>{incoming ? <ArrowDownLeft size={17}/> : <ArrowUpRight size={17}/>}</span>
-                  <div className="recent-transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{dateLabel(transaction.created_at)} · Ref {transaction.reference}{synthetic ? " · Sample history" : ""}</span></div>
+                  <div className="recent-transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{dateLabel(transaction.created_at)} · Ref {transaction.reference}</span></div>
                   <div className="recent-transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + (review ? "review" : transaction.status)}>{review ? "Under review" : transaction.status}</span></div>
                 </article>;
               })}
             </div>}
         </section>
-        <footer className="dashboard-disclaimer">Nexora Bank is a portfolio application. Balances and transfers are internal ledger records, not real funds or bank services.</footer>
+
       </section>
     </main>
   );
