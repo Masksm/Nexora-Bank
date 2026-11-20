@@ -11,7 +11,7 @@ export async function GET() {
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { data: accounts, error: accountError } = await supabase
-    .from("bank_accounts").select("id").eq("user_id", user.id);
+    .from("bank_accounts").select("id,account_number").eq("user_id", user.id);
   if (accountError) return new Response("Unable to load accounts", { status: 500 });
   const accountIds = (accounts ?? []).map((account) => account.id);
   if (!accountIds.length) {
@@ -27,6 +27,7 @@ export async function GET() {
     .order("created_at", { ascending: false })
     .limit(5000);
   if (entryError) return new Response("Unable to load ledger entries", { status: 500 });
+  const accountNumberById = new Map((accounts ?? []).map((account) => [account.id, account.account_number]));
   const transactionIds = [...new Set((entries ?? []).map((entry) => entry.transaction_id))];
   const { data: transactions, error: transactionError } = transactionIds.length
     ? await supabase.from("ledger_transactions")
@@ -36,29 +37,24 @@ export async function GET() {
   if (transactionError) return new Response("Unable to load transactions", { status: 500 });
 
   const txMap = new Map((transactions ?? []).map((transaction) => [transaction.id, transaction]));
-  const totals = new Map<string, { amount: number; currency: string }>();
-  for (const entry of entries ?? []) {
-    const current = totals.get(entry.transaction_id) ?? { amount: 0, currency: entry.currency };
-    current.amount += Number(entry.amount_minor);
-    totals.set(entry.transaction_id, current);
-  }
-
   const rows = [
-    ["Date","Description","Reference","Type","Status","Amount","Currency","Synthetic demo"],
-    ...(transactions ?? []).map((transaction) => {
-      const amount = totals.get(transaction.id);
+    ["Date","Account Number","Description","Reference","Type","Status","Amount","Currency","Synthetic demo"],
+    ...(entries ?? []).flatMap((entry) => {
+      const transaction = txMap.get(entry.transaction_id);
+      if (!transaction) return [];
       const metadata = transaction.metadata as { synthetic_demo?: boolean; review_required?: boolean } | null;
       const status = metadata?.review_required ? "under_review" : transaction.status;
-      return [
+      return [[
         new Date(transaction.created_at).toISOString(),
+        accountNumberById.get(entry.account_id) ?? "",
         transaction.description || transaction.transaction_type,
         transaction.reference,
         transaction.transaction_type,
         status,
-        ((amount?.amount ?? 0) / 100).toFixed(2),
-        amount?.currency ?? "USD",
+        (Number(entry.amount_minor) / 100).toFixed(2),
+        entry.currency,
         metadata?.synthetic_demo ? "yes" : "no",
-      ];
+      ]];
     }),
   ];
   const body = rows.map((row) => row.map(csvCell).join(",")).join("\r\n");
