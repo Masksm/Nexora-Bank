@@ -8,8 +8,8 @@ async function requireAdmin() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data, error } = await supabase.auth.getClaims();
-  const role = data?.claims?.app_metadata as { role?: string } | undefined;
-  if (!user || error || role?.role !== "admin") redirect("/login");
+  const appMetadata = data?.claims?.app_metadata as { role?: string } | undefined;
+  if (!user || error || appMetadata?.role !== "admin") redirect("/login");
   return supabase;
 }
 
@@ -28,8 +28,8 @@ function resultUrl(kind: string, message: string): never {
 }
 
 export async function adjustBalance(formData: FormData) {
+  const supabase = await requireAdmin();
   try {
-    const supabase = await requireAdmin();
     const accountId = String(formData.get("account_id") || "");
     const direction = String(formData.get("direction") || "");
     const amountMinor = amountToMinor(formData.get("amount"));
@@ -45,15 +45,15 @@ export async function adjustBalance(formData: FormData) {
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/transactions");
-    resultUrl("success", "Ledger adjustment posted successfully.");
   } catch (error) {
     resultUrl("error", error instanceof Error ? error.message : "The adjustment could not be completed.");
   }
+  resultUrl("success", "Ledger adjustment posted successfully.");
 }
 
 export async function generateDemoHistory(formData: FormData) {
+  const supabase = await requireAdmin();
   try {
-    const supabase = await requireAdmin();
     const accountId = String(formData.get("account_id") || "");
     const targetMinor = amountToMinor(formData.get("target_amount"));
     const startYear = Number(formData.get("start_year") || 2019);
@@ -70,15 +70,15 @@ export async function generateDemoHistory(formData: FormData) {
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/transactions");
-    resultUrl("success", "Synthetic historical activity generated. The account balance matches the target.");
   } catch (error) {
     resultUrl("error", error instanceof Error ? error.message : "Demo history could not be generated.");
   }
+  resultUrl("success", "Synthetic historical activity generated. The account balance matches the target.");
 }
 
 export async function setAccountStatus(formData: FormData) {
+  const supabase = await requireAdmin();
   try {
-    const supabase = await requireAdmin();
     const accountId = String(formData.get("account_id") || "");
     const status = String(formData.get("status") || "");
     const reason = String(formData.get("reason") || "").trim();
@@ -92,8 +92,8 @@ export async function setAccountStatus(formData: FormData) {
     revalidatePath("/admin");
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/accounts");
-    resultUrl("success", "Account status updated.");
   } catch (error) {
     resultUrl("error", error instanceof Error ? error.message : "Account status could not be changed.");
   }
+  resultUrl("success", "Account status updated.");
 }
