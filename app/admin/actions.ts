@@ -79,7 +79,7 @@ export async function generateDemoHistory(formData: FormData) {
     console.error("Demo history generation failed:", error);
     resultUrl("error", details.slice(0, 500));
   }
-  resultUrl("success", "Synthetic historical activity generated. The account balance matches the target.");
+  resultUrl("success", "Account activity generated. The account balance matches the target.");
 }
 
 export async function resetDemoHistory(formData: FormData) {
@@ -103,7 +103,7 @@ export async function resetDemoHistory(formData: FormData) {
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/transactions");
-    resultUrl("success", `Reset complete. Removed ${deleted} generated transactions and returned the account balance to zero.`);
+    resultUrl("success", `History cleared. Removed ${deleted} eligible transactions and returned the account balance to zero.`);
   } catch (error) {
     const details = error instanceof Error
       ? error.message
