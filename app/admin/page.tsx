@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Activity, ArrowDownToLine, ArrowLeft, ArrowUpFromLine, ShieldCheck, Users, Wallet } from "lucide-react";
+import { Activity, ArrowLeft, ArrowUpFromLine, ShieldCheck, Users, Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { adjustBalance, generateDemoHistory, setAccountStatus } from "./actions";
 
@@ -32,7 +32,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       <aside className="admin-sidebar">
         <Link className="admin-brand" href="/"><span>N</span>NEXORA <i>ADMIN</i></Link>
         <div className="admin-side-label">CONTROL CENTRE</div>
-        <nav><a className="selected" href="/admin"><Activity size={17}/> Overview</a><a href="#customers"><Users size={17}/> Customers</a><a href="#ledger"><Wallet size={17}/> Ledger operations</a></nav>
+        <nav><Link className="selected" href="/admin"><Activity size={17}/> Overview</Link><a href="#customers"><Users size={17}/> Customers</a><a href="#ledger"><Wallet size={17}/> Ledger operations</a><Link href="/admin/reviews">Security reviews</Link><Link href="/admin/support">Support inbox</Link><Link href="/admin/audit">Audit log</Link></nav>
         <div className="admin-sidebar-foot"><ShieldCheck size={16}/> Administrator session</div>
       </aside>
       <section className="admin-main">
