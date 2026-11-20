@@ -22,6 +22,7 @@ Additional database changes applied through the Supabase management connection o
 - `optimize_support_message_policies`
 - `isolate_privileged_rpc_implementations`
 - `notify_customers_on_support_replies`
+- `recheck_account_status_on_transfer_approval`
 
 These add admin balance/history operations, account restrictions, transfer review, support conversations, device/session tracking, and simulated virtual-card controls. The demo-history generator was corrected to keep generated activity between its configured start date and the current time.
 
