@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowDownLeft, ArrowLeft, ArrowUpRight, FileText } from "lucide-react";
+import { ArrowDownLeft, ArrowLeft, ArrowUpRight, Download, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +38,7 @@ export default async function TransactionsPage() {
       <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link><span className="workspace-overline">NEXORA BANK · PERSONAL</span></header>
       <section className="workspace-intro"><div><span className="workspace-kicker">A CLEAR RECORD</span><h1>Transactions</h1><p>Review activity recorded against your accounts.</p></div></section>
       <section className="workspace-panel">
-        <div className="workspace-panel-heading"><div><span className="workspace-kicker">ACCOUNT ACTIVITY</span><h2>Recent transactions</h2></div><span className="workspace-count">{transactions?.length ?? 0} records</span></div>
+        <div className="workspace-panel-heading"><div><span className="workspace-kicker">ACCOUNT ACTIVITY</span><h2>Recent transactions</h2></div><div className="transaction-tools"><span className="workspace-count">{transactions?.length ?? 0} records</span><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> Export CSV</Link></div></div>
         {failed ? <div className="workspace-alert">We couldn’t load transaction activity. Please refresh and try again.</div> :
           (transactions ?? []).length === 0 ? <div className="workspace-empty"><FileText size={25}/><h2>No transactions yet</h2><p>Once a transaction is posted, it will appear here.</p></div> :
           <div className="transaction-list">
