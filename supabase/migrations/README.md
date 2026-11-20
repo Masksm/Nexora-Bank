@@ -19,6 +19,9 @@ Additional database changes applied through the Supabase management connection o
 - `bound_synthetic_history_dates`
 - `session_revocation_and_location_context`
 - `protect_device_fingerprints`
+- `optimize_support_message_policies`
+- `isolate_privileged_rpc_implementations`
+- `notify_customers_on_support_replies`
 
 These add admin balance/history operations, account restrictions, transfer review, support conversations, device/session tracking, and simulated virtual-card controls. The demo-history generator was corrected to keep generated activity between its configured start date and the current time.
 
