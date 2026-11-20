@@ -102,7 +102,7 @@ export default function Home() {
       <footer className="footer shell">
         <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
         <span>© {new Date().getFullYear()} Nexora Bank. A digital banking experience.</span>
-        <span className="footer-note">Portfolio software · Internal ledger simulation</span>
+        <Link className="footer-note" href="/policy">Policies</Link>
       </footer>
     </main>
   );
