@@ -47,13 +47,18 @@ export async function signIn(formData: FormData) {
     const region = requestHeaders.get("x-vercel-ip-country-region");
     const country = requestHeaders.get("x-vercel-ip-country");
     const location = [city, region, country].filter(Boolean).join(", ").slice(0, 120);
-    await supabase.rpc("record_login_context_v2", {
+    const { error: trackingError } = await supabase.rpc("record_login_context_v2", {
       p_fingerprint: fingerprint,
       p_device_label: deviceLabel(userAgent),
       p_user_agent: userAgent,
       p_ip_address: ipAddress || null,
       p_approximate_location: location || null,
     });
+    if (trackingError) {
+      // Keep authentication available, but make tracking failures observable
+      // in server logs without recording IPs, tokens, or other personal data.
+      console.error("Nexora login tracking failed:", trackingError.code || "UNKNOWN");
+    }
   } catch {
     // The login remains valid. Transfers fail closed into manual review if no trusted session record exists.
   }
