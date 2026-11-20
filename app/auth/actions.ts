@@ -8,12 +8,14 @@ function safeNext(value: FormDataEntryValue | null) {
   return path.startsWith("/") && !path.startsWith("//") ? path : "/dashboard";
 }
 
+const validEmail = (email: string) => /^\S+@\S+\.\S+$/.test(email);
+
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const next = safeNext(formData.get("next"));
 
-  if (!email || !/^\\S+@\\S+\\.\\S+$/.test(email) || password.length < 8) {
+  if (!validEmail(email) || password.length < 8) {
     redirect("/login?error=Enter%20a%20valid%20email%20and%20password.");
   }
 
@@ -29,15 +31,19 @@ export async function signUp(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
-  if (fullName.length < 2 || !/^\\S+@\\S+\\.\\S+$/.test(email) || password.length < 10 || password !== confirmPassword) {
+  if (fullName.length < 2 || !validEmail(email) || password.length < 10 || password !== confirmPassword) {
     redirect("/register?error=Check%20your%20details.%20Use%20a%2010-character%20password%20and%20matching%20confirmation.");
   }
 
   const supabase = await createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: {
+      data: { full_name: fullName },
+      emailRedirectTo: new URL("/auth/confirm", siteUrl).toString(),
+    },
   });
 
   if (error) redirect("/register?error=Unable%20to%20create%20your%20account.%20Please%20try%20again.");
