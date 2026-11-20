@@ -11,7 +11,7 @@ type HistoryTransaction = {
   status: string;
   description: string | null;
   created_at: string;
-  synthetic_demo: boolean;
+
   review_required: boolean;
   amount_minor: number;
   currency: string;
@@ -105,7 +105,7 @@ export default function TransactionHistory({ transactions }: { transactions: His
             const incoming = transaction.amount_minor > 0;
             return <Link href={`/dashboard/transactions/${transaction.id}`} className="transaction-row transaction-row-link" key={transaction.id}>
               <span className={incoming ? "transaction-icon incoming" : "transaction-icon"}>{incoming ? <ArrowDownLeft size={18}/> : <ArrowUpRight size={18}/>}</span>
-              <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}{transaction.synthetic_demo ? " · Synthetic demo activity" : ""}</span></div>
+              <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}</span></div>
               <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(transaction.amount_minor, transaction.currency)}</strong><span className={"transaction-status " + (transaction.review_required ? "review" : transaction.status)}>{transaction.review_required ? "Under review" : transaction.status}</span></div>
             </Link>;
           })}
