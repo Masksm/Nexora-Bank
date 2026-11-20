@@ -3,3 +3,6 @@
 @media(max-width:700px){.support-layout{grid-template-columns:1fr}.card-preview-grid{grid-template-columns:1fr}.transfer-form{padding:17px}.support-reply{padding:0 14px 15px}.support-messages{padding:15px}.workspace-intro form{align-self:start}}
 
 .beneficiary-list{margin-top:16px}.beneficiary-row{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid #edf1ed}.beneficiary-row:last-child{border-bottom:0}.beneficiary-row>div{min-width:0;flex:1}.beneficiary-row strong{color:#40584a;font-size:11px}.beneficiary-row p{margin:4px 0;color:#87968c;font-size:9px}.beneficiary-row small{color:#a0aaa3;font-size:8px}.beneficiary-row form button{display:grid;place-items:center;width:32px;height:32px;color:#986b5a;background:#fbf1ed;border:0;border-radius:5px}.transaction-status.review{color:#9b7645}
+
+.transaction-tools{display:flex;align-items:center;gap:12px}.workspace-download{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;color:#4d795e;background:#eef5ef;border-radius:5px;font-size:9px;font-weight:700}
+@media(max-width:650px){.transaction-tools{gap:7px}.workspace-download{padding:7px 8px;font-size:8px}}
