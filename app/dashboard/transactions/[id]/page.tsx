@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowDownLeft, ArrowLeft, ArrowUpRight, CheckCircle2, Clock3, FileText } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock3, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
