@@ -54,7 +54,6 @@ export default async function DashboardPage() {
       .in("id", transactionIds).order("created_at", { ascending: false })
     : { data: [], error: null };
 
-  const transactionById = new Map((transactions ?? []).map(transaction => [transaction.id, transaction]));
   const entryByTransaction = new Map<string, { amount_minor: number; currency: string }>();
   for (const entry of entries ?? []) {
     const current = entryByTransaction.get(entry.transaction_id);
