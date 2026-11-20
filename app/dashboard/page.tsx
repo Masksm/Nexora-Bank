@@ -67,7 +67,7 @@ export default async function DashboardPage() {
       <section className="dashboard-main">
         <header className="dashboard-topbar">
           <div><span className="dashboard-eyebrow">PERSONAL BANKING</span><h1>Overview</h1></div>
-          <div className="topbar-right">{isAdmin && <Link className="admin-shortcut" href="/admin">Admin portal <ArrowUpRight size={14}/></Link>}<span className="secure-indicator"><ShieldCheck size={15}/> Secure session</span><button className="notification-button" aria-label="Notifications"><Bell size={18}/></button></div>
+          <div className="topbar-right">{isAdmin && <Link className="admin-shortcut" href="/admin">Admin portal <ArrowUpRight size={14}/></Link>}<span className="secure-indicator"><ShieldCheck size={15}/> Secure session</span><Link href="/dashboard/notifications" className="notification-button" aria-label="Notifications"><Bell size={18}/></Link></div>
         </header>
 
         <div className="dashboard-welcome"><div><p>YOUR FINANCES, IN FOCUS</p><h2>Good day, {displayName.split(" ")[0]}.</h2><span>Here’s what’s happening with your account.</span></div><div className="welcome-date">{new Intl.DateTimeFormat("en-US",{weekday:"long",month:"long",day:"numeric"}).format(new Date())}</div></div>
