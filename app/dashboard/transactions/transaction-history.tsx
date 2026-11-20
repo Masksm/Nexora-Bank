@@ -67,7 +67,7 @@ export default function TransactionHistory({ transactions }: { transactions: His
     setDay(null);
   }
   function chooseMonth(value: string) {
-    setMonth(value);
+    setMonth(value || null);
     setDay(null);
   }
 
@@ -85,12 +85,14 @@ export default function TransactionHistory({ transactions }: { transactions: His
         {year && <>
           <div className="history-filter-label">MONTH</div>
           <div className="history-filter-options">
+            <button type="button" className={!month ? "history-filter-chip selected" : "history-filter-chip"} onClick={() => chooseMonth("")}>All months</button>
             {months.map(([value, label]) => <button type="button" key={value} className={month === value ? "history-filter-chip selected" : "history-filter-chip"} onClick={() => chooseMonth(value)}>{label}</button>)}
           </div>
         </>}
         {year && month && <>
           <div className="history-filter-label">DAY</div>
           <div className="history-filter-options">
+            <button type="button" className={!day ? "history-filter-chip selected" : "history-filter-chip"} onClick={() => setDay(null)}>All days</button>
             {days.map((value) => <button type="button" key={value} className={day === value ? "history-filter-chip selected" : "history-filter-chip"} onClick={() => setDay(day === value ? null : value)}>{value}</button>)}
           </div>
         </>}
