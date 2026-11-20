@@ -38,7 +38,7 @@ export default async function TransfersPage({ searchParams }: Props) {
           <label>Amount (USD)<input name="amount" type="number" min="0.01" step="0.01" placeholder="250.00" required/></label>
           <label>Description (optional)<input name="description" maxLength={160} placeholder="What is this transfer for?"/></label>
           <button type="submit">Review and send transfer <ArrowUpRight size={15}/></button>
-          <p>Transfers from new or unrecognized devices are held for manual security review. This is an internal simulation, not a real payment.</p>
+          <p>Transfers from new or unrecognized devices are held for manual security review before processing.</p>
         </form>
       </section>}
     {blocked && <p className="workspace-disclaimer">One or more accounts are restricted. Transfers are only available from active accounts.</p>}
