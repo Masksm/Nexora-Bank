@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --ink: #172b27;
+  --muted: #687873;
+  --green: #174d40;
+  --green-dark: #10392f;
+  --mint: #dcece4;
+  --paper: #f8faf7;
+  --line: #e4eae5;
+  --serif: Georgia, 'Times New Roman', serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; color: var(--ink); background: var(--paper); font-family: 'DM Sans', sans-serif; }
+a { color: inherit; text-decoration: none; }
+.shell { width: min(1160px, calc(100% - 64px)); margin: 0 auto; }
+.nav { height: 88px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+.brand { display: inline-flex; align-items: center; gap: 11px; font: 800 15px 'Manrope', sans-serif; letter-spacing: 1.7px; }
+.brand-mark { width: 31px; height: 31px; display: grid; place-items: center; color: white; background: var(--green); border-radius: 9px 9px 9px 2px; font: 700 18px Georgia, serif; letter-spacing: 0; }
+.brand-light { color: #82928a; font-weight: 500; }
+.nav-links { display: flex; gap: 36px; color: #66766f; font-size: 13px; }
+.nav-links a:hover, .text-link:hover { color: var(--green); }
+.nav-cta { display: flex; align-items: center; gap: 10px; padding: 12px 17px; border: 1px solid #d8e2db; border-radius: 6px; font-size: 13px; font-weight: 600; }
+.hero { min-height: 630px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; padding-top: 54px; padding-bottom: 70px; }
+.eyebrow { display: flex; align-items: center; gap: 9px; color: #6a8377; font-size: 10px; font-weight: 700; letter-spacing: 1.8px; }
+.pulse { width: 7px; height: 7px; background: #77a88c; border-radius: 50%; box-shadow: 0 0 0 4px #e5f0e9; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { margin: 26px 0 20px; font: 500 clamp(54px, 6vw, 78px)/1.05 'Manrope', sans-serif; letter-spacing: -4.8px; }
+h1 em, h2 em { color: #638779; font-family: var(--serif); font-weight: 400; }
+.hero-text { max-width: 440px; color: var(--muted); font-size: 15px; line-height: 1.9; }
+.hero-actions { display: flex; align-items: center; gap: 26px; margin-top: 32px; }
+.button-primary { display: inline-flex; align-items: center; gap: 18px; padding: 16px 20px; color: white; background: var(--green); border-radius: 5px; font-size: 13px; font-weight: 600; box-shadow: 0 9px 20px #174d401c; transition: .2s; }
+.button-primary:hover { background: var(--green-dark); transform: translateY(-2px); }
+.text-link { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }
+.trust-note { display: flex; align-items: center; gap: 8px; margin-top: 55px; color: #8b9992; font-size: 11px; }
+.visual-wrap { min-height: 430px; position: relative; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 48%, #e3eee7 0%, #edf3ee 42%, #f8faf7 72%); border-radius: 48% 48% 45% 45%; }
+.visual-orbit { position: absolute; border: 1px solid #d5e4da; border-radius: 50%; }
+.orbit-one { width: 440px; height: 300px; transform: rotate(-24deg); }
+.orbit-two { width: 360px; height: 420px; transform: rotate(28deg); }
+.bank-card { z-index: 1; width: min(390px, 82%); height: 238px; padding: 26px 29px; color: #edf5ef; border: 1px solid #ffffff30; border-radius: 17px; background: linear-gradient(125deg, #245b4c, #143b33 70%, #102f2a); box-shadow: 0 35px 60px #163d3238; transform: rotate(-7deg); }
+.card-top, .card-bottom { display: flex; align-items: center; justify-content: space-between; }
+.card-brand { font: 800 14px 'Manrope', sans-serif; letter-spacing: 2px; }
+.chip { width: 34px; height: 26px; border: 1px solid #c9d8b77a; border-radius: 5px; background: linear-gradient(135deg,#d8d7b5,#9cae8c); opacity: .9; }
+.card-caption { margin-top: 36px; color: #b6cfc2; font-size: 8px; letter-spacing: 1.8px; }
+.card-balance { margin-top: 8px; font: 500 37px 'Manrope', sans-serif; letter-spacing: -1.8px; }
+.card-balance span { color: #a9c4b4; font-size: 21px; }
+.card-bottom { margin-top: 26px; color: #c2d7ca; font-size: 10px; letter-spacing: 1.6px; }
+.card-network { font: italic 800 16px 'Manrope', sans-serif; }
+.float-label { z-index: 2; position: absolute; display: flex; align-items: center; gap: 9px; padding: 12px 15px; color: #577167; background: #ffffffeb; border: 1px solid #e4ece6; border-radius: 7px; box-shadow: 0 10px 28px #244b3a12; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+.label-top { top: 65px; left: 8px; }
+.label-top span:last-child { margin-left: 12px; color: #8a9a91; }
+.label-dot { width: 6px; height: 6px; background: #78a68c; border-radius: 50%; }
+.label-bottom { right: 0; bottom: 69px; padding: 13px 17px; letter-spacing: 0; }
+.activity-icon { display: grid; place-items: center; width: 31px; height: 31px; color: #39715e; background: #e6f1e9; border-radius: 7px; }
+.label-bottom b, .label-bottom small { display: block; }
+.label-bottom b { color: #29473c; font-size: 11px; }
+.label-bottom small { margin-top: 4px; color: #89988f; font-size: 9px; font-weight: 400; }
+.visual-caption { position: absolute; bottom: 21px; color: #91a097; font: italic 12px var(--serif); }
+.feature-section { padding: 100px 0 110px; background: #fff; }
+.section-heading { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 48px; }
+h2 { margin: 17px 0 0; font: 600 38px/1.2 'Manrope', sans-serif; letter-spacing: -1.7px; }
+.section-heading > p { max-width: 360px; margin: 0 0 5px; color: var(--muted); font-size: 13px; line-height: 1.9; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.feature-card { position: relative; min-height: 225px; padding: 28px; border-right: 1px solid var(--line); }
+.feature-card:last-child { border: 0; }
+.feature-number { position: absolute; top: 28px; right: 28px; color: #a4b2aa; font: 12px 'Manrope', sans-serif; }
+.feature-icon { display: grid; place-items: center; width: 43px; height: 43px; margin-bottom: 25px; color: #39705c; background: #edf4ef; border-radius: 9px; }
+.feature-card h3 { margin-bottom: 10px; font: 700 15px 'Manrope', sans-serif; }
+.feature-card p { max-width: 260px; margin: 0; color: #7a8981; font-size: 12px; line-height: 1.8; }
+.feature-arrow { position: absolute; right: 28px; bottom: 27px; color: #9aaba1; }
+.security-band { padding: 45px 0; background: #edf3ee; }
+.security-inner { display: grid; grid-template-columns: 54px 1.1fr 1fr 60px; align-items: center; gap: 25px; }
+.security-symbol { display: grid; place-items: center; width: 50px; height: 50px; color: #39715e; background: #fff; border-radius: 50%; }
+.security-inner h2 { margin-top: 8px; font-size: 23px; }
+.security-inner > p { max-width: 330px; margin: 0; color: #718078; font-size: 12px; line-height: 1.8; }
+.security-globe { color: #a5b8ab; }
+.footer { min-height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #91a098; font-size: 10px; }
+.footer .brand { color: var(--ink); font-size: 12px; }
+.footer .brand-mark { width: 26px; height: 26px; font-size: 15px; }
+.footer-note { color: #a3aea7; }
+@media (max-width: 800px) {
+  .shell { width: min(100% - 40px, 600px); }
+  .nav { height: 72px; }
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; gap: 25px; padding-top: 70px; }
+  h1 { font-size: clamp(56px, 13vw, 76px); }
+  .trust-note { margin-top: 35px; }
+  .visual-wrap { min-height: 390px; }
+  .section-heading { display: block; }
+  .section-heading > p { margin-top: 20px; }
+  .feature-grid { grid-template-columns: 1fr; }
+  .feature-card { min-height: 190px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .feature-card:last-child { border-bottom: 0; }
+  .security-inner { grid-template-columns: 50px 1fr; }
+  .security-inner > p { grid-column: 2; }
+  .security-globe { display: none; }
+  .footer { padding: 25px 0; flex-wrap: wrap; }
+}
+@media (max-width: 430px) {
+  .shell { width: calc(100% - 32px); }
+  .nav-cta { padding: 10px 12px; }
+  .hero { padding-top: 55px; }
+  .hero-actions { align-items: flex-start; flex-direction: column; gap: 17px; }
+  .visual-wrap { min-height: 340px; }
+  .label-top { left: 0; top: 35px; }
+  .label-bottom { right: 0; bottom: 53px; }
+  .bank-card { height: 205px; padding: 22px; }
+  .card-caption { margin-top: 25px; }
+  .card-balance { font-size: 32px; }
+  .card-bottom { margin-top: 20px; }
+  h2 { font-size: 32px; }
+}
