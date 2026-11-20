@@ -4,13 +4,20 @@ A full-stack banking application portfolio project built with Next.js, TypeScrip
 
 ## Product scope
 
-- Customer banking portal: account overview, balances, transfers, beneficiaries, transaction history, virtual cards, notifications and profile/security settings.
-- Separate administrator portal: customer/account operations, transaction investigation, balance adjustments, access monitoring, bank settings and immutable audit history.
+- Customer banking portal: account overview, balances, internal transfers, saved beneficiaries, transaction history, virtual card previews, notifications, profile/security settings and customer support conversations.
+- Separate administrator portal: customer/account search, manual ledger adjustments, synthetic history generation, account restrictions, pending-transfer reviews, device trust controls, session revocation, support inbox and audit history.
 - Premium modern banking interface with USD as the initial display and ledger currency.
 
 ## Important operating boundary
 
 Nexora Bank is a software portfolio project. Transfers and balance adjustments are internal ledger simulations only. The application is not connected to a licensed bank, card network or payment processor, and it does not move or settle real-world money. Do not enter real financial credentials or sensitive personal data.
+
+## Implemented routes
+
+- Customer: `/dashboard`, `/dashboard/accounts`, `/dashboard/transfers`, `/dashboard/beneficiaries`, `/dashboard/transactions`, `/dashboard/cards`, `/dashboard/notifications`, `/dashboard/settings`, `/dashboard/security`, `/dashboard/help`.
+- Administration: `/admin`, `/admin/reviews`, `/admin/support`, `/admin/audit`.
+
+The support intake currently uses guided category/urgency routing and fixed safety guidance. It does not call a generative-AI model or paid AI API.
 
 ## Technology
 
