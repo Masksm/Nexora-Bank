@@ -46,10 +46,11 @@ export default async function TransactionsPage() {
               const entry = entryByTransaction.get(transaction.id);
               const amount = entry?.amount_minor ?? 0;
               const incoming = amount > 0;
+              const isReview = (transaction.metadata as { review_required?: boolean } | null)?.review_required === true;
               return <article className="transaction-row" key={transaction.id}>
                 <span className={incoming ? "transaction-icon incoming" : "transaction-icon"}>{incoming ? <ArrowDownLeft size={18}/> : <ArrowUpRight size={18}/>}</span>
                 <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}{(transaction.metadata as { synthetic_demo?: boolean } | null)?.synthetic_demo ? " · Synthetic demo activity" : ""}</span></div>
-                <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + transaction.status}>{transaction.status}</span></div>
+                <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + (isReview ? "review" : transaction.status)}>{isReview ? "Under review" : transaction.status}</span></div>
               </article>;
             })}
           </div>}
