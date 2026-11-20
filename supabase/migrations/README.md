@@ -10,6 +10,18 @@ The connected Nexora Supabase project already has five applied migrations:
 
 These versions were verified against the live project's migration history on 2026-11-20.
 
+Additional database changes applied through the Supabase management connection on 2026-11-20:
+
+- `admin_demo_history_generator`
+- `admin_account_status_controls`
+- `support_device_security_and_transfer_review`
+- `support_activity_and_virtual_cards`
+- `bound_synthetic_history_dates`
+- `session_revocation_and_location_context`
+- `protect_device_fingerprints`
+
+These add admin balance/history operations, account restrictions, transfer review, support conversations, device/session tracking, and simulated virtual-card controls. The demo-history generator was corrected to keep generated activity between its configured start date and the current time.
+
 **Important:** the remote migration history currently exists, but the original SQL bodies are not retrievable from the migration-history listing. Do not fabricate migration files with those version numbers and do not run a guessed baseline against the live project. The next database-source-control task is to reconstruct and review a clean, replayable baseline from the live catalog, then validate it on a separate local database before using it elsewhere.
 
 The live project must remain untouched during that reconstruction.
