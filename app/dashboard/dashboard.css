@@ -93,3 +93,24 @@
   .quick-actions a { font-size: 9px; }
   .secure-indicator { font-size: 0; gap: 0; }
 }
+
+
+.nav-count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; margin-left: auto; padding: 0 5px; color: #fff; background: #285b49; border-radius: 20px; font-size: 9px; font-weight: 700; }
+.notification-button { position: relative; }
+.notification-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: #c47b53; border: 1px solid #fff; border-radius: 50%; }
+.dashboard-recent-list { margin-top: 18px; }
+.dashboard-recent-row { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-top: 1px solid #edf0ed; }
+.recent-transaction-icon { flex: 0 0 36px; display: grid; place-items: center; width: 36px; height: 36px; color: #9a755d; background: #f6f0eb; border-radius: 50%; }
+.recent-transaction-icon.incoming { color: #39745a; background: #edf5ef; }
+.recent-transaction-description { min-width: 0; flex: 1; display: grid; gap: 5px; }
+.recent-transaction-description strong { overflow: hidden; color: #30473b; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+.recent-transaction-description span { overflow: hidden; color: #96a29a; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.recent-transaction-amount { display: grid; justify-items: end; gap: 5px; }
+.recent-transaction-amount strong { color: #8c6653; font: 600 11px 'Manrope',sans-serif; white-space: nowrap; }
+.recent-transaction-amount strong.positive { color: #39745a; }
+.recent-transaction-amount > span { color: #89968e; font-size: 9px; text-transform: capitalize; }
+@media (max-width: 650px) {
+  .dashboard-recent-row { gap: 9px; }
+  .recent-transaction-description span { max-width: 185px; }
+  .recent-transaction-amount strong { font-size: 10px; }
+}
