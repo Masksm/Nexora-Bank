@@ -78,7 +78,7 @@ export default async function DashboardPage() {
         <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
         <div className="sidebar-label">YOUR BANK</div>
         <nav className="dashboard-nav" aria-label="Main navigation">
-          <a className="active" href="/dashboard"><LayoutDashboard size={17}/> Overview</Link>
+          <Link className="active" href="/dashboard"><LayoutDashboard size={17}/> Overview</Link>
           <Link href="/dashboard/accounts"><Wallet size={17}/> Accounts</Link>
           <Link href="/dashboard/beneficiaries"><Contact size={17}/> Beneficiaries</Link>
           <Link href="/dashboard/transfers"><ArrowUpRight size={17}/> Transfers</Link>
