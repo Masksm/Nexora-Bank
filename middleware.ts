@@ -14,23 +14,41 @@ export async function middleware(request: NextRequest) {
       setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-        Object.entries(headers).forEach(([name, value]) => response.headers.set(name, value));
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        );
+        Object.entries(headers).forEach(([name, value]) =>
+          response.headers.set(name, value)
+        );
       },
     },
   });
 
-  const { data } = await supabase.auth.getClaims();
-  const claims = data?.claims;
+  // Do not insert unrelated work between client creation and getClaims().
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = error ? null : data?.claims;
   const path = request.nextUrl.pathname;
   const isCustomerArea = path.startsWith("/dashboard");
   const isAdminArea = path.startsWith("/admin");
 
+  const redirectWithSession = (target: URL) => {
+    const redirectResponse = NextResponse.redirect(target);
+    response.cookies.getAll().forEach(({ name, value, ...options }) => {
+      redirectResponse.cookies.set(name, value, options);
+    });
+    for (const name of ["Cache-Control", "Expires", "Pragma"]) {
+      const value = response.headers.get(name);
+      if (value) redirectResponse.headers.set(name, value);
+    }
+    return redirectResponse;
+  };
+
   if ((isCustomerArea || isAdminArea) && !claims) {
     const target = request.nextUrl.clone();
     target.pathname = "/login";
+    target.search = "";
     target.searchParams.set("next", path);
-    return NextResponse.redirect(target);
+    return redirectWithSession(target);
   }
 
   if (isAdminArea) {
@@ -39,7 +57,7 @@ export async function middleware(request: NextRequest) {
       const target = request.nextUrl.clone();
       target.pathname = "/dashboard";
       target.search = "";
-      return NextResponse.redirect(target);
+      return redirectWithSession(target);
     }
   }
 
@@ -47,7 +65,7 @@ export async function middleware(request: NextRequest) {
     const target = request.nextUrl.clone();
     target.pathname = "/dashboard";
     target.search = "";
-    return NextResponse.redirect(target);
+    return redirectWithSession(target);
   }
 
   return response;
