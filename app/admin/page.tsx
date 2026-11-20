@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Activity, ArrowLeft, ArrowUpFromLine, ShieldCheck, Users, Wallet } from "lucide-react";
+import { Activity, ArrowUpFromLine, ShieldCheck, Users, Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { adjustBalance, generateDemoHistory, setAccountStatus } from "./actions";
 
@@ -20,7 +20,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   if (!user || claimsError || appMetadata?.role !== "admin") redirect("/dashboard");
 
   const [{ data: accounts, error }, params] = await Promise.all([
-    supabase.from("account_balances").select("account_id,user_id,account_number,account_name,account_type,currency,status,balance_minor").order("account_number"),
+    supabase.from("account_balances").select("account_id,user_id,account_number,account_name,account_type,currency,status,balance_minor").not("user_id", "is", null).order("account_number"),
     searchParams,
   ]);
   const rows = accounts ?? [];
@@ -38,7 +38,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         <div className="admin-sidebar-foot"><ShieldCheck size={16}/> Administrator session</div>
       </aside>
       <section className="admin-main">
-        <header className="admin-topbar"><div><span>ADMINISTRATION / OVERVIEW</span><h1>Control centre</h1></div><Link href="/dashboard"><ArrowLeft size={15}/> Customer portal</Link></header>
+        <header className="admin-topbar"><div><span>ADMINISTRATION / OVERVIEW</span><h1>Control centre</h1></div></header>
         <div className="admin-welcome"><div><span>SECURE ADMINISTRATION</span><h2>Bank operations</h2><p>Manage customer accounts and internal demo-ledger activity.</p></div><div className="admin-identity"><ShieldCheck size={18}/><span>{user.email}<small>Administrator</small></span></div></div>
         {params.message && <div className={params.kind === "error" ? "admin-alert error" : "admin-alert success"}>{params.message}</div>}
         <section className="admin-stats">
