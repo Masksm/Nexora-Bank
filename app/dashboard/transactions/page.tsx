@@ -21,7 +21,7 @@ export default async function TransactionsPage() {
     : { data: [], error: null };
   const transactionIds = [...new Set((entries ?? []).map((entry) => entry.transaction_id))];
   const { data: transactions, error: transactionsError } = transactionIds.length
-    ? await supabase.from("ledger_transactions").select("id,reference,transaction_type,status,description,created_at,posted_at").in("id", transactionIds).order("created_at", { ascending: false })
+    ? await supabase.from("ledger_transactions").select("id,reference,transaction_type,status,description,created_at,posted_at,metadata").in("id", transactionIds).order("created_at", { ascending: false })
     : { data: [], error: null };
 
   const entryByTransaction = new Map<string, { amount_minor: number; currency: string }>();
@@ -48,7 +48,7 @@ export default async function TransactionsPage() {
               const incoming = amount > 0;
               return <article className="transaction-row" key={transaction.id}>
                 <span className={incoming ? "transaction-icon incoming" : "transaction-icon"}>{incoming ? <ArrowDownLeft size={18}/> : <ArrowUpRight size={18}/>}</span>
-                <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}</span></div>
+                <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}{(transaction.metadata as { synthetic_demo?: boolean } | null)?.synthetic_demo ? " · Synthetic demo activity" : ""}</span></div>
                 <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + transaction.status}>{transaction.status}</span></div>
               </article>;
             })}
