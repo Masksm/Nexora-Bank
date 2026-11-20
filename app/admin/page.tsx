@@ -6,7 +6,7 @@ import { adjustBalance, generateDemoHistory, setAccountStatus } from "./actions"
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = Promise<{ kind?: string; message?: string }>;
+type SearchParams = Promise<{ kind?: string; message?: string; q?: string }>;
 
 function money(minor: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(minor / 100);
@@ -24,6 +24,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     searchParams,
   ]);
   const rows = accounts ?? [];
+  const search = (params.q || "").trim().toLowerCase();
+  const displayedRows = search ? rows.filter((row) => row.account_number.toLowerCase().includes(search) || row.account_name.toLowerCase().includes(search) || row.user_id.toLowerCase().includes(search)) : rows;
   const totalMinor = rows.reduce((sum, row) => sum + Number(row.balance_minor || 0), 0);
   const activeCount = rows.filter((row) => row.status === "active").length;
 
@@ -46,10 +48,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         </section>
 
         <section className="admin-panel" id="customers">
-          <div className="admin-panel-heading"><div><span>CUSTOMER DIRECTORY</span><h2>Customer accounts</h2></div><span>{rows.length} accounts</span></div>
+          <div className="admin-panel-heading"><div><span>CUSTOMER DIRECTORY</span><h2>Customer accounts</h2></div><span>{displayedRows.length} of {rows.length}</span></div>
+          <form className="admin-search" action="/admin" method="get"><input name="q" defaultValue={params.q || ""} placeholder="Search account number, name or customer ID"/><button type="submit">Search</button></form>
           {error ? <p className="admin-empty">Could not load customer accounts. Check the administrator database policies.</p> : rows.length === 0 ? <p className="admin-empty">No customer accounts have been created yet.</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Account</th><th>Account number</th><th>Balance</th><th>Status</th><th>Customer ID</th></tr></thead><tbody>
-              {rows.map((row) => <tr key={row.account_id}><td><strong>{row.account_name}</strong><small>{row.account_type} · {row.currency}</small></td><td>{row.account_number}</td><td>{money(Number(row.balance_minor))}</td><td><span className={"admin-status " + row.status}>{row.status}</span></td><td><code>{row.user_id.slice(0, 8)}…</code></td></tr>)}
+              {displayedRows.map((row) => <tr key={row.account_id}><td><strong>{row.account_name}</strong><small>{row.account_type} · {row.currency}</small></td><td>{row.account_number}</td><td>{money(Number(row.balance_minor))}</td><td><span className={"admin-status " + row.status}>{row.status}</span></td><td><code>{row.user_id.slice(0, 8)}…</code></td></tr>)}
             </tbody></table></div>}
         </section>
 
