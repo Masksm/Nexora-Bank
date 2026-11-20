@@ -82,6 +82,39 @@ export async function generateDemoHistory(formData: FormData) {
   resultUrl("success", "Synthetic historical activity generated. The account balance matches the target.");
 }
 
+export async function resetDemoHistory(formData: FormData) {
+  const supabase = await requireAdmin();
+  try {
+    const accountId = String(formData.get("account_id") || "");
+    const confirmation = String(formData.get("confirm_account_number") || "").trim();
+    const reason = String(formData.get("reason") || "").trim();
+    if (!accountId || !/^\\d{10}$/.test(confirmation) || reason.length < 8 || reason.length > 240) {
+      throw new Error("Select an account, enter its exact 10-digit account number, and provide a reason of at least 8 characters.");
+    }
+    const { data, error } = await supabase.rpc("admin_reset_demo_history", {
+      p_account_id: accountId,
+      p_confirm_account_number: confirmation,
+      p_reason: reason,
+    });
+    if (error) throw error;
+    const result = Array.isArray(data) ? data[0] : data;
+    const deleted = Number(result?.deleted_transactions || 0);
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/accounts");
+    revalidatePath("/dashboard/transactions");
+    resultUrl("success", `Reset complete. Removed ${deleted} generated transactions and returned the account balance to zero.`);
+  } catch (error) {
+    const details = error instanceof Error
+      ? error.message
+      : typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message: unknown }).message)
+        : "Unknown database error.";
+    console.error("Demo history reset failed:", error);
+    resultUrl("error", details.slice(0, 500));
+  }
+}
+
 export async function setAccountStatus(formData: FormData) {
   const supabase = await requireAdmin();
   try {
