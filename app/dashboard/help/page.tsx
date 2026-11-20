@@ -11,17 +11,6 @@ const categories = [
   ["account","Account access or balance"],["transfer","Transfer or payment"],["card","Virtual card"],["security","Security or suspicious activity"],["profile","Profile and personal details"],["general","Something else"],
 ];
 
-function guidance(category: string) {
-  const tips: Record<string,string> = {
-    account:"Check the account status and recent transaction list. If the account is frozen or blocked, only customer care can resolve it.",
-    transfer:"Keep the transaction reference, amount and approximate time available. Never send your password or one-time code.",
-    card:"Nexora cards are virtual previews only. They cannot be used for real purchases.",
-    security:"If you suspect unauthorized access, stop initiating transfers and include the approximate sign-in time and device.",
-    profile:"Tell support which profile field needs attention. Do not include identity documents or sensitive personal numbers.",
-    general:"Describe what happened, what you expected, and the exact message you saw.",
-  };
-  return tips[category] || tips.general;
-}
 
 export default async function HelpPage({ searchParams }: Props) {
   const supabase = await createClient();
