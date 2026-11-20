@@ -26,7 +26,7 @@ export default async function RegisterPage({ searchParams }: Props) {
           <button className="auth-submit" type="submit">Create account <span>↗</span></button>
         </form>
         <p className="auth-switch">Already have an account? <Link href="/login">Sign in</Link></p>
-        <p className="auth-footnote">Portfolio software only. Do not submit real banking credentials or sensitive financial information.</p>
+
       </div>
       <aside className="auth-aside"><div className="auth-aside-mark">N</div><p>Your finances,<br /><em>with room to breathe.</em></p><span>THE NEXORA EXPERIENCE</span></aside>
     </main>
