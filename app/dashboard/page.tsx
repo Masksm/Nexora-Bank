@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  ArrowDownLeft, ArrowUpRight, Bell, CreditCard, FileText,
+  ArrowUpRight, Bell, CreditCard, FileText,
   HelpCircle, LayoutDashboard, LogOut, Plus, Settings, ShieldCheck, Wallet,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
