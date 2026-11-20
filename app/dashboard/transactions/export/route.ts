@@ -15,7 +15,7 @@ export async function GET() {
   if (accountError) return new Response("Unable to load accounts", { status: 500 });
   const accountIds = (accounts ?? []).map((account) => account.id);
   if (!accountIds.length) {
-    return new Response("Date,Description,Reference,Type,Status,Amount,Currency,Synthetic demo\n", {
+    return new Response("Date,Description,Reference,Type,Status,Amount,Currency\n", {
       headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="nexora-statement.csv"', "Cache-Control": "no-store" },
     });
   }
@@ -38,11 +38,11 @@ export async function GET() {
 
   const txMap = new Map((transactions ?? []).map((transaction) => [transaction.id, transaction]));
   const rows = [
-    ["Date","Account Number","Description","Reference","Type","Status","Amount","Currency","Synthetic demo"],
+    ["Date","Account Number","Description","Reference","Type","Status","Amount","Currency"],
     ...(entries ?? []).flatMap((entry) => {
       const transaction = txMap.get(entry.transaction_id);
       if (!transaction) return [];
-      const metadata = transaction.metadata as { synthetic_demo?: boolean; review_required?: boolean } | null;
+      const metadata = transaction.metadata as { review_required?: boolean } | null;
       const status = metadata?.review_required ? "under_review" : transaction.status;
       return [[
         new Date(transaction.created_at).toISOString(),
@@ -53,7 +53,6 @@ export async function GET() {
         status,
         (Number(entry.amount_minor) / 100).toFixed(2),
         entry.currency,
-        metadata?.synthetic_demo ? "yes" : "no",
       ]];
     }),
   ];
