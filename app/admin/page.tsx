@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Activity, ArrowUpFromLine, LogOut, ShieldCheck, Users, Wallet } from "lucide-react";
+import { Activity, ArrowUpFromLine, LogOut, RotateCcw, ShieldCheck, Users, Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { adjustBalance, generateDemoHistory, setAccountStatus } from "./actions";
+import { adjustBalance, generateDemoHistory, resetDemoHistory, setAccountStatus } from "./actions";
 import { signOut } from "@/app/auth/actions";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +78,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
               <div className="admin-form-grid"><label>History begins<select name="start_year" defaultValue="2019">{Array.from({length:new Date().getFullYear()-2019+1},(_,i)=>2019+i).map((year)=><option key={year} value={year}>{year}</option>)}</select></label><label>Total transactions<select name="transactions" defaultValue="100"><option value="50">50 transactions</option><option value="100">100 transactions</option><option value="150">150 transactions</option><option value="200">200 transactions</option><option value="250">250 transactions</option></select></label></div>
               <button type="submit" className="secondary" disabled={!rows.some((row)=>Number(row.balance_minor)===0)}>Generate synthetic history</button>
               <small className="admin-warning">This action requires an empty account. It cannot overwrite existing transactions. Synthetic activity is marked in ledger metadata and audit logs.</small>
+            </form>
+          </article>
+
+          <article className="admin-panel">
+            <div className="admin-panel-heading"><div><span>DEMO DATA MAINTENANCE</span><h2>Reset generated account history</h2></div><RotateCcw size={18}/></div>
+            <p className="admin-help">Permanently removes the selected account’s generated synthetic transactions and restores its balance to zero. Real customer transactions are protected: if the account contains any non-demo activity, the reset is rejected without changing anything.</p>
+            <form action={resetDemoHistory} className="admin-form">
+              <label>Account to reset<select name="account_id" required defaultValue=""><option value="" disabled>Select an account</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} · {money(Number(row.balance_minor))}</option>)}</select></label>
+              <label>Confirm by entering the exact 10-digit account number<input name="confirm_account_number" inputMode="numeric" pattern="[0-9]{10}" minLength={10} maxLength={10} placeholder="Enter account number" required/></label>
+              <label>Reason for reset<input name="reason" minLength={8} maxLength={240} placeholder="e.g. Rebuild synthetic demo history" required/></label>
+              <button type="submit" className="admin-danger-button" disabled={!rows.length}>Permanently reset generated history</button>
+              <small className="admin-danger-warning">Irreversible. Only transactions marked as synthetic demo history can be removed. The action is recorded in the administrator audit log.</small>
             </form>
           </article>
 
