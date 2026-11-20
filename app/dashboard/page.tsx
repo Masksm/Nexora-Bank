@@ -62,7 +62,7 @@ export default async function DashboardPage() {
   }
 
   const transactionIds = [...new Set(entries.map(entry => entry.transaction_id))];
-  const transactions: Array<{ id: string; reference: string; transaction_type: string; status: string; description: string | null; created_at: string; metadata: { review_required?: boolean; synthetic_demo?: boolean } | null }> = [];
+  const transactions: Array<{ id: string; reference: string; transaction_type: string; status: string; description: string | null; created_at: string; metadata: { review_required?: boolean } | null }> = [];
   let transactionsError: unknown = null;
   // Chunk IDs to keep PostgREST request URLs within practical limits.
   for (let offset = 0; offset < transactionIds.length; offset += 300) {
@@ -176,7 +176,6 @@ export default async function DashboardPage() {
                 const amount = entry?.amount_minor ?? 0;
                 const incoming = amount > 0;
                 const review = (transaction.metadata as { review_required?: boolean; synthetic_demo?: boolean } | null)?.review_required === true;
-                const synthetic = (transaction.metadata as { synthetic_demo?: boolean } | null)?.synthetic_demo === true;
                 return <article className="dashboard-recent-row" key={transaction.id}>
                   <span className={incoming ? "recent-transaction-icon incoming" : "recent-transaction-icon"}>{incoming ? <ArrowDownLeft size={17}/> : <ArrowUpRight size={17}/>}</span>
                   <div className="recent-transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{dateLabel(transaction.created_at)} · Ref {transaction.reference}</span></div>
