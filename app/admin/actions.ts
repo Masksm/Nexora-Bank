@@ -88,7 +88,7 @@ export async function resetDemoHistory(formData: FormData) {
     const accountId = String(formData.get("account_id") || "");
     const confirmation = String(formData.get("confirm_account_number") || "").trim();
     const reason = String(formData.get("reason") || "").trim();
-    if (!accountId || !/^\\d{10}$/.test(confirmation) || reason.length < 8 || reason.length > 240) {
+    if (!accountId || !/^\d{10}$/.test(confirmation) || reason.length < 8 || reason.length > 240) {
       throw new Error("Select an account, enter its exact 10-digit account number, and provide a reason of at least 8 characters.");
     }
     const { data, error } = await supabase.rpc("admin_reset_demo_history", {
