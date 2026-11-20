@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  ArrowUpRight, Bell, CreditCard, FileText,
+  ArrowUpRight, Bell, Contact, CreditCard, FileText,
   HelpCircle, LayoutDashboard, LogOut, Plus, Settings, ShieldCheck, Wallet,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -45,6 +45,7 @@ export default async function DashboardPage() {
         <nav className="dashboard-nav" aria-label="Main navigation">
           <a className="active" href="/dashboard"><LayoutDashboard size={17}/> Overview</a>
           <a href="/dashboard/accounts"><Wallet size={17}/> Accounts</a>
+          <a href="/dashboard/beneficiaries"><Contact size={17}/> Beneficiaries</a>
           <a href="/dashboard/transfers"><ArrowUpRight size={17}/> Transfers</a>
           <a href="/dashboard/cards"><CreditCard size={17}/> Cards</a>
           <a href="/dashboard/transactions"><FileText size={17}/> Transactions</a>
