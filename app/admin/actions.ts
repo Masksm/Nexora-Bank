@@ -57,13 +57,13 @@ export async function generateDemoHistory(formData: FormData) {
     const accountId = String(formData.get("account_id") || "");
     const targetMinor = amountToMinor(formData.get("target_amount"));
     const startYear = Number(formData.get("start_year") || 2019);
-    const pairs = Number(formData.get("pairs") || 24);
-    if (!accountId || !Number.isInteger(startYear) || !Number.isInteger(pairs)) {
+    const transactionCount = Number(formData.get("transactions") || 100);
+    if (!accountId || !Number.isInteger(startYear) || !Number.isInteger(transactionCount) || transactionCount < 3 || transactionCount > 250) {
       throw new Error("Check the selected account, start year and activity count.");
     }
     const { error } = await supabase.rpc("admin_generate_demo_history", {
       p_account_id: accountId, p_target_balance_minor: targetMinor,
-      p_start_year: startYear, p_pairs: pairs,
+      p_start_year: startYear, p_pairs: transactionCount,
     });
     if (error) throw error;
     revalidatePath("/admin");
