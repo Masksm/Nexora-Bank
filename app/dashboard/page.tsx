@@ -78,19 +78,19 @@ export default async function DashboardPage() {
         <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
         <div className="sidebar-label">YOUR BANK</div>
         <nav className="dashboard-nav" aria-label="Main navigation">
-          <a className="active" href="/dashboard"><LayoutDashboard size={17}/> Overview</a>
-          <a href="/dashboard/accounts"><Wallet size={17}/> Accounts</a>
-          <a href="/dashboard/beneficiaries"><Contact size={17}/> Beneficiaries</a>
-          <a href="/dashboard/transfers"><ArrowUpRight size={17}/> Transfers</a>
-          <a href="/dashboard/cards"><CreditCard size={17}/> Cards</a>
-          <a href="/dashboard/transactions"><FileText size={17}/> Transactions</a>
+          <a className="active" href="/dashboard"><LayoutDashboard size={17}/> Overview</Link>
+          <Link href="/dashboard/accounts"><Wallet size={17}/> Accounts</Link>
+          <Link href="/dashboard/beneficiaries"><Contact size={17}/> Beneficiaries</Link>
+          <Link href="/dashboard/transfers"><ArrowUpRight size={17}/> Transfers</Link>
+          <Link href="/dashboard/cards"><CreditCard size={17}/> Cards</Link>
+          <Link href="/dashboard/transactions"><FileText size={17}/> Transactions</Link>
         </nav>
         <div className="sidebar-label sidebar-bottom-label">PREFERENCES</div>
         <nav className="dashboard-nav">
-          <a href="/dashboard/notifications"><Bell size={17}/> Notifications{Number(unreadCount ?? 0) > 0 && <span className="nav-count">{unreadCount}</span>}</a>
-          <a href="/dashboard/settings"><Settings size={17}/> Settings</a>
-          <a href="/dashboard/security"><ShieldCheck size={17}/> Security</a>
-          <a href="/dashboard/help"><HelpCircle size={17}/> Help centre</a>
+          <Link href="/dashboard/notifications"><Bell size={17}/> Notifications{Number(unreadCount ?? 0) > 0 && <span className="nav-count">{unreadCount}</span>}</Link>
+          <Link href="/dashboard/settings"><Settings size={17}/> Settings</Link>
+          <Link href="/dashboard/security"><ShieldCheck size={17}/> Security</Link>
+          <Link href="/dashboard/help"><HelpCircle size={17}/> Help centre</Link>
         </nav>
         <div className="sidebar-footer">
           <div className="avatar">{displayName.slice(0,1).toUpperCase()}</div>
