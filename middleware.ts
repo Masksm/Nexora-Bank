@@ -30,6 +30,8 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isCustomerArea = path.startsWith("/dashboard");
   const isAdminArea = path.startsWith("/admin");
+  const appMetadata = claims?.app_metadata as { role?: string } | undefined;
+  const isAdmin = appMetadata?.role === "admin";
 
   const redirectWithSession = (target: URL) => {
     const redirectResponse = NextResponse.redirect(target);
@@ -67,19 +69,24 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (isAdminArea) {
-    const appMetadata = claims?.app_metadata as { role?: string } | undefined;
-    if (appMetadata?.role !== "admin") {
-      const target = request.nextUrl.clone();
-      target.pathname = "/dashboard";
-      target.search = "";
-      return redirectWithSession(target);
-    }
+  // Keep the customer and administrator experiences separate.
+  if (isAdminArea && !isAdmin) {
+    const target = request.nextUrl.clone();
+    target.pathname = "/dashboard";
+    target.search = "";
+    return redirectWithSession(target);
+  }
+
+  if (isCustomerArea && isAdmin) {
+    const target = request.nextUrl.clone();
+    target.pathname = "/admin";
+    target.search = "";
+    return redirectWithSession(target);
   }
 
   if (claims && (path === "/login" || path === "/register")) {
     const target = request.nextUrl.clone();
-    target.pathname = "/dashboard";
+    target.pathname = isAdmin ? "/admin" : "/dashboard";
     target.search = "";
     return redirectWithSession(target);
   }
