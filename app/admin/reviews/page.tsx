@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Check, ShieldAlert, ShieldCheck, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { reviewTransfer, setDeviceTrust } from "../actions";
+import { reviewTransfer, setDeviceTrust, revokeUserSession } from "../actions";
 
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ kind?: string; message?: string }> };
@@ -17,9 +17,10 @@ export default async function AdminReviewsPage({searchParams}:Props) {
   const {data:claims,error:claimsError}=await supabase.auth.getClaims();
   const meta=claims?.claims?.app_metadata as {role?:string}|undefined;
   if(!user||claimsError||meta?.role!=="admin") redirect("/login");
-  const [{data:pending},{data:devices},params]=await Promise.all([
+  const [{data:pending},{data:devices},{data:sessions},params]=await Promise.all([
     supabase.from("ledger_transactions").select("id,reference,description,metadata,created_at,status").eq("transaction_type","transfer").eq("status","pending").order("created_at",{ascending:true}),
     supabase.from("trusted_devices").select("id,user_id,device_label,user_agent,ip_address,is_trusted,first_seen_at,last_seen_at").order("last_seen_at",{ascending:false}).limit(100),
+    supabase.from("user_sessions").select("id,user_id,auth_session_id,device_label,ip_address,approximate_location,last_seen_at,created_at,revoked_at").order("last_seen_at",{ascending:false}).limit(100),
     searchParams,
   ]);
   const reviewItems=(pending??[]).filter((tx)=>Boolean((tx.metadata as {review_required?:boolean}).review_required));
@@ -44,6 +45,9 @@ export default async function AdminReviewsPage({searchParams}:Props) {
       </section>
       <section className="admin-panel admin-device-panel"><div className="admin-panel-heading"><div><span>DEVICE RECOGNITION</span><h2>Known and unfamiliar devices</h2></div><span>{devices?.length??0} devices</span></div>
         {!devices?.length?<p className="admin-empty">No device sign-ins have been recorded yet. Device records are created after the next successful login.</p>:<div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Device</th><th>Customer ID</th><th>Last seen</th><th>Trust</th><th>Control</th></tr></thead><tbody>{devices.map(d=><tr key={d.id}><td><strong>{d.device_label}</strong><small>{d.ip_address??"IP unavailable"}</small></td><td><code>{d.user_id.slice(0,8)}…</code></td><td>{new Date(d.last_seen_at).toLocaleString()}</td><td><span className={d.is_trusted?"admin-status active":"admin-status blocked"}>{d.is_trusted?"Trusted":"Untrusted"}</span></td><td><form action={setDeviceTrust} className="admin-inline-form"><input type="hidden" name="device_id" value={d.id}/><input type="hidden" name="trusted" value={d.is_trusted?"false":"true"}/><input name="reason" aria-label="Reason" placeholder="Reason (8+ chars)" minLength={8} required/><button type="submit" className="secondary">{d.is_trusted?"Revoke":"Trust device"}</button></form></td></tr>)}</tbody></table></div>}
+      </section>
+      <section className="admin-panel admin-device-panel"><div className="admin-panel-heading"><div><span>SESSION MANAGEMENT</span><h2>Customer sessions</h2></div><span>{(sessions??[]).filter(s=>!s.revoked_at).length} active records</span></div>
+        {!sessions?.length?<p className="admin-empty">No session records have been captured yet.</p>:<div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Device and location</th><th>Customer ID</th><th>Last seen</th><th>Session</th><th>Action</th></tr></thead><tbody>{sessions.map(s=><tr key={s.id}><td><strong>{s.device_label??"Unknown device"}</strong><small>{s.ip_address??"IP unavailable"} · {s.approximate_location??"Location unavailable"}</small></td><td><code>{s.user_id.slice(0,8)}…</code></td><td>{new Date(s.last_seen_at).toLocaleString()}</td><td><span className={s.revoked_at?"admin-status blocked":"admin-status active"}>{s.revoked_at?"Revoked":"Active"}</span></td><td>{!s.revoked_at&&<form action={revokeUserSession} className="admin-inline-form"><input type="hidden" name="session_id" value={s.id}/><input name="reason" aria-label="Revocation reason" placeholder="Reason (8+ chars)" minLength={8} required/><button type="submit" className="secondary">Revoke session</button></form>}</td></tr>)}</tbody></table></div>}
       </section>
       <p className="admin-disclaimer">Transfers from an unrecognized device remain pending and do not affect account balances until an administrator approves them. Device recognition is based on a persistent browser identifier and user-agent, not biometric identity verification.</p>
     </section>
