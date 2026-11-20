@@ -3,6 +3,7 @@ import "./globals.css";
 import "./auth.css";
 import "./dashboard/dashboard.css";
 import "./dashboard/workspace.css";
+import "./admin/admin.css";
 
 export const metadata: Metadata = {
   title: "Nexora Bank | Banking, made clear",
