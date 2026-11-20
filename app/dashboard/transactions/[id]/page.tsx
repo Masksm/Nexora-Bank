@@ -35,7 +35,7 @@ export default async function TransactionReceiptPage({ params }: Props) {
   const accountById = new Map((accounts ?? []).map(account => [account.id, account]));
   const total = entries.reduce((sum, entry) => sum + Number(entry.amount_minor), 0);
   const incoming = entries.some(entry => Number(entry.amount_minor) > 0);
-  const metadata = transaction.metadata as { review_required?: boolean; synthetic_demo?: boolean } | null;
+  const metadata = transaction.metadata as { review_required?: boolean } | null;
   const review = metadata?.review_required === true;
   const statusLabel = review ? "Under review" : transaction.status.replaceAll("_", " ");
 
