@@ -7,3 +7,5 @@
 .admin-search{display:flex;gap:8px;padding:13px 17px;border-bottom:1px solid #edf1ed}.admin-search input{flex:1;min-width:0;height:35px;padding:0 10px;border:1px solid #e3eae4;border-radius:4px;font-size:10px}.admin-search button{padding:0 13px;color:#fff;background:#174d40;border:0;border-radius:4px;font-size:9px;font-weight:700}
 
 .admin-sidebar-foot form{margin-left:auto}.admin-logout-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 10px;color:#eaf2eb;background:#245548;border:1px solid #426b5e;border-radius:5px;font:600 10px 'DM Sans',sans-serif;cursor:pointer}.admin-logout-button:hover{background:#326758}
+
+.admin-form button.admin-danger-button{color:#fff;background:#9a493e}.admin-form button.admin-danger-button:hover{background:#7f382f}.admin-danger-warning{color:#a14f43;font-size:9px;line-height:1.65}
