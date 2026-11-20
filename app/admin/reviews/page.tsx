@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Check, ShieldAlert, ShieldCheck, X } from "lucide-react";
+import { ArrowLeft, Check, LogOut, ShieldAlert, ShieldCheck, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { signOut } from "@/app/auth/actions";
 import { reviewTransfer, setDeviceTrust, revokeUserSession } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +38,7 @@ export default async function AdminReviewsPage({searchParams}:Props) {
     else item.to=account?.account_number;
     entryMap.set(entry.transaction_id,item);
   }
-  return <main className="admin-shell"><aside className="admin-sidebar"><Link className="admin-brand" href="/admin"><span>N</span>NEXORA <i>ADMIN</i></Link><div className="admin-side-label">CONTROL CENTRE</div><nav><Link href="/admin">Overview</Link><Link className="selected" href="/admin/reviews">Security reviews</Link><Link href="/admin/support">Support inbox</Link></nav><div className="admin-sidebar-foot"><ShieldCheck size={16}/> Administrator session</div></aside>
+  return <main className="admin-shell"><aside className="admin-sidebar"><Link className="admin-brand" href="/admin"><span>N</span>NEXORA <i>ADMIN</i></Link><div className="admin-side-label">CONTROL CENTRE</div><nav><Link href="/admin">Overview</Link><Link className="selected" href="/admin/reviews">Security reviews</Link><Link href="/admin/support">Support inbox</Link></nav><div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>Administrator session</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> Sign out</button></form></div></aside>
     <section className="admin-main"><header className="admin-topbar"><div><span>ADMINISTRATION / SECURITY</span><h1>Security reviews</h1></div><Link href="/admin"><ArrowLeft size={15}/> Overview</Link></header>
       {params.message&&<div className={params.kind==="error"?"admin-alert error":"admin-alert success"}>{params.message}</div>}
       <section className="admin-panel admin-review-panel"><div className="admin-panel-heading"><div><span>TRANSFER MONITORING</span><h2>Transfers awaiting approval</h2></div><span>{reviewItems.length} pending</span></div>
