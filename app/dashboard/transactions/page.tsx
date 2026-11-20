@@ -1,59 +1,91 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowDownLeft, ArrowLeft, ArrowUpRight, Download, FileText } from "lucide-react";
+import { ArrowLeft, Download, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import TransactionHistory from "./transaction-history";
 
 export const dynamic = "force-dynamic";
-
-function money(amountMinor: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(Math.abs(amountMinor) / 100);
-}
 
 export default async function TransactionsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: accounts } = await supabase.from("bank_accounts").select("id,account_number").eq("user_id", user.id);
+  const { data: accounts, error: accountError } = await supabase
+    .from("bank_accounts").select("id,account_number").eq("user_id", user.id);
   const accountIds = (accounts ?? []).map((account) => account.id);
-  const { data: entries, error: entriesError } = accountIds.length
-    ? await supabase.from("ledger_entries").select("transaction_id,account_id,amount_minor,currency,created_at").in("account_id", accountIds).order("created_at", { ascending: false }).limit(100)
-    : { data: [], error: null };
-  const transactionIds = [...new Set((entries ?? []).map((entry) => entry.transaction_id))];
-  const { data: transactions, error: transactionsError } = transactionIds.length
-    ? await supabase.from("ledger_transactions").select("id,reference,transaction_type,status,description,created_at,posted_at,metadata").in("id", transactionIds).order("created_at", { ascending: false })
-    : { data: [], error: null };
+
+  // Read the ledger in pages. Supabase's default response cap must never silently
+  // turn a customer's older history into missing records.
+  const allEntries: Array<{ transaction_id: string; account_id: string; amount_minor: number; currency: string; created_at: string }> = [];
+  let entriesError: unknown = accountError;
+  if (!accountError && accountIds.length) {
+    const pageSize = 1000;
+    for (let offset = 0; ; offset += pageSize) {
+      const { data, error } = await supabase.from("ledger_entries")
+        .select("transaction_id,account_id,amount_minor,currency,created_at")
+        .in("account_id", accountIds)
+        .order("created_at", { ascending: false })
+        .order("transaction_id", { ascending: false })
+        .range(offset, offset + pageSize - 1);
+      if (error) { entriesError = error; break; }
+      allEntries.push(...(data ?? []));
+      if (!data || data.length < pageSize) break;
+    }
+  }
+
+  const transactionIds = [...new Set(allEntries.map((entry) => entry.transaction_id))];
+  const allTransactions: Array<{
+    id: string; reference: string; transaction_type: string; status: string;
+    description: string | null; created_at: string; metadata: { synthetic_demo?: boolean; review_required?: boolean } | null;
+  }> = [];
+  let transactionsError: unknown = null;
+  // Chunk .in() requests to avoid oversized PostgREST URLs for long histories.
+  for (let offset = 0; offset < transactionIds.length; offset += 300) {
+    const batch = transactionIds.slice(offset, offset + 300);
+    const { data, error } = await supabase.from("ledger_transactions")
+      .select("id,reference,transaction_type,status,description,created_at,metadata")
+      .in("id", batch);
+    if (error) { transactionsError = error; break; }
+    allTransactions.push(...(data ?? []));
+  }
 
   const entryByTransaction = new Map<string, { amount_minor: number; currency: string }>();
-  for (const entry of entries ?? []) {
+  for (const entry of allEntries) {
     const current = entryByTransaction.get(entry.transaction_id);
     if (!current || Math.abs(Number(entry.amount_minor)) > Math.abs(current.amount_minor)) {
       entryByTransaction.set(entry.transaction_id, { amount_minor: Number(entry.amount_minor), currency: entry.currency });
     }
   }
+
   const failed = Boolean(entriesError || transactionsError);
+  const history = allTransactions
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .map((transaction) => {
+      const entry = entryByTransaction.get(transaction.id);
+      return {
+        id: transaction.id,
+        reference: transaction.reference,
+        transaction_type: transaction.transaction_type,
+        status: transaction.status,
+        description: transaction.description,
+        created_at: transaction.created_at,
+        synthetic_demo: transaction.metadata?.synthetic_demo === true,
+        review_required: transaction.metadata?.review_required === true,
+        amount_minor: entry?.amount_minor ?? 0,
+        currency: entry?.currency ?? "USD",
+      };
+    });
 
   return (
     <main className="workspace-shell">
       <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link><span className="workspace-overline">NEXORA BANK · PERSONAL</span></header>
-      <section className="workspace-intro"><div><span className="workspace-kicker">A CLEAR RECORD</span><h1>Transactions</h1><p>Review activity recorded against your accounts.</p></div></section>
+      <section className="workspace-intro"><div><span className="workspace-kicker">A CLEAR RECORD</span><h1>Transactions</h1><p>Review all activity recorded against your accounts.</p></div></section>
       <section className="workspace-panel">
-        <div className="workspace-panel-heading"><div><span className="workspace-kicker">ACCOUNT ACTIVITY</span><h2>Recent transactions</h2></div><div className="transaction-tools"><span className="workspace-count">{transactions?.length ?? 0} records</span><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> Export CSV</Link></div></div>
-        {failed ? <div className="workspace-alert">We couldn’t load transaction activity. Please refresh and try again.</div> :
-          (transactions ?? []).length === 0 ? <div className="workspace-empty"><FileText size={25}/><h2>No transactions yet</h2><p>Once a transaction is posted, it will appear here.</p></div> :
-          <div className="transaction-list">
-            {(transactions ?? []).map((transaction) => {
-              const entry = entryByTransaction.get(transaction.id);
-              const amount = entry?.amount_minor ?? 0;
-              const incoming = amount > 0;
-              const isReview = (transaction.metadata as { review_required?: boolean } | null)?.review_required === true;
-              return <Link href={`/dashboard/transactions/${transaction.id}`} className="transaction-row transaction-row-link" key={transaction.id}>
-                <span className={incoming ? "transaction-icon incoming" : "transaction-icon"}>{incoming ? <ArrowDownLeft size={18}/> : <ArrowUpRight size={18}/>}</span>
-                <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}{(transaction.metadata as { synthetic_demo?: boolean } | null)?.synthetic_demo ? " · Synthetic demo activity" : ""}</span></div>
-                <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + (isReview ? "review" : transaction.status)}>{isReview ? "Under review" : transaction.status}</span></div>
-              </Link>;
-            })}
-          </div>}
+        <div className="workspace-panel-heading"><div><span className="workspace-kicker">ACCOUNT ACTIVITY</span><h2>Transaction history</h2></div><div className="transaction-tools"><span className="workspace-count">{history.length} records</span><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> Export CSV</Link></div></div>
+        {failed ? <div className="workspace-alert">We couldn’t load the complete transaction history. Please refresh and try again.</div> :
+          history.length === 0 ? <div className="workspace-empty"><FileText size={25}/><h2>No transactions yet</h2><p>Once a transaction is posted, it will appear here.</p></div> :
+          <TransactionHistory transactions={history}/>}
       </section>
       <p className="workspace-disclaimer">This history reflects internal ledger activity only. It is not a bank statement or proof of real-world payment.</p>
     </main>
