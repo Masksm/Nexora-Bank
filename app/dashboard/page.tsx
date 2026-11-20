@@ -24,8 +24,7 @@ export default async function DashboardPage() {
     supabase.from("profiles").select("first_name,last_name,display_name").eq("user_id", user.id).maybeSingle(),
     supabase.from("account_balances")
       .select("account_id,account_number,account_name,account_type,currency,status,balance_minor")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: true }),
+      .eq("user_id", user.id),
   ]);
 
   const displayName = profile?.display_name ||
