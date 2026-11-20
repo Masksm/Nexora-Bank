@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 function safeNext(value: FormDataEntryValue | null) {
   const path = typeof value === "string" ? value : "";
-  return path.startsWith("/") && !path.startsWith("//") ? path : "/dashboard";
+  return path.startsWith("/") && !path.startsWith("//") && !path.includes("\\") ? path : "/dashboard";
 }
 
 const validEmail = (email: string) => /^\S+@\S+\.\S+$/.test(email);
