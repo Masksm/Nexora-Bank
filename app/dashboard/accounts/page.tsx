@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Copy, Wallet } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Wallet } from "lucide-react";
+import { CopyButton } from "../copy-button";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +39,7 @@ export default async function AccountsPage() {
               <div className="account-detail-top"><span className="account-detail-icon"><Wallet size={20}/></span><span className={account.status === "active" ? "account-status" : "account-status inactive"}>{account.status}</span></div>
               <div className="account-detail-name"><span>{account.account_type} ACCOUNT</span><h2>{account.account_name}</h2></div>
               <strong className="account-detail-balance">{money(Number(account.balance_minor), account.currency)}</strong>
-              <div className="account-number-line"><div><span>ACCOUNT NUMBER</span><strong>{account.account_number}</strong></div><button type="button" aria-label="Account number is shown above" disabled><Copy size={15}/></button></div>
+              <div className="account-number-line"><div><span>ACCOUNT NUMBER</span><strong>{account.account_number}</strong></div><CopyButton value={account.account_number}/></div>
               <div className="account-detail-foot"><span>{account.currency} · {account.account_type}</span><Link href="/dashboard/transfers">Make a transfer <ArrowUpRight size={14}/></Link></div>
             </article>
           ))}
