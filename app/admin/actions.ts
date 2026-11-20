@@ -158,3 +158,16 @@ export async function updateSupportStatus(formData: FormData) {
   revalidatePath("/admin/support");
   resultUrl("success", "Support status updated.");
 }
+
+export async function revokeUserSession(formData: FormData) {
+  const supabase = await requireAdmin();
+  const sessionId = String(formData.get("session_id") || "");
+  const reason = String(formData.get("reason") || "").trim();
+  if (!sessionId || reason.length < 8) resultUrl("error", "Select a session and provide a reason of at least 8 characters.");
+  const { error } = await supabase.rpc("admin_revoke_user_session", {
+    p_session_record_id: sessionId, p_reason: reason,
+  });
+  if (error) resultUrl("error", error.message);
+  revalidatePath("/admin/reviews");
+  resultUrl("success", "Session revoked. The affected user will be signed out on their next protected request.");
+}
