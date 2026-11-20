@@ -40,7 +40,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       </aside>
       <section className="admin-main">
         <header className="admin-topbar"><div><span>ADMINISTRATION / OVERVIEW</span><h1>Control centre</h1></div></header>
-        <div className="admin-welcome"><div><span>SECURE ADMINISTRATION</span><h2>Bank operations</h2><p>Manage customer accounts and internal demo-ledger activity.</p></div><div className="admin-identity"><ShieldCheck size={18}/><span>{user.email}<small>Administrator</small></span></div></div>
+        <div className="admin-welcome"><div><span>SECURE ADMINISTRATION</span><h2>Bank operations</h2><p>Manage customer accounts and ledger operations.</p></div><div className="admin-identity"><ShieldCheck size={18}/><span>{user.email}<small>Administrator</small></span></div></div>
         {params.message && <div className={params.kind === "error" ? "admin-alert error" : "admin-alert success"}>{params.message}</div>}
         <section className="admin-stats">
           <article><span><Users size={17}/> CUSTOMER ACCOUNTS</span><strong>{rows.length}</strong><small>Accounts in the ledger</small></article>
@@ -64,32 +64,32 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
             <form action={adjustBalance} className="admin-form">
               <label>Customer account<select name="account_id" required defaultValue=""><option value="" disabled>Select an account</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} · {money(Number(row.balance_minor))}</option>)}</select></label>
               <div className="admin-form-grid"><label>Operation<select name="direction" defaultValue="credit"><option value="credit">Credit / money in</option><option value="debit">Debit / money out</option></select></label><label>Amount (USD)<input name="amount" type="number" min="0.01" step="0.01" placeholder="2500.00" required/></label></div>
-              <label>Source or reason<input name="reason" minLength={8} maxLength={240} placeholder="e.g. Demo funding allocation" required/></label>
+              <label>Source or reason<input name="reason" minLength={8} maxLength={240} placeholder="e.g. Account funding adjustment" required/></label>
               <button type="submit" disabled={!rows.length}>Post ledger adjustment</button>
             </form>
           </article>
 
           <article className="admin-panel">
-            <div className="admin-panel-heading"><div><span>SYNTHETIC HISTORY BUILDER</span><h2>Generate demo activity</h2></div><Activity size={18}/></div>
-            <p className="admin-help">Creates the selected number of clearly labelled historical transactions, including the opening balance. Credits and debits use independently randomized amounts and descriptions. Total incoming and outgoing activity is balanced, so the final balance remains exactly at the target.</p>
+            <div className="admin-panel-heading"><div><span>ACCOUNT HISTORY MANAGEMENT</span><h2>Generate account activity</h2></div><Activity size={18}/></div>
+            <p className="admin-help">Creates the selected number of historical transactions, including the opening balance. Credits and debits use independently randomized amounts and descriptions. Total incoming and outgoing activity is balanced, so the final balance remains exactly at the target.</p>
             <form action={generateDemoHistory} className="admin-form">
               <label>Empty customer account<select name="account_id" required defaultValue=""><option value="" disabled>Select an account</option>{rows.filter((row)=>Number(row.balance_minor)===0).map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name}</option>)}</select></label>
               <label>Target opening and final balance (USD)<input name="target_amount" type="number" min="0.01" step="0.01" placeholder="100000000.00" required/></label>
               <div className="admin-form-grid"><label>History begins<select name="start_year" defaultValue="2019">{Array.from({length:new Date().getFullYear()-2019+1},(_,i)=>2019+i).map((year)=><option key={year} value={year}>{year}</option>)}</select></label><label>Total transactions<select name="transactions" defaultValue="100"><option value="50">50 transactions</option><option value="100">100 transactions</option><option value="150">150 transactions</option><option value="200">200 transactions</option><option value="250">250 transactions</option></select></label></div>
-              <button type="submit" className="secondary" disabled={!rows.some((row)=>Number(row.balance_minor)===0)}>Generate synthetic history</button>
-              <small className="admin-warning">This action requires an empty account. It cannot overwrite existing transactions. Synthetic activity is marked in ledger metadata and audit logs.</small>
+              <button type="submit" className="secondary" disabled={!rows.some((row)=>Number(row.balance_minor)===0)}>Generate account history</button>
+              <small className="admin-warning">This action requires an empty account. It cannot overwrite existing transactions. Generated activity is tracked in internal ledger metadata and audit logs.</small>
             </form>
           </article>
 
           <article className="admin-panel">
-            <div className="admin-panel-heading"><div><span>DEMO DATA MAINTENANCE</span><h2>Reset generated account history</h2></div><RotateCcw size={18}/></div>
-            <p className="admin-help">Permanently removes the selected account’s generated synthetic transactions and restores its balance to zero. Real customer transactions are protected: if the account contains any non-demo activity, the reset is rejected without changing anything.</p>
+            <div className="admin-panel-heading"><div><span>ACCOUNT HISTORY MANAGEMENT</span><h2>Clear account history</h2></div><RotateCcw size={18}/></div>
+            <p className="admin-help">Permanently removes eligible generated transactions from the selected account and restores its balance to zero. Other transaction records are protected. If the account contains activity that is not eligible for removal, the operation is rejected without changing anything.</p>
             <form action={resetDemoHistory} className="admin-form">
               <label>Account to reset<select name="account_id" required defaultValue=""><option value="" disabled>Select an account</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} · {money(Number(row.balance_minor))}</option>)}</select></label>
               <label>Confirm by entering the exact 10-digit account number<input name="confirm_account_number" inputMode="numeric" pattern="[0-9]{10}" minLength={10} maxLength={10} placeholder="Enter account number" required/></label>
-              <label>Reason for reset<input name="reason" minLength={8} maxLength={240} placeholder="e.g. Rebuild synthetic demo history" required/></label>
-              <button type="submit" className="admin-danger-button" disabled={!rows.length}>Permanently reset generated history</button>
-              <small className="admin-danger-warning">Irreversible. Only transactions marked as synthetic demo history can be removed. The action is recorded in the administrator audit log.</small>
+              <label>Reason for reset<input name="reason" minLength={8} maxLength={240} placeholder="e.g. Rebuild account history" required/></label>
+              <button type="submit" className="admin-danger-button" disabled={!rows.length}>Permanently clear eligible history</button>
+              <small className="admin-danger-warning">Irreversible. Only eligible generated transactions can be removed. The action is recorded in the administrator audit log.</small>
             </form>
           </article>
 
@@ -103,7 +103,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
             </form>
           </article>
         </section>
-        <footer className="admin-disclaimer">Nexora is a portfolio simulation. All balances and generated transactions are synthetic internal ledger records, not real money or bank services.</footer>
+
       </section>
     </main>
   );
