@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./auth.css";
+import "./dashboard/dashboard.css";
 
 export const metadata: Metadata = {
   title: "Nexora Bank | Banking, made clear",
