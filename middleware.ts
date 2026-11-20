@@ -51,6 +51,22 @@ export async function middleware(request: NextRequest) {
     return redirectWithSession(target);
   }
 
+  if ((isCustomerArea || isAdminArea) && claims?.session_id && claims?.sub) {
+    const { data: sessionRecord } = await supabase
+      .from("user_sessions")
+      .select("revoked_at")
+      .eq("auth_session_id", String(claims.session_id))
+      .eq("user_id", String(claims.sub))
+      .maybeSingle();
+    if (sessionRecord?.revoked_at) {
+      await supabase.auth.signOut({ scope: "local" });
+      const target = request.nextUrl.clone();
+      target.pathname = "/login";
+      target.search = "?error=This%20session%20has%20been%20revoked.%20Please%20sign%20in%20again.";
+      return redirectWithSession(target);
+    }
+  }
+
   if (isAdminArea) {
     const appMetadata = claims?.app_metadata as { role?: string } | undefined;
     if (appMetadata?.role !== "admin") {
