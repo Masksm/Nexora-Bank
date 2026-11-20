@@ -22,7 +22,7 @@ export default async function LoginPage({ searchParams }: Props) {
           <button className="auth-submit" type="submit">Sign in <span>↗</span></button>
         </form>
         <p className="auth-switch">New to Nexora? <Link href="/register">Create an account</Link></p>
-        <p className="auth-footnote">Nexora is a portfolio banking application. No real funds are held or transferred.</p>
+      
       </div>
       <aside className="auth-aside"><div className="auth-aside-mark">N</div><p>Banking should feel<br /><em>clear, calm and in control.</em></p><span>THE NEXORA EXPERIENCE</span></aside>
     </main>
