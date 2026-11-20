@@ -71,7 +71,13 @@ export async function generateDemoHistory(formData: FormData) {
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/transactions");
   } catch (error) {
-    resultUrl("error", error instanceof Error ? error.message : "Demo history could not be generated.");
+    const details = error instanceof Error
+      ? error.message
+      : typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message: unknown }).message)
+        : "Unknown database error.";
+    console.error("Demo history generation failed:", error);
+    resultUrl("error", details.slice(0, 500));
   }
   resultUrl("success", "Synthetic historical activity generated. The account balance matches the target.");
 }
