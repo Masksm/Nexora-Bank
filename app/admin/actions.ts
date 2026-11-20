@@ -97,3 +97,64 @@ export async function setAccountStatus(formData: FormData) {
   }
   resultUrl("success", "Account status updated.");
 }
+
+export async function reviewTransfer(formData: FormData) {
+  const supabase = await requireAdmin();
+  const transactionId = String(formData.get("transaction_id") || "");
+  const decision = String(formData.get("decision") || "");
+  const reason = String(formData.get("reason") || "").trim();
+  if (!transactionId || !["approve","reject"].includes(decision) || reason.length < 8) {
+    resultUrl("error", "Choose a decision and provide a reason of at least 8 characters.");
+  }
+  const { error } = await supabase.rpc("admin_review_transfer", {
+    p_transaction_id: transactionId, p_decision: decision, p_reason: reason,
+  });
+  if (error) resultUrl("error", error.message);
+  revalidatePath("/admin");
+  revalidatePath("/admin/reviews");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/transactions");
+  resultUrl("success", decision === "approve" ? "Transfer approved and posted." : "Transfer rejected.");
+}
+
+export async function setDeviceTrust(formData: FormData) {
+  const supabase = await requireAdmin();
+  const deviceId = String(formData.get("device_id") || "");
+  const trusted = String(formData.get("trusted") || "") === "true";
+  const reason = String(formData.get("reason") || "").trim();
+  if (!deviceId || reason.length < 8) resultUrl("error", "A device and a reason of at least 8 characters are required.");
+  const { error } = await supabase.rpc("admin_set_device_trust", {
+    p_device_id: deviceId, p_trusted: trusted, p_reason: reason,
+  });
+  if (error) resultUrl("error", error.message);
+  revalidatePath("/admin/reviews");
+  resultUrl("success", trusted ? "Device marked as trusted." : "Device trust revoked.");
+}
+
+export async function adminReplySupport(formData: FormData) {
+  const supabase = await requireAdmin();
+  const conversationId = String(formData.get("conversation_id") || "");
+  const body = String(formData.get("body") || "").trim().slice(0,4000);
+  if (!conversationId || !body) resultUrl("error", "Enter a reply.");
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { error } = await supabase.from("support_messages").insert({
+    conversation_id: conversationId, sender_user_id: user.id, sender_role: "admin", body,
+  });
+  if (error) resultUrl("error", error.message);
+  revalidatePath("/admin/support");
+  resultUrl("success", "Reply sent to the customer.");
+}
+
+export async function updateSupportStatus(formData: FormData) {
+  const supabase = await requireAdmin();
+  const conversationId = String(formData.get("conversation_id") || "");
+  const status = String(formData.get("status") || "");
+  if (!conversationId || !["open","waiting_customer","waiting_admin","resolved","closed"].includes(status)) {
+    resultUrl("error", "Choose a valid support status.");
+  }
+  const { error } = await supabase.from("support_conversations").update({ status, updated_at: new Date().toISOString() }).eq("id", conversationId);
+  if (error) resultUrl("error", error.message);
+  revalidatePath("/admin/support");
+  resultUrl("success", "Support status updated.");
+}
