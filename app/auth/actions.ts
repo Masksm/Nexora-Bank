@@ -1,5 +1,7 @@
 "use server";
 
+import { createHash, randomUUID } from "node:crypto";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,6 +11,12 @@ function safeNext(value: FormDataEntryValue | null) {
 }
 
 const validEmail = (email: string) => /^\S+@\S+\.\S+$/.test(email);
+
+function deviceLabel(userAgent: string) {
+  const browser = /Edg\//.test(userAgent) ? "Microsoft Edge" : /Firefox\//.test(userAgent) ? "Firefox" : /Chrome\//.test(userAgent) ? "Chrome" : /Safari\//.test(userAgent) ? "Safari" : "Unknown browser";
+  const platform = /iPhone|iPad/.test(userAgent) ? "Apple mobile device" : /Android/.test(userAgent) ? "Android device" : /Windows/.test(userAgent) ? "Windows computer" : /Mac OS/.test(userAgent) ? "Mac computer" : /Linux/.test(userAgent) ? "Linux computer" : "Unknown device";
+  return `${platform} · ${browser}`;
+}
 
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
@@ -22,6 +30,28 @@ export async function signIn(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) redirect("/login?error=Unable%20to%20sign%20in.%20Check%20your%20details.");
+
+  try {
+    const cookieStore = await cookies();
+    const requestHeaders = await headers();
+    const existingDeviceId = cookieStore.get("nexora_device_id")?.value;
+    const deviceId = existingDeviceId && /^[a-f0-9-]{36}$/i.test(existingDeviceId) ? existingDeviceId : randomUUID();
+    cookieStore.set("nexora_device_id", deviceId, {
+      httpOnly: true, secure: process.env.NODE_ENV === "production",
+      sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365,
+    });
+    const userAgent = (requestHeaders.get("user-agent") || "Unknown user agent").slice(0, 1000);
+    const fingerprint = createHash("sha256").update(`${deviceId}|${userAgent}`).digest("hex");
+    const ipAddress = (requestHeaders.get("x-forwarded-for") || "").split(",")[0].trim();
+    await supabase.rpc("record_login_context", {
+      p_fingerprint: fingerprint,
+      p_device_label: deviceLabel(userAgent),
+      p_user_agent: userAgent,
+      p_ip_address: ipAddress || null,
+    });
+  } catch {
+    // The login remains valid. Transfers fail closed into manual review if no trusted session record exists.
+  }
   redirect(next);
 }
 
