@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -29,15 +30,15 @@ export default function Home() {
   return (
     <main>
       <nav className="nav shell">
-        <a className="brand" href="/" aria-label="Nexora Bank home">
+        <Link className="brand" href="/" aria-label="Nexora Bank home">
           <span className="brand-mark">N</span>
           <span>NEXORA<span className="brand-light"> BANK</span></span>
-        </a>
+        </Link>
         <div className="nav-links">
-          <a href="#experience">Experience</a>
-          <a href="#security">Security</a>
+          <Link href="#experience">Experience</Link>
+          <Link href="#security">Security</Link>
         </div>
-        <a className="nav-cta" href="/login">Sign in <ArrowUpRight size={16} /></a>
+        <Link className="nav-cta" href="/login">Sign in <ArrowUpRight size={16} /></Link>
       </nav>
 
       <section className="hero shell">
@@ -49,8 +50,8 @@ export default function Home() {
             confidence at the centre of every interaction.
           </p>
           <div className="hero-actions">
-            <a className="button-primary" href="/register">Open an account <ArrowRight size={17} /></a>
-            <a className="text-link" href="#experience">Explore Nexora <ArrowUpRight size={16} /></a>
+            <Link className="button-primary" href="/register">Open an account <ArrowRight size={17} /></Link>
+            <Link className="text-link" href="#experience">Explore Nexora <ArrowUpRight size={16} /></Link>
           </div>
           <div className="trust-note"><ShieldCheck size={16} /> Designed around privacy and control</div>
         </div>
@@ -99,7 +100,7 @@ export default function Home() {
       </section>
 
       <footer className="footer shell">
-        <a className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></a>
+        <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
         <span>© {new Date().getFullYear()} Nexora Bank. A digital banking experience.</span>
         <span className="footer-note">Portfolio software · Internal ledger simulation</span>
       </footer>
