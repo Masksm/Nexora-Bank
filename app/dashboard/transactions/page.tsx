@@ -37,7 +37,7 @@ export default async function TransactionsPage() {
   const transactionIds = [...new Set(allEntries.map((entry) => entry.transaction_id))];
   const allTransactions: Array<{
     id: string; reference: string; transaction_type: string; status: string;
-    description: string | null; created_at: string; metadata: { synthetic_demo?: boolean; review_required?: boolean } | null;
+    description: string | null; created_at: string; metadata: { review_required?: boolean } | null;
   }> = [];
   let transactionsError: unknown = null;
   // Chunk .in() requests to avoid oversized PostgREST URLs for long histories.
@@ -70,8 +70,7 @@ export default async function TransactionsPage() {
         status: transaction.status,
         description: transaction.description,
         created_at: transaction.created_at,
-        synthetic_demo: transaction.metadata?.synthetic_demo === true,
-        review_required: transaction.metadata?.review_required === true,
+            review_required: transaction.metadata?.review_required === true,
         amount_minor: entry?.amount_minor ?? 0,
         currency: entry?.currency ?? "USD",
       };
