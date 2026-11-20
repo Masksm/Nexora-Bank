@@ -67,6 +67,13 @@ export async function middleware(request: NextRequest) {
       target.search = "?error=This%20session%20has%20been%20revoked.%20Please%20sign%20in%20again.";
       return redirectWithSession(target);
     }
+
+    // Refresh activity timestamps for this exact authenticated session and
+    // its recognized device. The database function can only touch timestamps.
+    const { error: activityError } = await supabase.rpc("touch_session_activity");
+    if (activityError) {
+      console.error("Nexora session activity update failed:", activityError.code || "UNKNOWN");
+    }
   }
 
   // Keep the customer and administrator experiences separate.
