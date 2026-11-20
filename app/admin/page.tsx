@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Activity, ArrowUpFromLine, ShieldCheck, Users, Wallet } from "lucide-react";
+import { Activity, ArrowUpFromLine, LogOut, ShieldCheck, Users, Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { adjustBalance, generateDemoHistory, setAccountStatus } from "./actions";
+import { signOut } from "@/app/auth/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         <Link className="admin-brand" href="/"><span>N</span>NEXORA <i>ADMIN</i></Link>
         <div className="admin-side-label">CONTROL CENTRE</div>
         <nav><Link className="selected" href="/admin"><Activity size={17}/> Overview</Link><a href="#customers"><Users size={17}/> Customers</a><a href="#ledger"><Wallet size={17}/> Ledger operations</a><Link href="/admin/reviews">Security reviews</Link><Link href="/admin/support">Support inbox</Link><Link href="/admin/audit">Audit log</Link></nav>
-        <div className="admin-sidebar-foot"><ShieldCheck size={16}/> Administrator session</div>
+        <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>Administrator session</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> Sign out</button></form></div>
       </aside>
       <section className="admin-main">
         <header className="admin-topbar"><div><span>ADMINISTRATION / OVERVIEW</span><h1>Control centre</h1></div></header>
