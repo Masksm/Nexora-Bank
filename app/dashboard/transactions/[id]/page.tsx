@@ -50,10 +50,10 @@ export default async function TransactionReceiptPage({ params }: Props) {
         <div><span>TRANSACTION TYPE</span><strong>{transaction.transaction_type.replaceAll("_", " ")}</strong></div>
         <div><span>DATE & TIME</span><strong>{new Date(transaction.created_at).toLocaleString("en-US")}</strong></div>
         <div><span>STATUS</span><strong className="receipt-capitalize">{statusLabel}</strong></div>
-        {metadata?.synthetic_demo && <div><span>RECORD TYPE</span><strong>Sample historical activity</strong></div>}
+
       </div>
       <div className="receipt-ledger"><div className="receipt-ledger-heading"><FileText size={15}/> ACCOUNT ENTRIES</div>{entries.map((entry,index)=>{const account=accountById.get(entry.account_id);const amount=Number(entry.amount_minor);return <div className="receipt-ledger-row" key={index}><div><strong>{account?.account_name ?? "Account"}</strong><span>Account ending {account?.account_number?.slice(-4) ?? "••••"}</span></div><strong className={amount>0?"positive":""}>{amount>0?"+":"−"}{money(amount,entry.currency)}</strong></div>})}</div>
-      <p className="receipt-footnote">This is a Nexora internal ledger record, not proof of a real-world bank payment or settlement.</p>
+
     </article>
   </main>;
 }
