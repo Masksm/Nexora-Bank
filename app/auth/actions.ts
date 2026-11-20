@@ -43,11 +43,16 @@ export async function signIn(formData: FormData) {
     const userAgent = (requestHeaders.get("user-agent") || "Unknown user agent").slice(0, 1000);
     const fingerprint = createHash("sha256").update(`${deviceId}|${userAgent}`).digest("hex");
     const ipAddress = (requestHeaders.get("x-forwarded-for") || "").split(",")[0].trim();
-    await supabase.rpc("record_login_context", {
+    const city = requestHeaders.get("x-vercel-ip-city");
+    const region = requestHeaders.get("x-vercel-ip-country-region");
+    const country = requestHeaders.get("x-vercel-ip-country");
+    const location = [city, region, country].filter(Boolean).join(", ").slice(0, 120);
+    await supabase.rpc("record_login_context_v2", {
       p_fingerprint: fingerprint,
       p_device_label: deviceLabel(userAgent),
       p_user_agent: userAgent,
       p_ip_address: ipAddress || null,
+      p_approximate_location: location || null,
     });
   } catch {
     // The login remains valid. Transfers fail closed into manual review if no trusted session record exists.
