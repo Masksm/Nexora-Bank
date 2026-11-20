@@ -42,17 +42,38 @@ export default async function DashboardPage() {
     sum + (account.currency === "USD" ? Number(account.balance_minor ?? 0) : 0), 0);
   const accountIds = (accounts ?? []).map(account => account.account_id);
 
-  const { data: entries, error: entriesError } = accountIds.length
-    ? await supabase.from("ledger_entries")
-      .select("transaction_id,account_id,amount_minor,currency,created_at")
-      .in("account_id", accountIds).order("created_at", { ascending: false }).limit(100)
-    : { data: [], error: null };
-  const transactionIds = [...new Set((entries ?? []).map(entry => entry.transaction_id))];
-  const { data: transactions, error: transactionsError } = transactionIds.length
-    ? await supabase.from("ledger_transactions")
+  // Load the complete account ledger in bounded pages. The dashboard's monthly
+  // totals must not silently become inaccurate after the first 100 records.
+  const entries: Array<{ transaction_id: string; account_id: string; amount_minor: number; currency: string; created_at: string }> = [];
+  let entriesError: unknown = null;
+  if (accountIds.length) {
+    const pageSize = 1000;
+    for (let offset = 0; ; offset += pageSize) {
+      const { data, error } = await supabase.from("ledger_entries")
+        .select("transaction_id,account_id,amount_minor,currency,created_at")
+        .in("account_id", accountIds)
+        .order("created_at", { ascending: false })
+        .order("transaction_id", { ascending: false })
+        .range(offset, offset + pageSize - 1);
+      if (error) { entriesError = error; break; }
+      entries.push(...(data ?? []));
+      if (!data || data.length < pageSize) break;
+    }
+  }
+
+  const transactionIds = [...new Set(entries.map(entry => entry.transaction_id))];
+  const transactions: Array<{ id: string; reference: string; transaction_type: string; status: string; description: string | null; created_at: string; metadata: { review_required?: boolean; synthetic_demo?: boolean } | null }> = [];
+  let transactionsError: unknown = null;
+  // Chunk IDs to keep PostgREST request URLs within practical limits.
+  for (let offset = 0; offset < transactionIds.length; offset += 300) {
+    const batch = transactionIds.slice(offset, offset + 300);
+    const { data, error } = await supabase.from("ledger_transactions")
       .select("id,reference,transaction_type,status,description,created_at,metadata")
-      .in("id", transactionIds).order("created_at", { ascending: false })
-    : { data: [], error: null };
+      .in("id", batch);
+    if (error) { transactionsError = error; break; }
+    transactions.push(...(data ?? []));
+  }
+  transactions.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   const entryByTransaction = new Map<string, { amount_minor: number; currency: string }>();
   for (const entry of entries ?? []) {
