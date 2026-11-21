@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { isLanguagePreference, type SupportedLocale } from "@/lib/locale";
 import "./globals.css";
 import "./auth.css";
 import "./dashboard/dashboard.css";
@@ -10,11 +12,17 @@ export const metadata: Metadata = {
   description: "A modern digital banking experience.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const savedLocale = cookieStore.get("nexora_locale")?.value || "en";
+  const locale: SupportedLocale = isLanguagePreference(savedLocale) && savedLocale !== "auto"
+    ? savedLocale
+    : "en";
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>{children}</body>
     </html>
   );
