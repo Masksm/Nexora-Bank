@@ -61,3 +61,9 @@ Additional migration applied and source-controlled on 2026-11-21:
 - `20261121075245_keep_customer_kyc_status_in_sync`: recalculates aggregate verification status from the latest document of each type whenever a customer uploads or removes a pending document, preventing stale submitted/rejected states.
 
 - `20261121075307_use_invoker_for_public_kyc_review_rpc`: restores invoker rights on the exposed RPC wrapper; the internal private implementation retains its explicit administrator-claim check.
+
+
+Additional migrations applied and source-controlled on 2026-11-21:
+
+- `20261121080755_add_savings_goals_and_ledger_operations`: creates customer-owned savings goals and a savings contribution sub-ledger, provisions a dedicated internal custody account, and adds ownership-checked private functions with authenticated invoker RPC wrappers. Contributions and withdrawals are balanced posted ledger transactions with request idempotency. Customers can read their own goals and activity but cannot write directly to the financial tables.
+- `20261121081003_harden_savings_goal_operations_and_indexes`: indexes savings entry foreign keys and hardens the movement RPC against null operation types.
