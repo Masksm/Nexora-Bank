@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: Props) {
         <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
         <div className="auth-kicker">{t("WELCOME BACK")}</div>
         <h1>{t("Good to have")}<br /><em>{t("you back.")}</em></h1>
-        <p className="auth-intro">{t("{t("Sign in")} to access your Nexora account.")}</p>
+        <p className="auth-intro">{t("Sign in to access your Nexora account.")}</p>
         {params.error && <p className="form-message error" role="alert">{params.error}</p>}
         <form action={signIn} className="auth-form">
           <input type="hidden" name="next" value={params.next ?? "/dashboard"} />
