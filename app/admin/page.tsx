@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
 import { Activity, ArrowUpFromLine, LogOut, RotateCcw, ShieldCheck, Users, Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -14,6 +17,8 @@ function money(minor: number) {
 }
 
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
+  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const t = (value: string) => pageText(locale, value);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
@@ -34,9 +39,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     <main className="admin-shell">
       <aside className="admin-sidebar">
         <Link className="admin-brand" href="/"><span>N</span>NEXORA <i>ADMIN</i></Link>
-        <div className="admin-side-label">CONTROL CENTRE</div>
-        <nav><Link className="selected" href="/admin"><Activity size={17}/> Overview</Link><a href="#customers"><Users size={17}/> Customers</a><a href="#ledger"><Wallet size={17}/> Ledger operations</a><Link href="/admin/reviews">Security reviews</Link><Link href="/admin/support">Support inbox</Link><Link href="/admin/audit">Audit log</Link></nav>
-        <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>Administrator session</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> Sign out</button></form></div>
+        <div className="admin-side-label">{t("CONTROL CENTRE")}</div>
+        <nav><Link className="selected" href="/admin"><Activity size={17}/> Overview</Link><a href="#customers"><Users size={17}/> Customers</a><a href="#ledger"><Wallet size={17}/> Ledger operations</a><Link href="/admin/reviews">{t("Security reviews")}</Link><Link href="/admin/support">{t("Support inbox")}</Link><Link href="/admin/audit">{t("Audit log")}</Link></nav>
+        <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>{t("Administrator session")}</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> Sign out</button></form></div>
       </aside>
       <section className="admin-main">
         <header className="admin-topbar"><div><span>ADMINISTRATION / OVERVIEW</span><h1>Control centre</h1></div></header>
@@ -49,7 +54,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         </section>
 
         <section className="admin-panel" id="customers">
-          <div className="admin-panel-heading"><div><span>CUSTOMER DIRECTORY</span><h2>Customer accounts</h2></div><span>{displayedRows.length} of {rows.length}</span></div>
+          <div className="admin-panel-heading"><div><span>CUSTOMER DIRECTORY</span><h2>{t("Customer accounts")}</h2></div><span>{displayedRows.length} of {rows.length}</span></div>
           <form className="admin-search" action="/admin" method="get"><input name="q" defaultValue={params.q || ""} placeholder="Search account number, name or customer ID"/><button type="submit">Search</button></form>
           {error ? <p className="admin-empty">Could not load customer accounts. Check the administrator database policies.</p> : rows.length === 0 ? <p className="admin-empty">No customer accounts have been created yet.</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Account</th><th>Account number</th><th>Balance</th><th>Status</th><th>Customer ID</th></tr></thead><tbody>
@@ -76,13 +81,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
               <label>Empty customer account<select name="account_id" required defaultValue=""><option value="" disabled>Select an account</option>{rows.filter((row)=>Number(row.balance_minor)===0).map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name}</option>)}</select></label>
               <label>Target opening and final balance (USD)<input name="target_amount" type="number" min="0.01" step="0.01" placeholder="100000000.00" required/></label>
               <div className="admin-form-grid"><label>History begins<select name="start_year" defaultValue="2019">{Array.from({length:new Date().getFullYear()-2019+1},(_,i)=>2019+i).map((year)=><option key={year} value={year}>{year}</option>)}</select></label><label>Total transactions<select name="transactions" defaultValue="100"><option value="50">50 transactions</option><option value="100">100 transactions</option><option value="150">150 transactions</option><option value="200">200 transactions</option><option value="250">250 transactions</option></select></label></div>
-              <button type="submit" className="secondary" disabled={!rows.some((row)=>Number(row.balance_minor)===0)}>Generate account history</button>
+              <button type="submit" className="secondary" disabled={!rows.some((row)=>Number(row.balance_minor)===0)}>{t("Generate account history")}</button>
               <small className="admin-warning">This action requires an empty account. It cannot overwrite existing transactions. Generated activity is tracked in internal ledger metadata and audit logs.</small>
             </form>
           </article>
 
           <article className="admin-panel">
-            <div className="admin-panel-heading"><div><span>ACCOUNT HISTORY MANAGEMENT</span><h2>Clear account history</h2></div><RotateCcw size={18}/></div>
+            <div className="admin-panel-heading"><div><span>ACCOUNT HISTORY MANAGEMENT</span><h2>{t("Clear account history")}</h2></div><RotateCcw size={18}/></div>
             <p className="admin-help">Permanently removes eligible generated transactions from the selected account and restores its balance to zero. Other transaction records are protected. If the account contains activity that is not eligible for removal, the operation is rejected without changing anything.</p>
             <form action={resetDemoHistory} className="admin-form">
               <label>Account to reset<select name="account_id" required defaultValue=""><option value="" disabled>Select an account</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} · {money(Number(row.balance_minor))}</option>)}</select></label>
@@ -94,12 +99,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           </article>
 
           <article className="admin-panel">
-            <div className="admin-panel-heading"><div><span>ACCOUNT CONTROLS</span><h2>Freeze or block account</h2></div><ShieldCheck size={18}/></div>
+            <div className="admin-panel-heading"><div><span>ACCOUNT CONTROLS</span><h2>{t("Freeze or block account")}</h2></div><ShieldCheck size={18}/></div>
             <p className="admin-help">Frozen and blocked accounts cannot send or receive transfers through the current transfer engine.</p>
             <form action={setAccountStatus} className="admin-form">
               <label>Customer account<select name="account_id" required defaultValue=""><option value="" disabled>Select an account</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} ({row.status})</option>)}</select></label>
               <div className="admin-form-grid"><label>New status<select name="status"><option value="active">Active / unblock</option><option value="frozen">Frozen</option><option value="blocked">Blocked</option></select></label><label>Reason<input name="reason" minLength={8} maxLength={240} placeholder="Reason for status change" required/></label></div>
-              <button type="submit" className="secondary" disabled={!rows.length}>Update account status</button>
+              <button type="submit" className="secondary" disabled={!rows.length}>{t("Update account status")}</button>
             </form>
           </article>
         </section>
