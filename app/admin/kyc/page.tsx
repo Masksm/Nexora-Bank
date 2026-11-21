@@ -57,14 +57,14 @@ export default async function AdminKycPage({ searchParams }: Props) {
   ]);
   const documents = docsResult.data ?? [];
   const userIds = [...new Set(documents.map((doc) => doc.user_id))];
-  const [profilesResult, verificationsResult] = userIds.length ? await Promise.all([
+  const [profilesResult, verificationsResult] = await Promise.all([
     supabase.from("profiles")
       .select("user_id,first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,city,region")
       .in("user_id", userIds),
     supabase.from("customer_verifications")
       .select("user_id,status,rejection_reason,submitted_at,reviewed_at")
       .in("user_id", userIds),
-  ]) : [{ data: [] }, { data: [] }];
+  ]);
 
   const profileMap = new Map((profilesResult.data ?? []).map((profile) => [profile.user_id, profile as ProfileRow]));
   const verificationMap = new Map((verificationsResult.data ?? []).map((verification) => [verification.user_id, verification]));
