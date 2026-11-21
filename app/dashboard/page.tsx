@@ -105,7 +105,7 @@ export default async function DashboardPage() {
     <main className="dashboard-shell">
       <aside className="dashboard-sidebar">
         <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
-        <div className="sidebar-label">nav.yourBank</div>
+        <div className="sidebar-label">{t("nav.yourBank")}</div>
         <nav className="dashboard-nav" aria-label="Main navigation">
           <Link className="active" href="/dashboard"><LayoutDashboard size={17}/> {t("nav.overview")}</Link>
           <Link href="/dashboard/accounts"><Wallet size={17}/> {t("nav.accounts")}</Link>
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
         <div className="sidebar-footer">
           <div className="avatar">{displayName.slice(0,1).toUpperCase()}</div>
           <div className="sidebar-user"><strong>{displayName}</strong><span>{user.email}</span></div>
-          <form action={signOut}><button className="logout-button" type="submit" aria-label="Sign out"><LogOut size={17}/></button></form>
+          <form action={signOut}><button className="logout-button" type="submit" aria-label={t("nav.signOut")}><LogOut size={17}/></button></form>
         </div>
       </aside>
 
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
                 return <article className="dashboard-recent-row" key={transaction.id}>
                   <span className={incoming ? "recent-transaction-icon incoming" : "recent-transaction-icon"}>{incoming ? <ArrowDownLeft size={17}/> : <ArrowUpRight size={17}/>}</span>
                   <div className="recent-transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{dateLabel(transaction.created_at)} · Ref {transaction.reference}</span></div>
-                  <div className="recent-transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + (review ? "review" : transaction.status)}>{review ? "{t("dashboard.underReview") : transaction.status}</span></div>
+                  <div className="recent-transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + (review ? "review" : transaction.status)}>{review ? t("dashboard.underReview") : transaction.status}</span></div>
                 </article>;
               })}
             </div>}
