@@ -1,0 +1,115 @@
+/* Site-wide dark appearance. The preference is set on the root html element. */
+:root[data-theme="dark"]{
+ color-scheme:dark;
+ --ink:#e7eee9;--muted:#a1b1a7;--green:#5d9b7d;--green-dark:#42765e;
+ --mint:#203b30;--paper:#101713;--line:#2b3b32;
+}
+html[data-theme="dark"],html[data-theme="dark"] body{background:#101713!important;color:#e7eee9!important}
+html[data-theme="dark"] body{color-scheme:dark}
+html[data-theme="dark"] .auth-page,
+html[data-theme="dark"] .dashboard-shell,
+html[data-theme="dark"] .dashboard-main,
+html[data-theme="dark"] .workspace-shell,
+html[data-theme="dark"] .admin-shell,
+html[data-theme="dark"] .admin-main,
+html[data-theme="dark"] main{background-color:#101713!important;color:#e7eee9}
+html[data-theme="dark"] .dashboard-sidebar,
+html[data-theme="dark"] .auth-panel,
+html[data-theme="dark"] .settings-popup-dialog,
+html[data-theme="dark"] .settings-popup-header,
+html[data-theme="dark"] .settings-popup-trigger,
+html[data-theme="dark"] .workspace-panel,
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .dashboard-panel,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .admin-panel,
+html[data-theme="dark"] .admin-stats article,
+html[data-theme="dark"] .admin-identity,
+html[data-theme="dark"] .admin-table-wrap,
+html[data-theme="dark"] .admin-content-card,
+html[data-theme="dark"] .settings-link-panel,
+html[data-theme="dark"] .settings-popup-content,
+html[data-theme="dark"] .transaction-card,
+html[data-theme="dark"] .transaction-row,
+html[data-theme="dark"] .analytics-card,
+html[data-theme="dark"] .statement-card,
+html[data-theme="dark"] .savings-card,
+html[data-theme="dark"] .beneficiary-card,
+html[data-theme="dark"] .security-card,
+html[data-theme="dark"] .support-card,
+html[data-theme="dark"] .super-dialog,
+html[data-theme="dark"] .super-dialog-content,
+html[data-theme="dark"] .super-section-card{
+ background-color:#17231d!important;color:#e4ece6!important;border-color:#304238!important;
+}
+html[data-theme="dark"] .settings-popup-trigger:hover{background:#1d2d24!important;border-color:#52745e!important}
+html[data-theme="dark"] .settings-popup-icon,
+html[data-theme="dark"] .avatar,
+html[data-theme="dark"] .theme-preference-icon{background:#263d30!important;color:#a8d0b5!important}
+html[data-theme="dark"] .dashboard-nav a:hover,
+html[data-theme="dark"] .dashboard-nav a.active{background:#243a2e!important;color:#b6dfc2!important}
+html[data-theme="dark"] .dashboard-nav a,
+html[data-theme="dark"] .sidebar-user strong,
+html[data-theme="dark"] .workspace-shell h1,
+html[data-theme="dark"] .workspace-shell h2,
+html[data-theme="dark"] .workspace-shell h3,
+html[data-theme="dark"] .dashboard-shell h1,
+html[data-theme="dark"] .dashboard-shell h2,
+html[data-theme="dark"] .admin-main h1,
+html[data-theme="dark"] .admin-main h2,
+html[data-theme="dark"] .admin-main h3,
+html[data-theme="dark"] .settings-popup-header h2,
+html[data-theme="dark"] .settings-popup-copy strong{color:#e7eee9!important}
+html[data-theme="dark"] .workspace-shell p,
+html[data-theme="dark"] .workspace-shell label,
+html[data-theme="dark"] .workspace-shell small,
+html[data-theme="dark"] .dashboard-shell p,
+html[data-theme="dark"] .dashboard-shell label,
+html[data-theme="dark"] .admin-main p,
+html[data-theme="dark"] .admin-main label,
+html[data-theme="dark"] .settings-popup-copy small,
+html[data-theme="dark"] .settings-popup-header p{color:#a6b6ac}
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea{
+ background:#101a14!important;color:#e7eee9!important;border-color:#3a5143!important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{color:#82978a!important}
+html[data-theme="dark"] option{background:#17231d;color:#e7eee9}
+html[data-theme="dark"] table,
+html[data-theme="dark"] th,
+html[data-theme="dark"] td{color:#e2ebe4;border-color:#304238!important}
+html[data-theme="dark"] thead,
+html[data-theme="dark"] .table-header,
+html[data-theme="dark"] .workspace-table th{background:#203128!important}
+html[data-theme="dark"] .workspace-header,
+html[data-theme="dark"] .dashboard-topbar,
+html[data-theme="dark"] .sidebar-footer,
+html[data-theme="dark"] .admin-topbar{border-color:#304238!important}
+html[data-theme="dark"] .workspace-back,
+html[data-theme="dark"] .admin-topbar>a,
+html[data-theme="dark"] .settings-link-panel a{color:#9bc9a9!important}
+html[data-theme="dark"] .settings-popup-backdrop,
+html[data-theme="dark"] .super-dialog-backdrop{background:#050a07c9!important}
+html[data-theme="dark"] .settings-popup-header>button,
+html[data-theme="dark"] .logout-button,
+html[data-theme="dark"] .notification-button{background:#1b2a22!important;color:#d9e6dd!important;border-color:#3a5143!important}
+html[data-theme="dark"] .auth-form label,
+html[data-theme="dark"] .auth-panel h1{color:#e7eee9}
+html[data-theme="dark"] .auth-form input{background:#101a14!important;color:#e7eee9!important;border-color:#3a5143!important}
+html[data-theme="dark"] .auth-aside{color:#edf5ef!important}
+html[data-theme="dark"] .admin-sidebar{background:#0d2b23!important}
+html[data-theme="dark"] .admin-sidebar nav a{color:#c0d4c8!important}
+html[data-theme="dark"] .admin-sidebar nav a.selected,
+html[data-theme="dark"] .admin-sidebar nav a:hover{background:#245548!important;color:#fff!important}
+html[data-theme="dark"] button:not(.auth-submit):not(.theme-switch):not(.settings-popup-trigger){border-color:#3a5143}
+html[data-theme="dark"] .theme-switch{background:#385846!important}
+html[data-theme="dark"] .theme-switch.is-on{background:#5a936e!important}
+html[data-theme="dark"] .theme-preference-row{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid #304238;border-radius:9px;background:#17231d}
+html[data-theme="dark"] .theme-preference-copy strong{color:#e7eee9}
+html[data-theme="dark"] .theme-preference-copy small{color:#a6b6ac}
+html[data-theme="dark"] .theme-switch{margin-left:auto;position:relative;width:46px;height:26px;padding:3px;border:0;border-radius:30px;cursor:pointer}
+html[data-theme="dark"] .theme-switch span{display:block;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .18s}
+html[data-theme="dark"] .theme-switch.is-on span{transform:translateX(20px)}
+@media(prefers-reduced-motion:reduce){html[data-theme="dark"] *,html[data-theme="dark"] *:before,html[data-theme="dark"] *:after{scroll-behavior:auto!important;transition:none!important}}
