@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { updateProfile } from "../actions";
 import IdentityDocuments from "./identity-documents";
 import SettingsPopupSection from "./settings-popup-section";
+import ThemeToggle from "./theme-toggle";
 
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ error?: string; success?: string }> };
@@ -21,7 +22,9 @@ const countries = [
 ];
 
 export default async function SettingsPage({ searchParams }: Props) {
-  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("nexora_locale")?.value || "en") as SupportedLocale;
+  const theme = cookieStore.get("nexora_theme")?.value === "dark" ? "dark" : "light";
   const t = (value: string) => pageText(locale, value);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -106,9 +109,11 @@ export default async function SettingsPage({ searchParams }: Props) {
               <option value="auto">{t("Automatic (based on location and browser)")}</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="pt">Português</option><option value="de">Deutsch</option>
             </select></label>
           </div>{hiddenProfile}<div className="settings-form-actions"><p>{t("Automatic mode uses your detected country first, then your browser language.")}</p><button type="submit"><Save size={15}/> {t("Save preferences")}</button></div></form>
+          <div className="workspace-panel-heading theme-section-heading"><div><span className="workspace-kicker">{t("APPEARANCE")}</span><h2>{t("Appearance")}</h2></div></div>
+          <ThemeToggle initialTheme={theme} labels={{light:t("Light mode"),dark:t("Dark mode"),description:t("Choose a comfortable appearance for every Nexora page.")}}/>
         </SettingsPopupSection>
 
-        <SettingsPopupSection title={t("Security and access")} description={t("Review devices and protect your account.")} icon={<ShieldCheck size={18}/>}>
+        <SettingsPopupSection title={t("Security and access") description={t("Review devices and protect your account.")} icon={<ShieldCheck size={18}/>}>
           <div className="settings-link-panel"><div><strong>{t("Security and devices")}</strong><span>{t("Review active sessions, recognised devices and sign-in activity.")}</span></div><Link href="/dashboard/security">{t("Manage security")} <ShieldCheck size={15}/></Link></div>
           <div className="settings-link-panel"><div><strong>{t("Account preferences")}</strong><span>{t("Your language is detected from your location and browser unless you choose a language manually.")}</span></div><span className="settings-link-note"><Settings2 size={15}/> {t("Profile preferences")}</span></div>
         </SettingsPopupSection>
