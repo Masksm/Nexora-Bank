@@ -39,3 +39,8 @@ Additional migration applied and source-controlled on 2026-11-21:
 Additional migration applied and source-controlled on 2026-11-21:
 
 - `20261121073100_add_customer_language_preference`: adds a constrained customer language preference (`auto`, English, Spanish, French, Portuguese or German). Automatic mode resolves from the browser's accepted languages, then the saved country, with English as the fallback.
+
+
+Additional migration applied and source-controlled on 2026-11-21:
+
+- `20261121090000_financial_experience_and_scheduled_transfers`: adds customer-editable account nicknames, a private-owner-scoped scheduled transfer table, and a pg_cron worker that submits due transfers into the existing administrator security-review queue. Scheduled transfers do not post balances until an administrator approves the resulting ledger transaction. Recurring weekly/monthly schedules pause while the latest execution is awaiting review.
