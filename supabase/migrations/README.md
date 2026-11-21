@@ -85,3 +85,5 @@ Additional migrations applied and source-controlled on 2026-11-21:
 Staff administrators can read and manage only customers assigned to them. Super Admin retains global oversight and access to the existing administrator tools. Role and assignment changes are audit logged. The existing customer accounts, balances, transactions, support messages and identity records are preserved.
 
 - `20261121191151_fix_super_admin_directory_return_types`: explicitly casts Auth email and directory fields to the public RPC's declared return types.
+
+- `20261121191342_scope_transfer_review_to_assigned_source_customer`: limits staff transfer-review authority to the assigned sender's customer account, without granting visibility into an unassigned recipient.
