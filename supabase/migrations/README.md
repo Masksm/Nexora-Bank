@@ -34,3 +34,8 @@ The live project must remain untouched during that reconstruction.
 Additional migration applied and source-controlled on 2026-11-21:
 
 - `20261121062755_expand_customer_profile_and_private_identity_documents`: adds customer address and time-zone fields, plus a private identity-document bucket and owner-scoped metadata/storage policies. Identity uploads are limited to PDF/JPEG/PNG and 10 MB. Customers can remove only documents that have not entered review.
+
+
+Additional migration applied and source-controlled on 2026-11-21:
+
+- `20261121073100_add_customer_language_preference`: adds a constrained customer language preference (`auto`, English, Spanish, French, Portuguese or German). Automatic mode resolves from the browser's accepted languages, then the saved country, with English as the fallback.
