@@ -29,3 +29,8 @@ These add admin balance/history operations, account restrictions, transfer revie
 **Important:** the remote migration history currently exists, but the original SQL bodies are not retrievable from the migration-history listing. Do not fabricate migration files with those version numbers and do not run a guessed baseline against the live project. The next database-source-control task is to reconstruct and review a clean, replayable baseline from the live catalog, then validate it on a separate local database before using it elsewhere.
 
 The live project must remain untouched during that reconstruction.
+
+
+Additional migration applied and source-controlled on 2026-11-21:
+
+- `20261121062755_expand_customer_profile_and_private_identity_documents`: adds customer address and time-zone fields, plus a private identity-document bucket and owner-scoped metadata/storage policies. Identity uploads are limited to PDF/JPEG/PNG and 10 MB. Customers can remove only documents that have not entered review.
