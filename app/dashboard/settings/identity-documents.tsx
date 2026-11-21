@@ -119,29 +119,29 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
   return (
     <div className="identity-document-content">
       <form className="transfer-form identity-upload-form" onSubmit={uploadDocument}>
-        <label>Document type
+        <label>{t("Document type")}
           <select value={documentType} onChange={(event) => setDocumentType(event.target.value as IdentityDocument["document_type"])}>
             <option value="passport">{t("Passport")}</option>
             <option value="national_id">{t("National identity card")}</option>
             <option value="drivers_license">{t("Driver's licence")}</option>
           </select>
         </label>
-        <label>Choose document
+        <label>{t("Choose document")}
           <input id="identity-file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={(event) => setFile(event.target.files?.[0] ?? null)} required />
         </label>
         <p>{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.")}</p>
-        <button type="submit" disabled={!file || busy}>{busy ? "Uploading…" : "Upload identity document"}</button>
+        <button type="submit" disabled={!file || busy}>{busy ? t("Uploading…") : t("Upload identity document")}</button>
       </form>
       {message && <p className="identity-message" role="status">{message}</p>}
       <div className="identity-document-list">
         {documents.length === 0 ? (
-          <p className="identity-empty">{t("No identity documents have been uploaded.")}</p>
+          <p className="identity-empty">{t("{t("No identity documents have been uploaded.")}")}</p>
         ) : documents.map((document) => (
           <article key={document.id} className="identity-document-row">
             <div>
               <strong>{t(labels[document.document_type])}</strong>
               <span>{document.file_name}</span>
-              <small>{new Date(document.uploaded_at).toLocaleDateString()} · {document.review_status.replace("_", " ")}</small>
+              <small>{new Date(document.uploaded_at).toLocaleDateString()} · {t(document.review_status.replaceAll("_", " "))}</small>
               {document.review_status === "rejected" && document.rejection_reason && <p className="identity-rejection-reason">{document.rejection_reason}</p>}
             </div>
             {document.review_status === "submitted" && (
@@ -152,7 +152,7 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
           </article>
         ))}
       </div>
-      <p className="identity-disclaimer">Uploading a document does not mean your identity has been verified. Verification status will only change after an authorised review.</p>
+      <p className="identity-disclaimer">{t("Uploading a document does not mean your identity has been verified. Verification status will only change after an authorised review.")}</p>
     </div>
   );
 }
