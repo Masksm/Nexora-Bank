@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { Activity, Eye, LogOut, ShieldCheck, Users, UserCog, MessageSquare, LockKeyhole } from "lucide-react";
+import { Activity, Eye, LogOut, ShieldCheck, Users, UserCog, MessageSquare, LockKeyhole, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
-import { superAdminSetAssignment, superAdminSetRole } from "./actions";
+import { superAdminDeleteAccount, superAdminSetAssignment, superAdminSetRole } from "./actions";
+import { DeleteAccountForm } from "./delete-account-form";
 import { SuperAdminDialog } from "./section-dialog";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
   const links = (assignments ?? []) as Assignment[];
   const admins = people.filter((person) => person.role === "admin");
   const customers = people.filter((person) => !["admin", "super_admin"].includes(person.role));
+  const deletableUsers = people.filter((person) => person.role !== "super_admin");
   const selected = (tickets ?? []).find((ticket) => ticket.id === params.ticket) ?? (tickets ?? [])[0];
   const { data: messages } = selected
     ? await supabase.from("support_messages").select("id,sender_user_id,sender_role,body,created_at").eq("conversation_id", selected.id).order("created_at").limit(250)
@@ -49,7 +51,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <a href="#staff"><UserCog size={16}/> Staff administrators</a>
           <a href="#assignments"><Users size={16}/> Customer access</a>
           <a href="#promote"><UserCog size={16}/> Role management</a>
-          <a href="#oversight"><Eye size={16}/> Support oversight</a>
+          <a href="#oversight"><Eye size={16}/> Support oversight</a>\n          <a href="#accounts"><Trash2 size={16}/> Account management</a>
           <Link href="/admin"><LockKeyhole size={16}/> Legacy admin operations</Link>
         </nav>
         <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>Super Admin session</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> Sign out</button></form></div>
@@ -69,13 +71,13 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <div className="admin-panel-heading"><div><span>STAFF AUTHORITY</span><h2>Staff administrator accounts</h2></div><span>{staffCount} staff</span></div>
           {directoryError ? <p className="admin-empty">Unable to load the administrator directory: {directoryError.message}</p> : !admins.length ? <p className="admin-empty">No staff administrators have been appointed yet.</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Staff administrator</th><th>Assigned customers</th><th>Access</th></tr></thead><tbody>
-              {admins.map((person) => <tr key={person.user_id}><td><strong>{person.display_name}</strong><small>{person.email} · {person.user_id.slice(0, 10)}…</small></td><td>{person.assigned_customer_count}</td><td><form action={superAdminSetRole}><input type="hidden" name="user_id" value={person.user_id}/><input type="hidden" name="make_admin" value="false"/><button className="admin-danger-button" type="submit">Revoke staff role</button></form></td></tr>)}
+              {admins.map((person) => <tr key={person.user_id}><td><strong>{person.display_name}</strong><small>{person.email} · {person.user_id.slice(0, 10)}…</small></td><td>{person.assigned_customer_count}</td><td><form action={superAdminSetRole}><input type="hidden" name="user_id" value={person.user_id}/><input type="hidden" name="make_admin" value="false"/><button className="admin-danger-button" type="submit">Remove admin access</button></form></td></tr>)}
             </tbody></table></div>}
         </SuperAdminDialog>
 
         <SuperAdminDialog title="Customer access" eyebrow="ACCESS ALLOCATION" description="Review the customer directory and control which staff member can access each customer." count={customers.length} id="assignments" icon={<Users size={20}/>}>
           <div className="admin-panel-heading"><div><span>ACCESS ALLOCATION</span><h2>Assign customers to staff</h2></div><span>{customers.length} customers</span></div>
-          <p className="admin-help">A staff administrator can only access the customers explicitly assigned here. Assigning a customer to a second staff member gives both staff members access to that customer.</p>
+          <p className="admin-help">Each customer can belong to only one staff administrator. Remove the current assignment before assigning that customer to another staff member.</p>
           {!admins.length ? <p className="admin-empty">Promote at least one customer to staff administrator before assigning customer accounts.</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Customer</th><th>Bank accounts</th><th>Assigned staff</th><th>Grant access</th></tr></thead><tbody>
               {customers.map((person) => {
@@ -102,6 +104,20 @@ export default async function SuperAdminPage({ searchParams }: Props) {
             <div className="super-support-layout"><div className="admin-ticket-list">{tickets.map((ticket) => <Link href={"/super-admin?ticket=" + ticket.id + "#oversight"} key={ticket.id} className={selected?.id === ticket.id ? "admin-ticket selected" : "admin-ticket"}><strong>{ticket.subject}</strong><span>{personMap.get(ticket.user_id)?.email ?? ticket.user_id} · {ticket.category} · {ticket.status}</span><small>{new Date(ticket.updated_at).toLocaleString(locale)}</small></Link>)}</div>
               {selected && <div className="super-support-thread"><div className="admin-panel-heading"><div><span>READ-ONLY CONVERSATION MONITOR</span><h2>{selected.subject}</h2></div><MessageSquare size={18}/></div><div className="admin-case-meta"><span>Customer: {personMap.get(selected.user_id)?.email ?? selected.user_id}</span><span>Status: {selected.status}</span><span>Category: {selected.category}</span></div><div className="admin-support-messages">{(messages ?? []).map((message) => <article key={message.id} className={message.sender_role === "admin" ? "admin-support-message staff" : "admin-support-message"}><span>{message.sender_role === "admin" ? "Staff admin" : "Customer"} · {personMap.get(message.sender_user_id)?.email ?? "Account"} · {new Date(message.created_at).toLocaleString(locale)}</span><p>{message.body}</p></article>)}</div></div>}
             </div>}
+        </SuperAdminDialog>
+
+        <SuperAdminDialog title="Account management" eyebrow="ACCOUNT CONTROL" description="Permanently delete customer or staff accounts when they are eligible for closure." count={deletableUsers.length} id="accounts" icon={<Trash2 size={20}/>}>
+          <div className="admin-panel-heading"><div><span>ACCOUNT CONTROL</span><h2>Delete customer or staff accounts</h2></div><span>{deletableUsers.length} eligible accounts</span></div>
+          <p className="admin-help">Deletion is permanent. Accounts with non-zero balances, pending financial transactions or money remaining in savings goals are blocked. Scheduled transfers are cancelled. Zero-balance bank accounts are closed and ledger history is retained for audit. Super Admin accounts cannot be deleted here.</p>
+          {!deletableUsers.length ? <p className="admin-empty">There are no customer or staff accounts to manage.</p> :
+            <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Account holder</th><th>Role</th><th>Bank accounts</th><th>Permanent deletion</th></tr></thead><tbody>
+              {deletableUsers.map((person) => <tr key={person.user_id}>
+                <td><strong>{person.display_name}</strong><small>{person.email}</small></td>
+                <td><span className={person.role === "admin" ? "admin-status active" : "admin-status pending"}>{person.role === "admin" ? "Staff admin" : "Customer"}</span></td>
+                <td>{person.account_count}</td>
+                <td><DeleteAccountForm userId={person.user_id} email={person.email}/></td>
+              </tr>)}
+            </tbody></table></div>}
         </SuperAdminDialog>
         <p className="admin-disclaimer">Super Admin oversight is read-only for customer conversations. Staff administrators remain responsible for replying to their assigned customers. All role and assignment changes are recorded in the audit log.</p>
       </section>
