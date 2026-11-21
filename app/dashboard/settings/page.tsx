@@ -3,11 +3,11 @@ import { cookies } from "next/headers";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
-import { ArrowLeft, LogOut, Save, ShieldCheck, UserRound, MapPin, FileCheck, {t("Settings")}2 } from "lucide-react";
+import { ArrowLeft, LogOut, Save, ShieldCheck, UserRound, MapPin, FileCheck, Settings2 } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
 import { updateProfile } from "../actions";
-import Identity{t("Documents")} from "./identity-documents";
+import IdentityDocuments from "./identity-documents";
 
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ error?: string; success?: string }> };
@@ -19,7 +19,7 @@ const countries = [
   ["IN", "India"], ["AE", "United Arab Emirates"], ["XX", "Other / not listed"],
 ];
 
-export default async function {t("Settings")}Page({ searchParams }: Props) {
+export default async function SettingsPage({ searchParams }: Props) {
   const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
   const t = (value: string) => pageText(locale, value);
   const supabase = await createClient();
@@ -103,7 +103,7 @@ export default async function {t("Settings")}Page({ searchParams }: Props) {
       <section className="settings-section-heading"><div className="settings-section-icon"><FileCheck size={18}/></div><div><h2>{t("Identity documents")}</h2><p>{t("Submit an identity document for account records.")}</p></div></section>
       <section className="workspace-panel settings-panel">
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">IDENTITY RECORDS</span><h2>{t("Documents")}</h2></div><span className="workspace-count">{documents?.length ?? 0} uploaded</span></div>
-        <Identity{t("Documents")} userId={user.id} initial{t("Documents")}={(documents ?? []) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";uploaded_at:string}>}/>
+        <IdentityDocuments userId={user.id} initial{t("Documents")}={(documents ?? []) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";uploaded_at:string}>}/>
       </section>
 
       <section className="settings-section-heading"><div className="settings-section-icon"><ShieldCheck size={18}/></div><div><h2>{t("Security and access")}</h2><p>{t("Review devices and protect your account.")}</p></div></section>
