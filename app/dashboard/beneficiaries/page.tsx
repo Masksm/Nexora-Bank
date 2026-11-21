@@ -12,7 +12,7 @@ export const dynamic="force-dynamic";
 type Props={searchParams:Promise<{error?:string;success?:string}>};
 const countryNames:Record<string,string>={NX:"Nexora Bank",US:"United States",GB:"United Kingdom",DE:"Germany",FR:"France",NL:"Netherlands",ES:"Spain",IE:"Ireland"};
 
-function accountLabel(b:any){
+function accountLabel(b: { country_code: string; routing_number: string | null; sort_code: string | null; account_number: string | null; iban: string | null }){
   if(b.country_code==="US") return `Routing: ${b.routing_number} · Account: ••••${String(b.account_number||"").slice(-4)}`;
   if(b.country_code==="GB") return `Sort code: ${b.sort_code} · Account: ••••${String(b.account_number||"").slice(-4)}`;
   if(b.iban) return `IBAN: ••••${b.iban.slice(-4)}`;
