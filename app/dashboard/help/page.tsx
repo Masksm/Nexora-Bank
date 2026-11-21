@@ -36,11 +36,11 @@ export default async function HelpPage({ searchParams }: Props) {
       <div className="workspace-panel support-new">
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("GUIDED INTAKE")}</span><h2>{t("Tell us what happened")}</h2></div><MessageCircle size={19}/></div>
         <form action={createSupportRequest} className="transfer-form">
-          <label>{t("What do you need help with?")}<select name="category" defaultValue="general">{categories.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+          <label>{t("What do you need help with?")}<select name="category" defaultValue="general">{categories.map(([value,label])=><option key={value} value={value}>{t(label)}</option>)}</select></label>
           <label>{t("Subject")}<input name="subject" maxLength={120} placeholder={t("Briefly describe the issue")} required/></label>
           <label>{t("Related account (optional)")}<select name="account_number" defaultValue=""><option value="">{t("Not applicable")}</option>{(accounts ?? []).map((account)=><option key={account.account_number} value={account.account_number}>{account.account_number}</option>)}</select></label>
           <label>{t("How urgent is it?")}<select name="urgency"><option value="normal">{t("Normal")}</option><option value="high">{t("High")}</option><option value="critical">{t("Urgent security concern")}</option></select></label>
-          <label>{t("Explain the issue")}<textarea name="details" rows={4} minLength={10} maxLength={3500} placeholder="Include what happened, when it happened, and any error message. Do not include passwords or verification codes." required/></label>
+          <label>{t("Explain the issue")}<textarea name="details" rows={4} minLength={10} maxLength={3500} placeholder={t("Include what happened, when it happened, and any error message. Do not include passwords or verification codes.")} required/></label>
           <button type="submit">{t("Send to customer care")} <Send size={15}/></button>
         </form>
         <div className="support-assistant"><ShieldCheck size={17}/><div><strong>{t("Guided support assistant")}</strong><p>We route your request using the topic and urgency you select. A human administrator handles the reply. This intake currently uses fixed guidance, not a connected generative-AI model.</p></div></div>
