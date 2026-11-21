@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Download, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -7,6 +10,8 @@ import TransactionHistory from "./transaction-history";
 export const dynamic = "force-dynamic";
 
 export default async function TransactionsPage() {
+  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const t = (value: string) => pageText(locale, value);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -78,12 +83,12 @@ export default async function TransactionsPage() {
 
   return (
     <main className="workspace-shell">
-      <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link><span className="workspace-overline">NEXORA BANK · PERSONAL</span></header>
-      <section className="workspace-intro"><div><span className="workspace-kicker">A CLEAR RECORD</span><h1>Transactions</h1><p>Review all activity recorded against your accounts.</p></div></section>
+      <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">NEXORA BANK · PERSONAL</span></header>
+      <section className="workspace-intro"><div><span className="workspace-kicker">{t("A CLEAR RECORD")}</span><h1>{t("Transactions")}</h1><p>{t("Review all activity recorded against your accounts.")}</p></div></section>
       <section className="workspace-panel">
-        <div className="workspace-panel-heading"><div><span className="workspace-kicker">ACCOUNT ACTIVITY</span><h2>Transaction history</h2></div><div className="transaction-tools"><span className="workspace-count">{history.length} records</span><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> Export CSV</Link></div></div>
+        <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("ACCOUNT ACTIVITY")}</span><h2>{t("Transaction history")}</h2></div><div className="transaction-tools"><span className="workspace-count">{history.length} records</span><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> {t("Export CSV")}</Link></div></div>
         {failed ? <div className="workspace-alert">We couldn’t load the complete transaction history. Please refresh and try again.</div> :
-          history.length === 0 ? <div className="workspace-empty"><FileText size={25}/><h2>No transactions yet</h2><p>Once a transaction is posted, it will appear here.</p></div> :
+          history.length === 0 ? <div className="workspace-empty"><FileText size={25}/><h2>{t("No transactions yet")}</h2><p>{t("Once a transaction is posted, it will appear here.")}</p></div> :
           <TransactionHistory transactions={history}/>}
       </section>
       <p className="workspace-disclaimer">This history reflects internal ledger activity only. It is not a bank statement or proof of real-world payment.</p>
