@@ -15,9 +15,14 @@ export default async function StatementsPage({searchParams}:Props){
   const locale=((await cookies()).get("nexora_locale")?.value||"en") as SupportedLocale;
   const t=(value:string)=>pageText(locale,value);
   const params=await searchParams;
-  const validDate=(value?:string)=>Boolean(value&&/^\d{4}-\d{2}-\d{2}$/.test(value));
+  const validDate=(value?:string)=>{
+    if(!value||!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const parsed=new Date(value+"T00:00:00.000Z");
+    return !Number.isNaN(parsed.getTime())&&parsed.toISOString().slice(0,10)===value;
+  };
   const from=validDate(params.from)?params.from!:null;
   const to=validDate(params.to)?params.to!:null;
+  const invalidRange=Boolean(from&&to&&from>to);
   const supabase=await createClient();
   const {data:{user}}=await supabase.auth.getUser();
   if(!user)redirect("/login");
