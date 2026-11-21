@@ -21,6 +21,7 @@ export async function updateProfile(formData: FormData) {
   const region = String(formData.get("region") || "").trim().slice(0, 100);
   const postalCode = String(formData.get("postal_code") || "").trim().slice(0, 24);
   const timezone = String(formData.get("preferred_timezone") || "").trim().slice(0, 80);
+  const preferredLanguage = String(formData.get("preferred_language") || "auto").trim();
 
   if (displayName.length < 2) redirect("/dashboard/settings?error=Enter%20a%20valid%20display%20name.");
   if (!/^[A-Z]{2}$/.test(countryCode)) redirect("/dashboard/settings?error=Choose%20a%20valid%20two-letter%20country%20code.");
@@ -44,6 +45,7 @@ export async function updateProfile(formData: FormData) {
     region: region || null,
     postal_code: postalCode || null,
     preferred_timezone: timezone || null,
+    preferred_language: preferredLanguage,
     updated_at: new Date().toISOString(),
   }).eq("user_id", user.id);
 
