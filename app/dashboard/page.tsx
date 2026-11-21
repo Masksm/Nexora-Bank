@@ -12,14 +12,14 @@ import { signOut } from "@/app/auth/actions";
 
 export const dynamic = "force-dynamic";
 
-function money(amountMinor: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
+function money(amountMinor: number, currency = "USD", locale: SupportedLocale = "en") {
+  return new Intl.NumberFormat(locale, {
     style: "currency", currency, minimumFractionDigits: 2,
   }).format(Math.abs(amountMinor) / 100);
 }
 
-function dateLabel(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
+function dateLabel(value: string, locale: SupportedLocale = "en") {
+  return new Intl.DateTimeFormat(locale, {
     month: "short", day: "numeric", year: "numeric",
   }).format(new Date(value));
 }
@@ -134,22 +134,22 @@ export default async function DashboardPage() {
           <div className="topbar-right"><span className="secure-indicator"><ShieldCheck size={15}/> {t("dashboard.secureSession")}</span><Link href="/dashboard/notifications" className="notification-button" aria-label={Number(unreadCount ?? 0) ? `Notifications, ${unreadCount} unread` : "Notifications"}><Bell size={18}/>{Number(unreadCount ?? 0) > 0 && <i className="notification-dot"/>}</Link></div>
         </header>
 
-        <div className="dashboard-welcome"><div><p>{t("dashboard.welcomeEyebrow")}</p><h2>{t("dashboard.greeting")}, {displayName.split(" ")[0]}.</h2><span>{t("dashboard.welcome")}</span></div><div className="welcome-date">{new Intl.DateTimeFormat("en-US",{weekday:"long",month:"long",day:"numeric"}).format(new Date())}</div></div>
+        <div className="dashboard-welcome"><div><p>{t("dashboard.welcomeEyebrow")}</p><h2>{t("dashboard.greeting")}, {displayName.split(" ")[0]}.</h2><span>{t("dashboard.welcome")}</span></div><div className="welcome-date">{new Intl.DateTimeFormat(locale,{weekday:"long",month:"long",day:"numeric"}).format(new Date())}</div></div>
 
         <section className="dashboard-summary-grid">
           <article className="summary-card balance-card">
             <div className="summary-label">{t("dashboard.totalBalance")} <Wallet size={17}/></div>
-            <div className="summary-amount">{money(totalMinor)}</div>
+            <div className="summary-amount">{money(totalMinor, "USD", locale)}</div>
             <div className="summary-foot">{t("dashboard.acrossAccounts")}</div>
           </article>
           <article className="summary-card">
             <div className="summary-label">{t("dashboard.moneyIn")} <ArrowDownLeft size={17}/></div>
-            <div className="summary-amount">{money(moneyIn)}</div>
+            <div className="summary-amount">{money(moneyIn, "USD", locale)}</div>
             <div className="summary-foot">{t("dashboard.postedCredits")}</div>
           </article>
           <article className="summary-card">
             <div className="summary-label">{t("dashboard.moneyOut")} <ArrowUpRight size={17}/></div>
-            <div className="summary-amount">{money(moneyOut)}</div>
+            <div className="summary-amount">{money(moneyOut, "USD", locale)}</div>
             <div className="summary-foot">{t("dashboard.postedDebits")}</div>
           </article>
         </section>
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
           <article className="dashboard-panel account-panel">
             <div className="panel-heading"><div><span className="panel-kicker">{t("dashboard.accounts")}</span><h3>{t("dashboard.accountOverview")}</h3></div><Link href="/dashboard/accounts">{t("dashboard.viewAccounts")} <ArrowUpRight size={15}/></Link></div>
             {accountError ? <p className="dashboard-empty">{t("dashboard.loadingAccounts")}</p> :
-              primary ? <div className="account-row"><div className="account-symbol"><Wallet size={19}/></div><div className="account-details"><strong>{primary.account_name}</strong><span>{primary.account_type} · {primary.account_number}</span></div><div className="account-balance"><strong>{money(Number(primary.balance_minor), primary.currency)}</strong><span>{primary.status}</span></div></div> :
+              primary ? <div className="account-row"><div className="account-symbol"><Wallet size={19}/></div><div className="account-details"><strong>{primary.account_name}</strong><span>{primary.account_type} · {primary.account_number}</span></div><div className="account-balance"><strong>{money(Number(primary.balance_minor), primary.currency, locale)}</strong><span>{primary.status}</span></div></div> :
               <div className="dashboard-empty">{t("dashboard.noAccount")}</div>}
             {primary && <div className="account-card-foot"><span>{t("dashboard.accountNumber")}</span><strong>{primary.account_number}</strong></div>}
           </article>
@@ -186,8 +186,8 @@ export default async function DashboardPage() {
                 const review = (transaction.metadata as { review_required?: boolean; synthetic_demo?: boolean } | null)?.review_required === true;
                 return <article className="dashboard-recent-row" key={transaction.id}>
                   <span className={incoming ? "recent-transaction-icon incoming" : "recent-transaction-icon"}>{incoming ? <ArrowDownLeft size={17}/> : <ArrowUpRight size={17}/>}</span>
-                  <div className="recent-transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{dateLabel(transaction.created_at)} · Ref {transaction.reference}</span></div>
-                  <div className="recent-transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD")}</strong><span className={"transaction-status " + (review ? "review" : transaction.status)}>{review ? t("dashboard.underReview") : transaction.status}</span></div>
+                  <div className="recent-transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{dateLabel(transaction.created_at, locale)} · Ref {transaction.reference}</span></div>
+                  <div className="recent-transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD", locale)}</strong><span className={"transaction-status " + (review ? "review" : transaction.status)}>{review ? t("dashboard.underReview") : transaction.status}</span></div>
                 </article>;
               })}
             </div>}
