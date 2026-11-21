@@ -31,8 +31,11 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isCustomerArea = path.startsWith("/dashboard");
   const isAdminArea = path.startsWith("/admin");
+  const isSuperAdminArea = path.startsWith("/super-admin");
   const appMetadata = claims?.app_metadata as { role?: string } | undefined;
   const isAdmin = appMetadata?.role === "admin";
+  const isSuperAdmin = appMetadata?.role === "super_admin";
+  const isPrivileged = isAdmin || isSuperAdmin;
 
   if (claims?.sub) {
     const { data: profile } = await supabase
@@ -79,7 +82,7 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   };
 
-  if ((isCustomerArea || isAdminArea) && !claims) {
+  if ((isCustomerArea || isAdminArea || isSuperAdminArea) && !claims) {
     const target = request.nextUrl.clone();
     target.pathname = "/login";
     target.search = "";
@@ -87,7 +90,7 @@ export async function middleware(request: NextRequest) {
     return redirectWithSession(target);
   }
 
-  if ((isCustomerArea || isAdminArea) && claims?.session_id && claims?.sub) {
+  if ((isCustomerArea || isAdminArea || isSuperAdminArea) && claims?.session_id && claims?.sub) {
     const { data: sessionRecord } = await supabase
       .from("user_sessions")
       .select("revoked_at")
@@ -110,14 +113,21 @@ export async function middleware(request: NextRequest) {
 
   if (isAdminArea && !isAdmin) {
     const target = request.nextUrl.clone();
-    target.pathname = "/dashboard";
+    target.pathname = isSuperAdmin ? "/super-admin" : "/dashboard";
     target.search = "";
     return redirectWithSession(target);
   }
 
-  if (isCustomerArea && isAdmin) {
+  if (isSuperAdminArea && !isSuperAdmin) {
     const target = request.nextUrl.clone();
-    target.pathname = "/admin";
+    target.pathname = isSuperAdmin ? "/super-admin" : isAdmin ? "/admin" : "/dashboard";
+    target.search = "";
+    return redirectWithSession(target);
+  }
+
+  if (isCustomerArea && isPrivileged) {
+    const target = request.nextUrl.clone();
+    target.pathname = isSuperAdmin ? "/super-admin" : "/admin";
     target.search = "";
     return redirectWithSession(target);
   }
