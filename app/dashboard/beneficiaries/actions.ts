@@ -5,6 +5,24 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const supportedCountries = new Set(["NX","US","GB","DE","FR","NL","ES","IE"]);
+const ibanLengths:Record<string,number>={DE:22,FR:27,NL:18,ES:24,IE:22};
+
+function validIban(value:string){
+  if(!/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/.test(value)) return false;
+  const rearranged=value.slice(4)+value.slice(0,4);
+  let remainder=0;
+  for(const character of rearranged){
+    const digits=character>="A"&&character<="Z" ? String(character.charCodeAt(0)-55) : character;
+    for(const digit of digits) remainder=(remainder*10+Number(digit))%97;
+  }
+  return remainder===1;
+}
+
+function validUsRouting(value:string){
+  if(!/^\\d{9}$/.test(value)) return false;
+  const digits=value.split("").map(Number);
+  return (3*(digits[0]+digits[3]+digits[6])+7*(digits[1]+digits[4]+digits[7])+(digits[2]+digits[5]+digits[8]))%10===0;
+}
 
 export async function addBeneficiary(formData:FormData){
   const supabase=await createClient();
@@ -33,7 +51,7 @@ export async function addBeneficiary(formData:FormData){
   if(country==="GB" && (!/^\d{6}$/.test(sortCode) || !/^\d{8}$/.test(account))){
     redirect("/dashboard/beneficiaries?error=Enter%20a%206-digit%20UK%20sort%20code%20and%208-digit%20account%20number.");
   }
-  if(["DE","FR","NL","ES","IE"].includes(country) && !/^[A-Z]{2}[0-9A-Z]{13,32}$/.test(iban)){
+  if(["DE","FR","NL","ES","IE"].includes(country) && (iban.length!==ibanLengths[country] || !validIban(iban))){
     redirect("/dashboard/beneficiaries?error=Enter%20a%20valid%20IBAN.");
   }
   if(bic && !/^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(bic)){
