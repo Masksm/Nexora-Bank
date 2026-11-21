@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { getMessages } from "@/lib/messages";
+import { pageText } from "@/lib/page-translations";
 import { isLanguagePreference, type SupportedLocale } from "@/lib/locale";
 import { redirect } from "next/navigation";
 import {
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
   const locale = (isLanguagePreference(savedLocale) && savedLocale !== "auto" ? savedLocale : "en") as SupportedLocale;
   const messages = getMessages(locale);
   const t = (key: keyof typeof messages) => messages[key];
+  const pt = (value: string) => pageText(locale, value);
   const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) redirect("/login");
@@ -173,8 +175,8 @@ export default async function DashboardPage() {
               <Link href="/dashboard/beneficiaries"><span><Plus size={18}/></span>{t("dashboard.addBeneficiary")}</Link>
               <Link href="/dashboard/transactions"><span><FileText size={18}/></span>{t("nav.transactions")}</Link>
               <Link href="/dashboard/cards"><span><CreditCard size={18}/></span>{t("dashboard.manageCards")}</Link>
-              <Link href="/dashboard/analytics"><span><Activity size={18}/></span>Spending analytics</Link>
-              <Link href="/dashboard/scheduled-transfers"><span><CalendarClock size={18}/></span>Schedule a transfer</Link>\n              <Link href="/dashboard/savings"><span><PiggyBank size={18}/></span>Savings goals</Link>
+              <Link href="/dashboard/analytics"><span><Activity size={18}/></span>{pt("Spending analytics")}</Link>
+              <Link href="/dashboard/scheduled-transfers"><span><CalendarClock size={18}/></span>{pt("Schedule a transfer")}</Link>\n              <Link href="/dashboard/savings"><span><PiggyBank size={18}/></span>{pt("Savings goals")}</Link>
             </div>
           </article>
         </section>
@@ -191,7 +193,7 @@ export default async function DashboardPage() {
                 const review = (transaction.metadata as { review_required?: boolean; synthetic_demo?: boolean } | null)?.review_required === true;
                 return <article className="dashboard-recent-row" key={transaction.id}>
                   <span className={incoming ? "recent-transaction-icon incoming" : "recent-transaction-icon"}>{incoming ? <ArrowDownLeft size={17}/> : <ArrowUpRight size={17}/>}</span>
-                  <div className="recent-transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{dateLabel(transaction.created_at, locale)} · Ref {transaction.reference}</span></div>
+                  <div className="recent-transaction-description"><strong>{transaction.description || pt(transaction.transaction_type.replaceAll("_", " "))}</strong><span>{dateLabel(transaction.created_at, locale)} · Ref {transaction.reference}</span></div>
                   <div className="recent-transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD", locale)}</strong><span className={"transaction-status " + (review ? "review" : transaction.status)}>{review ? t("dashboard.underReview") : transaction.status}</span></div>
                 </article>;
               })}
