@@ -17,8 +17,8 @@ type HistoryTransaction = {
   currency: string;
 };
 
-function money(amountMinor: number, currency: string) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(Math.abs(amountMinor) / 100);
+function money(amountMinor: number, currency: string, locale: SupportedLocale) {
+  return new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: 2 }).format(Math.abs(amountMinor) / 100);
 }
 
 function dateParts(value: string, locale: SupportedLocale) {
