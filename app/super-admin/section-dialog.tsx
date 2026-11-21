@@ -3,10 +3,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { X, ArrowUpRight } from "lucide-react";
 
-type Props = { id?: string; title: string; eyebrow: string; description: string; count: string | number; icon: ReactNode; children: ReactNode };
+type Props = { id?: string; defaultOpen?: boolean; title: string; eyebrow: string; description: string; count: string | number; icon: ReactNode; children: ReactNode };
 
-export function SuperAdminDialog({ id, title, eyebrow, description, count, icon, children }: Props) {
-  const [open, setOpen] = useState(false);
+export function SuperAdminDialog({ id, defaultOpen = false, title, eyebrow, description, count, icon, children }: Props) {
+  const [open, setOpen] = useState(defaultOpen);
+  useEffect(() => { setOpen(defaultOpen); }, [defaultOpen]);
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
@@ -26,7 +27,7 @@ export function SuperAdminDialog({ id, title, eyebrow, description, count, icon,
         <div className="super-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
           <section className="super-dialog" role="dialog" aria-modal="true" aria-label={title}>
             <header className="super-dialog-header"><div><small>{eyebrow}</small><h2>{title}</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="Close section"><X size={19}/></button></header>
-            <div className="super-dialog-content">{children}</div>
+            <div className="super-dialog-content"><section className="admin-panel">{children}</section></div>
           </section>
         </div>
       )}
