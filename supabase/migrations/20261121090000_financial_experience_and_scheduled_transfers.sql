@@ -292,3 +292,11 @@ BEGIN
   RETURN v_new_status;
 END;
 $function$;
+
+ 
+-- Retain only seven days of scheduler execution logs to prevent unbounded growth.
+SELECT cron.schedule(
+  'nexora-cron-history-cleanup',
+  '0 2 * * *',
+  $$DELETE FROM cron.job_run_details WHERE end_time < now() - interval '7 days'$$
+);
