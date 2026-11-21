@@ -72,7 +72,7 @@ export default async function SettingsPage({ searchParams }: Props) {
             <label>{t("Date of birth")}<input name="date_of_birth" type="date" defaultValue={profile?.date_of_birth ?? ""} max={new Date().toISOString().slice(0,10)} autoComplete="bday"/></label>
             <label>{t("Country / region")}<select name="country_code" defaultValue={profile?.country_code?.trim() || "NG"}>{countries.map(([code,name])=><option key={code} value={code}>{name}</option>)}</select></label>
           </div>
-          {hiddenProfile}
+          <input type="hidden" name="preferred_language" value={profile?.preferred_language || "auto"}/>{hiddenProfile}
           <div className="settings-form-actions"><p>{t("Your email address is managed through your sign-in credentials.")}</p><button type="submit"><Save size={15}/> {t("Save personal details")}</button></div></form>
         </SettingsPopupSection>
 
