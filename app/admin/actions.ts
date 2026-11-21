@@ -9,7 +9,7 @@ async function requireAdmin() {
   const { data: { user } } = await supabase.auth.getUser();
   const { data, error } = await supabase.auth.getClaims();
   const appMetadata = data?.claims?.app_metadata as { role?: string } | undefined;
-  if (!user || error || appMetadata?.role !== "admin") redirect("/login");
+  if (!user || error || !["admin", "super_admin"].includes(appMetadata?.role ?? "")) redirect("/login");
   return supabase;
 }
 
