@@ -19,7 +19,7 @@ function validIban(value:string){
 }
 
 function validUsRouting(value:string){
-  if(!/^\\d{9}$/.test(value)) return false;
+  if(value.length!==9 || [...value].some(character=>character<"0" || character>"9")) return false;
   const digits=value.split("").map(Number);
   return (3*(digits[0]+digits[3]+digits[6])+7*(digits[1]+digits[4]+digits[7])+(digits[2]+digits[5]+digits[8]))%10===0;
 }
@@ -45,7 +45,7 @@ export async function addBeneficiary(formData:FormData){
   if(country==="NX" && !/^\d{10}$/.test(account)){
     redirect("/dashboard/beneficiaries?error=Enter%20a%2010-digit%20Nexora%20account%20number.");
   }
-  if(country==="US" && (!/^\d{9}$/.test(routing) || !/^\d{4,17}$/.test(account))){
+  if(country==="US" && (!validUsRouting(routing) || !/^\d{4,17}$/.test(account))){
     redirect("/dashboard/beneficiaries?error=Enter%20a%209-digit%20US%20routing%20number%20and%20valid%20account%20number.");
   }
   if(country==="GB" && (!/^\d{6}$/.test(sortCode) || !/^\d{8}$/.test(account))){
