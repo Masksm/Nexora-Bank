@@ -82,8 +82,8 @@ export default async function SettingsPage({ searchParams }: Props) {
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">ADDRESS DETAILS</span><h2>{t("Where you live")}</h2></div></div>
         <form action={updateProfile} className="transfer-form settings-form">
           <div className="settings-form-grid">
-            <label className="settings-span-two">{t("Address line 1")}<input name="address_line1" defaultValue={profile?.address_line1 ?? ""} maxLength={160} autoComplete="address-line1" placeholder="{t("Street address")}"/></label>
-            <label className="settings-span-two">{t("Address line 2 (optional)")}<input name="address_line2" defaultValue={profile?.address_line2 ?? ""} maxLength={160} autoComplete="address-line2" placeholder="{t("Apartment, suite or unit")}"/></label>
+            <label className="settings-span-two">{t("Address line 1")}<input name="address_line1" defaultValue={profile?.address_line1 ?? ""} maxLength={160} autoComplete="address-line1" placeholder={t("Street address")}/></label>
+            <label className="settings-span-two">{t("Address line 2 (optional)")}<input name="address_line2" defaultValue={profile?.address_line2 ?? ""} maxLength={160} autoComplete="address-line2" placeholder={t("Apartment, suite or unit")}/></label>
             <label>{t("City")}<input name="city" defaultValue={profile?.city ?? ""} maxLength={100} autoComplete="address-level2"/></label>
             <label>{t("State / province")}<input name="region" defaultValue={profile?.region ?? ""} maxLength={100} autoComplete="address-level1"/></label>
             <label>{t("Postal code")}<input name="postal_code" defaultValue={profile?.postal_code ?? ""} maxLength={24} autoComplete="postal-code"/></label>
