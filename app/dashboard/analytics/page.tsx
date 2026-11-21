@@ -64,7 +64,7 @@ export default async function AnalyticsPage() {
   const trend = months.map((month)=>{const rows=posted.filter((e)=>{const d=new Date(e.created_at);return d>=month.start&&d<month.end;});return {...month,in:rows.reduce((s,e)=>s+Math.max(0,Number(e.amount_minor)),0),out:rows.reduce((s,e)=>s+Math.max(0,-Number(e.amount_minor)),0)};});
   const maxTrend = Math.max(1,...trend.flatMap((m)=>[m.in,m.out]));
   return <main className="workspace-shell">
-    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">NEXORA BANK · INSIGHTS</span></header>
+    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link><span className="workspace-overline">NEXORA BANK · INSIGHTS</span></header>
     <section className="workspace-intro"><div><span className="workspace-kicker">YOUR MONEY, AT A GLANCE</span><h1>Spending analytics</h1><p>Understand how money moves across your accounts.</p></div><Link href="/dashboard/statements" className="workspace-download">View statements</Link></section>
     {failed ? <div className="workspace-alert">We couldn’t load complete account activity. Refresh and try again.</div> : <>
       <section className="analytics-summary">
