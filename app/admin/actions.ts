@@ -210,3 +210,34 @@ export async function revokeUserSession(formData: FormData) {
   revalidatePath("/admin/reviews");
   resultUrl("success", "Session revoked. The affected user will be signed out on their next protected request.");
 }
+
+
+export async function reviewIdentityDocument(formData: FormData) {
+  const supabase = await requireAdmin();
+  const documentId = String(formData.get("document_id") || "");
+  const decision = String(formData.get("decision") || "");
+  const rejectionReason = String(formData.get("rejection_reason") || "").trim();
+  if (!documentId || !["under_review", "verified", "rejected"].includes(decision)) {
+    redirect("/admin/kyc?kind=error&message=Choose%20a%20valid%20document%20review%20decision.");
+  }
+  if (decision === "rejected" && (rejectionReason.length < 8 || rejectionReason.length > 500)) {
+    redirect("/admin/kyc?kind=error&message=Provide%20a%20clear%20rejection%20reason%20between%208%20and%20500%20characters.");
+  }
+  const { error } = await supabase.rpc("admin_review_identity_document", {
+    p_document_id: documentId,
+    p_decision: decision,
+    p_rejection_reason: decision === "rejected" ? rejectionReason : null,
+  });
+  if (error) {
+    redirect("/admin/kyc?kind=error&message=" + encodeURIComponent(error.message));
+  }
+  revalidatePath("/admin/kyc");
+  revalidatePath("/admin/audit");
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard");
+  redirect("/admin/kyc?kind=success&message=" + encodeURIComponent(
+    decision === "verified" ? "Identity document verified." :
+    decision === "rejected" ? "Document rejected. The customer can see the reason and submit a replacement." :
+    "Document moved into review."
+  ));
+}
