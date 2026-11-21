@@ -117,7 +117,8 @@ export default async function DashboardPage() {
           <Link href="/dashboard/transactions"><FileText size={17}/> {t("nav.transactions")}</Link>
           <Link href="/dashboard/analytics"><Activity size={17}/> {pt("Analytics")}</Link>
           <Link href="/dashboard/statements"><FileText size={17}/> {pt("Statements")}</Link>
-          <Link href="/dashboard/scheduled-transfers"><CalendarClock size={17}/> {pt("Scheduled transfers")}</Link>\n          <Link href="/dashboard/savings"><PiggyBank size={17}/> {pt("Savings goals")}</Link>
+          <Link href="/dashboard/scheduled-transfers"><CalendarClock size={17}/> {pt("Scheduled transfers")}</Link>
+          <Link href="/dashboard/savings"><PiggyBank size={17}/> {pt("Savings goals")}</Link>
         </nav>
         <div className="sidebar-label sidebar-bottom-label">{t("nav.preferences")}</div>
         <nav className="dashboard-nav">
@@ -176,7 +177,8 @@ export default async function DashboardPage() {
               <Link href="/dashboard/transactions"><span><FileText size={18}/></span>{t("nav.transactions")}</Link>
               <Link href="/dashboard/cards"><span><CreditCard size={18}/></span>{t("dashboard.manageCards")}</Link>
               <Link href="/dashboard/analytics"><span><Activity size={18}/></span>{pt("Spending analytics")}</Link>
-              <Link href="/dashboard/scheduled-transfers"><span><CalendarClock size={18}/></span>{pt("Schedule a transfer")}</Link>\n              <Link href="/dashboard/savings"><span><PiggyBank size={18}/></span>{pt("Savings goals")}</Link>
+              <Link href="/dashboard/scheduled-transfers"><span><CalendarClock size={18}/></span>{pt("Schedule a transfer")}</Link>
+              <Link href="/dashboard/savings"><span><PiggyBank size={18}/></span>{pt("Savings goals")}</Link>
             </div>
           </article>
         </section>
