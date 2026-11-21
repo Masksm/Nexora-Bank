@@ -5,6 +5,7 @@ import { Activity, Eye, LogOut, ShieldCheck, Users, UserCog, MessageSquare, Lock
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { superAdminSetAssignment, superAdminSetRole } from "./actions";
+import { SuperAdminDialog } from "./section-dialog";
 
 export const dynamic = "force-dynamic";
 type DirectoryUser = { user_id: string; email: string; role: string; display_name: string; account_count: number; assigned_customer_count: number };
@@ -63,15 +64,15 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <article><span><LockKeyhole size={17}/> ACTIVE ASSIGNMENTS</span><strong>{assignmentCount}</strong><small>Customer-to-admin access links</small></article>
         </section>
 
-        <section className="admin-panel" id="staff">
+        <SuperAdminDialog title="Staff administrators" eyebrow="STAFF AUTHORITY" description="Review staff administrator accounts and manage their access." count={staffCount} staf} icon={<UserCog size={20}/>}>
           <div className="admin-panel-heading"><div><span>STAFF AUTHORITY</span><h2>Staff administrator accounts</h2></div><span>{staffCount} staff</span></div>
           {directoryError ? <p className="admin-empty">Unable to load the administrator directory: {directoryError.message}</p> : !admins.length ? <p className="admin-empty">No staff administrators have been appointed yet.</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Staff administrator</th><th>Assigned customers</th><th>Access</th></tr></thead><tbody>
               {admins.map((person) => <tr key={person.user_id}><td><strong>{person.display_name}</strong><small>{person.email} · {person.user_id.slice(0, 10)}…</small></td><td>{person.assigned_customer_count}</td><td><form action={superAdminSetRole}><input type="hidden" name="user_id" value={person.user_id}/><input type="hidden" name="make_admin" value="false"/><button className="admin-danger-button" type="submit">Revoke staff role</button></form></td></tr>)}
             </tbody></table></div>}
-        </section>
+        </SuperAdminDialog>
 
-        <section className="admin-panel" id="assignments">
+        <SuperAdminDialog title="Customer access" eyebrow="ACCESS ALLOCATION" description="Review the customer directory and control which staff member can access each customer." count={customers.length} customer} icon={<Users size={20}/>}>
           <div className="admin-panel-heading"><div><span>ACCESS ALLOCATION</span><h2>Assign customers to staff</h2></div><span>{customers.length} customers</span></div>
           <p className="admin-help">A staff administrator can only access the customers explicitly assigned here. Assigning a customer to a second staff member gives both staff members access to that customer.</p>
           {!admins.length ? <p className="admin-empty">Promote at least one customer to staff administrator before assigning customer accounts.</p> :
@@ -86,21 +87,21 @@ export default async function SuperAdminPage({ searchParams }: Props) {
                 </tr>;
               })}
             </tbody></table></div>}
-        </section>
+        </SuperAdminDialog>
 
-        <section className="admin-panel" id="promote">
+        <SuperAdminDialog title="Promote customers" eyebrow="ROLE MANAGEMENT" description="Choose customer accounts to appoint as staff administrators." count={customers.length} eligibl} icon={<ShieldCheck size={20}/>}>
           <div className="admin-panel-heading"><div><span>ROLE MANAGEMENT</span><h2>Promote a customer to staff administrator</h2></div><UserCog size={18}/></div>
           <p className="admin-help">Promoting an account does not grant access to any customer records. You must separately assign customers above.</p>
           <div className="super-promote-list">{customers.map((person) => <form action={superAdminSetRole} key={person.user_id}><div><strong>{person.display_name}</strong><small>{person.email}</small></div><input type="hidden" name="user_id" value={person.user_id}/><input type="hidden" name="make_admin" value="true"/><button type="submit">Promote to staff admin</button></form>)}</div>
-        </section>
+        </SuperAdminDialog>
 
-        <section className="admin-panel" id="oversight">
+        <SuperAdminDialog title="Support oversight" eyebrow="GLOBAL CUSTOMER CARE" description="Read support conversations across Nexora without needing to open each staff workspace." count={tickets?.length ?? 0} conversation} icon={<MessageSquare size={20}/>}>
           <div className="admin-panel-heading"><div><span>GLOBAL CUSTOMER CARE OVERSIGHT</span><h2>All support conversations</h2></div><span>{openCount} open · {tickets?.length ?? 0} recent</span></div>
           {ticketError ? <p className="admin-empty">Unable to load support conversations.</p> : !tickets?.length ? <p className="admin-empty">No support conversations have been opened.</p> :
             <div className="super-support-layout"><div className="admin-ticket-list">{tickets.map((ticket) => <Link href={"/super-admin?ticket=" + ticket.id + "#oversight"} key={ticket.id} className={selected?.id === ticket.id ? "admin-ticket selected" : "admin-ticket"}><strong>{ticket.subject}</strong><span>{personMap.get(ticket.user_id)?.email ?? ticket.user_id} · {ticket.category} · {ticket.status}</span><small>{new Date(ticket.updated_at).toLocaleString(locale)}</small></Link>)}</div>
               {selected && <div className="super-support-thread"><div className="admin-panel-heading"><div><span>READ-ONLY CONVERSATION MONITOR</span><h2>{selected.subject}</h2></div><MessageSquare size={18}/></div><div className="admin-case-meta"><span>Customer: {personMap.get(selected.user_id)?.email ?? selected.user_id}</span><span>Status: {selected.status}</span><span>Category: {selected.category}</span></div><div className="admin-support-messages">{(messages ?? []).map((message) => <article key={message.id} className={message.sender_role === "admin" ? "admin-support-message staff" : "admin-support-message"}><span>{message.sender_role === "admin" ? "Staff admin" : "Customer"} · {personMap.get(message.sender_user_id)?.email ?? "Account"} · {new Date(message.created_at).toLocaleString(locale)}</span><p>{message.body}</p></article>)}</div></div>}
             </div>}
-        </section>
+        </SuperAdminDialog>
         <p className="admin-disclaimer">Super Admin oversight is read-only for customer conversations. Staff administrators remain responsible for replying to their assigned customers. All role and assignment changes are recorded in the audit log.</p>
       </section>
     </main>
