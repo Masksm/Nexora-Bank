@@ -9,3 +9,40 @@
 .admin-sidebar-foot form{margin-left:auto}.admin-logout-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 10px;color:#eaf2eb;background:#245548;border:1px solid #426b5e;border-radius:5px;font:600 10px 'DM Sans',sans-serif;cursor:pointer}.admin-logout-button:hover{background:#326758}
 
 .admin-form button.admin-danger-button{color:#fff;background:#9a493e}.admin-form button.admin-danger-button:hover{background:#7f382f}.admin-danger-warning{color:#a14f43;font-size:9px;line-height:1.65}
+
+
+/* Customer identity review */
+.kyc-stats{margin-top:18px}
+.kyc-review-list{display:grid}
+.kyc-review-card{padding:19px;border-bottom:1px solid #edf1ed}
+.kyc-review-card:last-child{border-bottom:0}
+.kyc-review-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.kyc-review-top h3{margin:5px 0;color:#30483a;font:600 15px Manrope,sans-serif}
+.kyc-review-top small{color:#92a096;font-size:9px}
+.kyc-doc-type{color:#7f9486;font-size:8px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
+.kyc-review-top code{color:#698071}
+.admin-status.pending{background:#f8f1e6;color:#987344}
+.kyc-customer-details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0;padding:14px;background:#f8faf8;border:1px solid #edf1ed;border-radius:6px}
+.kyc-customer-details>div{display:grid;gap:5px;min-width:0}
+.kyc-customer-details span{color:#9aa69e;font-size:7px;font-weight:700;letter-spacing:1px}
+.kyc-customer-details strong{color:#52685a;font-size:9px;overflow-wrap:anywhere}
+.kyc-capitalize{text-transform:capitalize}
+.kyc-file-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;border:1px solid #e7ede8;border-radius:6px}
+.kyc-file-row>div{display:flex;align-items:center;gap:9px;min-width:0;color:#5d8067}
+.kyc-file-row>div span{display:grid;gap:4px;min-width:0}
+.kyc-file-row strong{overflow-wrap:anywhere;color:#52685a;font-size:9px}
+.kyc-file-row small,.kyc-file-unavailable{color:#9aa69e;font-size:8px}
+.kyc-file-row>a{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;color:#3e7352;font-size:9px;font-weight:700}
+.kyc-rejection-note{margin-top:12px;padding:12px 14px;background:#fbf3ef;border:1px solid #f0e3dc;border-radius:5px}
+.kyc-rejection-note strong{color:#955e4f;font-size:9px}
+.kyc-rejection-note p{margin:6px 0 0;color:#805d53;font-size:10px;line-height:1.6;white-space:pre-wrap}
+.kyc-review-actions{display:grid;grid-template-columns:auto auto minmax(220px,1fr);align-items:start;gap:8px;margin-top:13px}
+.kyc-review-actions form{min-width:0}
+.kyc-review-actions button{min-height:36px;padding:0 12px;border:0;border-radius:5px;font:700 9px 'DM Sans',sans-serif;cursor:pointer}
+.kyc-secondary-button{color:#456d51;background:#edf4ee}
+.kyc-approve-button{color:#fff;background:#174d40}
+.kyc-reject-form{display:grid;gap:7px}
+.kyc-reject-form textarea{width:100%;min-height:58px;padding:9px;border:1px solid #e5e9e5;border-radius:5px;font:9px 'DM Sans',sans-serif;resize:vertical}
+.kyc-reject-button{justify-self:start;color:#8b5547;background:#f8ece8}
+@media(max-width:850px){.kyc-review-actions{grid-template-columns:1fr 1fr}.kyc-reject-form{grid-column:1/-1}}
+@media(max-width:650px){.kyc-customer-details{grid-template-columns:1fr 1fr}.kyc-review-top{align-items:flex-start}.kyc-review-actions{grid-template-columns:1fr}.kyc-reject-form{grid-column:auto}.kyc-file-row{align-items:flex-start;flex-direction:column}.kyc-file-row>a{align-self:flex-start}}
