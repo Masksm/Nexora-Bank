@@ -123,3 +123,58 @@ html[data-theme="dark"] .theme-switch.is-on span{transform:translateX(20px)}
 .theme-switch span{display:block;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:transform .18s}
 .theme-switch.is-on{background:#5a936e}
 .theme-switch.is-on span{transform:translateX(20px)}
+
+/* Additional product surfaces outside the main dashboard */
+html[data-theme="dark"] .feature-card,
+html[data-theme="dark"] .analytics-summary,
+html[data-theme="dark"] .analytics-stat,
+html[data-theme="dark"] .analytics-panel,
+html[data-theme="dark"] .category-row,
+html[data-theme="dark"] .account-detail-card,
+html[data-theme="dark"] .statement-document,
+html[data-theme="dark"] .statement-table-wrap,
+html[data-theme="dark"] .support-ticket-list,
+html[data-theme="dark"] .support-thread,
+html[data-theme="dark"] .scheduled-row,
+html[data-theme="dark"] .notification-list,
+html[data-theme="dark"] .notification-symbol,
+html[data-theme="dark"] .workspace-empty,
+html[data-theme="dark"] .policy-card,
+html[data-theme="dark"] .policy-section,
+html[data-theme="dark"] .admin-table-wrap,
+html[data-theme="dark"] .admin-panel,
+html[data-theme="dark"] .admin-stats article,
+html[data-theme="dark"] .super-support-thread,
+html[data-theme="dark"] .admin-ticket-list,
+html[data-theme="dark"] .super-promote-list{
+ background:#17231d!important;color:#e4ece6!important;border-color:#304238!important;
+}
+html[data-theme="dark"] .nav{border-color:#304238!important}
+html[data-theme="dark"] .nav-links a,
+html[data-theme="dark"] .nav .brand,
+html[data-theme="dark"] .footer,
+html[data-theme="dark"] .footer a,
+html[data-theme="dark"] .section-heading,
+html[data-theme="dark"] .feature-card h3,
+html[data-theme="dark"] .policy-section h2,
+html[data-theme="dark"] .statement-document h2{color:#e7eee9!important}
+html[data-theme="dark"] .hero-copy,
+html[data-theme="dark"] .feature-card p,
+html[data-theme="dark"] .section-heading p,
+html[data-theme="dark"] .policy-section p,
+html[data-theme="dark"] .statement-footnote{color:#a6b6ac!important}
+html[data-theme="dark"] .security-band{background:#172c22!important;color:#e7eee9!important}
+html[data-theme="dark"] .security-band p,
+html[data-theme="dark"] .security-band span{color:#b3c9ba!important}
+html[data-theme="dark"] .statement-meta,
+html[data-theme="dark"] .statement-totals,
+html[data-theme="dark"] .statement-table th{background:#203128!important;color:#e4ece6!important}
+html[data-theme="dark"] .workspace-alert{background:#3a2922!important;color:#f1c5b9!important;border-color:#69483a!important}
+html[data-theme="dark"] .transfer-success{background:#1e3829!important;color:#b9e2c4!important;border-color:#345c42!important}
+html[data-theme="dark"] .workspace-disclaimer,
+html[data-theme="dark"] .admin-disclaimer{background:#1c2921!important;color:#a6b6ac!important;border-color:#304238!important}
+html[data-theme="dark"] .admin-table tr:hover,
+html[data-theme="dark"] .notification-list article:hover{background:#203128!important}
+html[data-theme="dark"] .statement-document{box-shadow:0 12px 36px #0003!important}
+html[data-theme="dark"] .auth-page .brand-light,
+html[data-theme="dark"] .admin-brand{color:#fff!important}
