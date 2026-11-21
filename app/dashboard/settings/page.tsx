@@ -26,12 +26,17 @@ export default async function SettingsPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: documents }, params] = await Promise.all([
+  const [{ data: profile }, { data: documents }, { data: verification }, params] = await Promise.all([
     supabase.from("profiles").select("first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,address_line2,city,region,postal_code,preferred_timezone,preferred_language").eq("user_id", user.id).maybeSingle(),
-    supabase.from("identity_documents").select("id,document_type,file_name,review_status,uploaded_at").eq("user_id", user.id).order("uploaded_at", { ascending: false }),
+    supabase.from("identity_documents").select("id,document_type,file_name,review_status,rejection_reason,uploaded_at").eq("user_id", user.id).order("uploaded_at", { ascending: false }),
+    supabase.from("customer_verifications").select("status,rejection_reason,submitted_at,reviewed_at").eq("user_id", user.id).maybeSingle(),
     searchParams,
   ]);
   const displayName = profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
+  const completionFields = [profile?.first_name, profile?.last_name, profile?.phone, profile?.date_of_birth, profile?.country_code, profile?.address_line1, profile?.city, profile?.region];
+  const completedFields = completionFields.filter((value) => Boolean(String(value ?? "").trim())).length;
+  const completionPercent = Math.round(completedFields / completionFields.length * 100);
+  const kycStatus = verification?.status || "not_started";
 
   return (
     <main className="workspace-shell settings-shell">
@@ -101,9 +106,18 @@ export default async function SettingsPage({ searchParams }: Props) {
       </section>
 
       <section className="settings-section-heading"><div className="settings-section-icon"><FileCheck size={18}/></div><div><h2>{t("Identity documents")}</h2><p>{t("Submit an identity document for account records.")}</p></div></section>
+      <section className="workspace-panel kyc-customer-summary">
+        <div className="kyc-summary-top"><div><span className="workspace-kicker">PROFILE READINESS</span><h2>Profile completion</h2><p>Complete your personal details and submit an identity document for review.</p></div><strong>{completionPercent}%</strong></div>
+        <div className="kyc-progress-track"><span style={{ width: completionPercent + "%" }}/></div>
+        <div className="kyc-summary-bottom"><span>{completedFields} of 8 profile details completed</span><span className={"kyc-customer-status " + kycStatus}>{kycStatus.replace("_", " ")}</span></div>
+        {kycStatus === "rejected" && verification?.rejection_reason && <div className="kyc-customer-rejection"><strong>Action required</strong><p>{verification.rejection_reason}</p><span>Upload a corrected document below. Your previous submission remains in your record.</span></div>}
+        {kycStatus === "verified" && <p className="kyc-customer-verified">Your identity documents have passed Nexora's internal review.</p>}
+        {kycStatus === "submitted" && <p className="kyc-customer-pending">Your documents have been received and are waiting for review.</p>}
+        {kycStatus === "under_review" && <p className="kyc-customer-pending">Your documents are currently being reviewed.</p>}
+      </section>
       <section className="workspace-panel settings-panel">
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">IDENTITY RECORDS</span><h2>{t("Documents")}</h2></div><span className="workspace-count">{documents?.length ?? 0} uploaded</span></div>
-        <IdentityDocuments userId={user.id} locale={locale} initialDocuments={(documents ?? []) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";uploaded_at:string}>}/>
+        <IdentityDocuments userId={user.id} locale={locale} initialDocuments={(documents ?? []) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";rejection_reason:string|null;uploaded_at:string}>}/>
       </section>
 
       <section className="settings-section-heading"><div className="settings-section-icon"><ShieldCheck size={18}/></div><div><h2>{t("Security and access")}</h2><p>{t("Review devices and protect your account.")}</p></div></section>
