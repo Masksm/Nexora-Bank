@@ -19,10 +19,12 @@ const labels: Record<IdentityDocument["document_type"], string> = {
   drivers_license: "Driver&apos;s licence",
 };
 
-export default function IdentityDocuments({ userId, initialDocuments }: {
+export default function IdentityDocuments({ userId, initialDocuments, locale }: {
   userId: string;
   initialDocuments: IdentityDocument[];
+  locale: SupportedLocale;
 }) {
+  const t = (value: string) => pageText(locale, value);
   const [documents, setDocuments] = useState(initialDocuments);
   const [documentType, setDocumentType] = useState<IdentityDocument["document_type"]>("passport");
   const [file, setFile] = useState<File | null>(null);
