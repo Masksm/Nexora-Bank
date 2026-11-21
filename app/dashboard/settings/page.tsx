@@ -68,7 +68,6 @@ export default async function SettingsPage({ searchParams }: Props) {
           <input type="hidden" name="region" value={profile?.region ?? ""}/>
           <input type="hidden" name="postal_code" value={profile?.postal_code ?? ""}/>
           <input type="hidden" name="preferred_timezone" value={profile?.preferred_timezone ?? "Africa/Lagos"}/>
-          <input type="hidden" name="preferred_language" value={profile?.preferred_language || "auto"}/>
           <div className="settings-form-actions"><p>Your email address is managed through your sign-in credentials.</p><button type="submit"><Save size={15}/> Save personal details</button></div>
         </form>
       </section>
