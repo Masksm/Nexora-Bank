@@ -212,3 +212,5 @@
 .savings-recent-entries b.positive{color:#4f8058}
 @media(max-width:900px){.savings-create-form{grid-template-columns:1fr 1fr}.savings-create-form button{grid-column:1/-1}.savings-money-actions form{grid-template-columns:1fr 1fr}.savings-money-actions button{grid-column:1/-1}}
 @media(max-width:650px){.savings-overview-grid,.savings-goals-grid,.savings-create-form,.savings-money-actions form{grid-template-columns:1fr}.savings-create-form button,.savings-money-actions button{grid-column:auto}.savings-goal-card{padding:16px}.savings-stat-card{padding:14px 16px}}
+
+.beneficiary-verification{display:block;margin-top:5px;color:#9b7645!important;font-size:8px!important}.form-hint{margin:-6px 0 2px;color:#718276;font-size:10px;line-height:1.5}
