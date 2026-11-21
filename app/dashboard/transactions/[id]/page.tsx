@@ -14,7 +14,9 @@ function money(amountMinor: number, currency = "USD") {
   return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(Math.abs(amountMinor) / 100);
 }
 
-export default async function TransactionReceiptPage({ params }: Props) {\n  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;\n  const t = (value: string) => pageText(locale, value);
+export default async function TransactionReceiptPage({ params }: Props) {
+  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const t = (value: string) => pageText(locale, value);
   const { id } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
