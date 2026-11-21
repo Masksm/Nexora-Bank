@@ -20,7 +20,7 @@ export function resolveLocale(
   countryCode: string | null | undefined,
 ): SupportedLocale {
   if (preference && preference !== "auto" && isLanguagePreference(preference)) {
-    return preference;
+    return preference as SupportedLocale;
   }
 
   const browserLanguages = (acceptLanguage || "")
