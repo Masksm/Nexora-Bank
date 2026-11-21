@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
@@ -11,12 +12,13 @@ type IdentityDocument = {
   file_name: string;
   review_status: "submitted" | "under_review" | "verified" | "rejected";
   uploaded_at: string;
+  rejection_reason: string | null;
 };
 
 const labels: Record<IdentityDocument["document_type"], string> = {
   passport: "Passport",
   national_id: "National identity card",
-  drivers_license: "Driver&apos;s licence",
+  drivers_license: "Driver's licence",
 };
 
 export default function IdentityDocuments({ userId, initialDocuments, locale }: {
@@ -25,6 +27,7 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
   locale: SupportedLocale;
 }) {
   const t = (value: string) => pageText(locale, value);
+  const router = useRouter();
   const [documents, setDocuments] = useState(initialDocuments);
   const [documentType, setDocumentType] = useState<IdentityDocument["document_type"]>("passport");
   const [file, setFile] = useState<File | null>(null);
@@ -66,7 +69,7 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
       file_name: safeName,
       content_type: file.type,
       file_size_bytes: file.size,
-    }).select("id,document_type,file_name,review_status,uploaded_at").single();
+    }).select("id,document_type,file_name,review_status,rejection_reason,uploaded_at").single();
 
     if (recordError || !data) {
       await supabase.storage.from("identity-documents").remove([path]);
@@ -81,6 +84,7 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
     if (input) input.value = "";
     setMessage(t("Document uploaded securely."));
     setBusy(false);
+    router.refresh();
   }
 
   async function removeDocument(document: IdentityDocument) {
@@ -119,13 +123,13 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
           <select value={documentType} onChange={(event) => setDocumentType(event.target.value as IdentityDocument["document_type"])}>
             <option value="passport">{t("Passport")}</option>
             <option value="national_id">{t("National identity card")}</option>
-            <option value="drivers_license">{t("Driver&apos;s licence")}</option>
+            <option value="drivers_license">{t("Driver's licence")}</option>
           </select>
         </label>
         <label>Choose document
           <input id="identity-file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={(event) => setFile(event.target.files?.[0] ?? null)} required />
         </label>
-        <p>{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately and are accessible only to your account under the current access rules.")}</p>
+        <p>{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.")}</p>
         <button type="submit" disabled={!file || busy}>{busy ? "Uploading…" : "Upload identity document"}</button>
       </form>
       {message && <p className="identity-message" role="status">{message}</p>}
@@ -138,6 +142,7 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
               <strong>{t(labels[document.document_type])}</strong>
               <span>{document.file_name}</span>
               <small>{new Date(document.uploaded_at).toLocaleDateString()} · {document.review_status.replace("_", " ")}</small>
+              {document.review_status === "rejected" && document.rejection_reason && <p className="identity-rejection-reason">{document.rejection_reason}</p>}
             </div>
             {document.review_status === "submitted" && (
               <button type="button" onClick={() => removeDocument(document)} disabled={busy} aria-label={"Remove " + t(labels[document.document_type])}>
