@@ -222,3 +222,27 @@
 .bank-autocomplete-list button{width:100%;padding:10px 11px;border:0;border-radius:4px;background:#fff;color:#40584a;text-align:left;font:500 11px 'DM Sans',sans-serif;cursor:pointer}
 .bank-autocomplete-list button:hover,.bank-autocomplete-list button:focus{background:#f0f5f0;outline:none}
 .bank-autocomplete-label>.form-hint{margin:2px 0 0;font-weight:400}
+
+
+/* Settings sections open as focused, independently scrollable dialogs */
+.settings-popup-list{display:grid;gap:10px;max-width:900px;margin:18px 0 28px}
+.settings-popup-trigger{display:flex;align-items:center;gap:14px;width:100%;min-height:78px;padding:15px 18px;text-align:left;background:#fff;border:1px solid #e5ebe6;border-radius:9px;color:#40584a;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.settings-popup-trigger:hover{border-color:#b8cbbb;box-shadow:0 5px 18px #1d35200a}
+.settings-popup-trigger>svg{margin-left:auto;color:#8b9a90;flex:0 0 auto}
+.settings-popup-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:8px;background:#edf4ef;color:#47745d}
+.settings-popup-copy{display:grid;gap:5px;min-width:0}
+.settings-popup-copy strong{color:#354f40;font:600 13px Manrope,sans-serif}
+.settings-popup-copy small{color:#8b9a90;font-size:10px;line-height:1.5}
+.settings-popup-backdrop{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:18px;background:#14251c99;backdrop-filter:blur(3px)}
+.settings-popup-dialog{display:flex;flex-direction:column;width:min(760px,100%);max-height:min(88vh,900px);overflow:hidden;background:#f9fbf9;border:1px solid #e2eae3;border-radius:12px;box-shadow:0 24px 80px #14251c40}
+.settings-popup-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:20px 22px;background:#fff;border-bottom:1px solid #e7ede8}
+.settings-popup-header h2{margin:0;color:#304b3b;font:600 18px Manrope,sans-serif}
+.settings-popup-header p{margin:6px 0 0;color:#89988e;font-size:10px;line-height:1.5}
+.settings-popup-header>button{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border:1px solid #e5ebe6;border-radius:7px;background:#fff;color:#65796c;cursor:pointer}
+.settings-popup-content{overflow-y:auto;overscroll-behavior:contain;padding:20px}
+.settings-popup-content>.workspace-panel,.settings-popup-content>.workspace-panel-heading{margin-top:0}
+.settings-popup-content .workspace-panel{margin-bottom:14px}
+.settings-popup-content .settings-form{padding:0 0 6px}
+.settings-popup-content .workspace-panel-heading{padding:0 0 15px}
+.settings-popup-content .settings-link-panel{margin:0 0 10px}
+@media(max-width:600px){.settings-popup-backdrop{align-items:end;padding:0}.settings-popup-dialog{width:100%;max-height:92dvh;border-radius:14px 14px 0 0}.settings-popup-header{padding:17px}.settings-popup-content{padding:16px}.settings-popup-trigger{min-height:72px;padding:13px}}
