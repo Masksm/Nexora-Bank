@@ -89,7 +89,7 @@ export default async function TransactionsPage() {
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("ACCOUNT ACTIVITY")}</span><h2>{t("Transaction history")}</h2></div><div className="transaction-tools"><span className="workspace-count">{history.length} records</span><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> {t("Export CSV")}</Link></div></div>
         {failed ? <div className="workspace-alert">We couldn’t load the complete transaction history. Please refresh and try again.</div> :
           history.length === 0 ? <div className="workspace-empty"><FileText size={25}/><h2>{t("No transactions yet")}</h2><p>{t("Once a transaction is posted, it will appear here.")}</p></div> :
-          <TransactionHistory transactions={history}/>}
+          <TransactionHistory transactions={history} locale={locale}/>}
       </section>
       <p className="workspace-disclaimer">This history reflects internal ledger activity only. It is not a bank statement or proof of real-world payment.</p>
     </main>
