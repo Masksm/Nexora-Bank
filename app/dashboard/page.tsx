@@ -4,7 +4,7 @@ import { getMessages } from "@/lib/messages";
 import { isLanguagePreference, type SupportedLocale } from "@/lib/locale";
 import { redirect } from "next/navigation";
 import {
-  ArrowDownLeft, ArrowUpRight, Bell, Contact, CreditCard, FileText,
+  ArrowDownLeft, ArrowUpRight, Bell, Contact, CreditCard, FileText, Activity, CalendarClock,
   HelpCircle, LayoutDashboard, LogOut, Plus, Settings, ShieldCheck, Wallet,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
   const [{ data: profile }, { data: accounts, error: accountError }, { count: unreadCount }] = await Promise.all([
     supabase.from("profiles").select("first_name,last_name,display_name").eq("user_id", user.id).maybeSingle(),
     supabase.from("account_balances")
-      .select("account_id,account_number,account_name,account_type,currency,status,balance_minor")
+      .select("account_id,account_number,account_name,nickname,account_type,currency,status,balance_minor")
       .eq("user_id", user.id),
     supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).is("read_at", null),
   ]);
@@ -113,6 +113,9 @@ export default async function DashboardPage() {
           <Link href="/dashboard/transfers"><ArrowUpRight size={17}/> {t("nav.transfers")}</Link>
           <Link href="/dashboard/cards"><CreditCard size={17}/> {t("nav.cards")}</Link>
           <Link href="/dashboard/transactions"><FileText size={17}/> {t("nav.transactions")}</Link>
+          <Link href="/dashboard/analytics"><Activity size={17}/> Analytics</Link>
+          <Link href="/dashboard/statements"><FileText size={17}/> Statements</Link>
+          <Link href="/dashboard/scheduled-transfers"><CalendarClock size={17}/> Scheduled transfers</Link>
         </nav>
         <div className="sidebar-label sidebar-bottom-label">{t("nav.preferences")}</div>
         <nav className="dashboard-nav">
@@ -158,7 +161,7 @@ export default async function DashboardPage() {
           <article className="dashboard-panel account-panel">
             <div className="panel-heading"><div><span className="panel-kicker">{t("dashboard.accounts")}</span><h3>{t("dashboard.accountOverview")}</h3></div><Link href="/dashboard/accounts">{t("dashboard.viewAccounts")} <ArrowUpRight size={15}/></Link></div>
             {accountError ? <p className="dashboard-empty">{t("dashboard.loadingAccounts")}</p> :
-              primary ? <div className="account-row"><div className="account-symbol"><Wallet size={19}/></div><div className="account-details"><strong>{primary.account_name}</strong><span>{primary.account_type} · {primary.account_number}</span></div><div className="account-balance"><strong>{money(Number(primary.balance_minor), primary.currency, locale)}</strong><span>{primary.status}</span></div></div> :
+              primary ? <div className="account-row"><div className="account-symbol"><Wallet size={19}/></div><div className="account-details"><strong>{primary.nickname || primary.account_name}</strong><span>{primary.account_type} · {primary.account_number}</span></div><div className="account-balance"><strong>{money(Number(primary.balance_minor), primary.currency, locale)}</strong><span>{primary.status}</span></div></div> :
               <div className="dashboard-empty">{t("dashboard.noAccount")}</div>}
             {primary && <div className="account-card-foot"><span>{t("dashboard.accountNumber")}</span><strong>{primary.account_number}</strong></div>}
           </article>
@@ -170,6 +173,8 @@ export default async function DashboardPage() {
               <Link href="/dashboard/beneficiaries"><span><Plus size={18}/></span>{t("dashboard.addBeneficiary")}</Link>
               <Link href="/dashboard/transactions"><span><FileText size={18}/></span>{t("nav.transactions")}</Link>
               <Link href="/dashboard/cards"><span><CreditCard size={18}/></span>{t("dashboard.manageCards")}</Link>
+              <Link href="/dashboard/analytics"><span><Activity size={18}/></span>Spending analytics</Link>
+              <Link href="/dashboard/scheduled-transfers"><span><CalendarClock size={18}/></span>Schedule a transfer</Link>
             </div>
           </article>
         </section>
