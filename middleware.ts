@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveLocale } from "@/lib/locale";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -32,6 +33,39 @@ export async function middleware(request: NextRequest) {
   const isAdminArea = path.startsWith("/admin");
   const appMetadata = claims?.app_metadata as { role?: string } | undefined;
   const isAdmin = appMetadata?.role === "admin";
+
+  if (claims?.sub) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("preferred_language,country_code")
+      .eq("user_id", String(claims.sub))
+      .maybeSingle();
+    const locale = resolveLocale(
+      profile?.preferred_language,
+      request.headers.get("accept-language"),
+      profile?.country_code,
+    );
+    response.cookies.set("nexora_locale", locale, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+  } else {
+    const locale = resolveLocale(
+      "auto",
+      request.headers.get("accept-language"),
+      null,
+    );
+    response.cookies.set("nexora_locale", locale, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
 
   const redirectWithSession = (target: URL) => {
     const redirectResponse = NextResponse.redirect(target);
@@ -68,15 +102,12 @@ export async function middleware(request: NextRequest) {
       return redirectWithSession(target);
     }
 
-    // Refresh activity timestamps for this exact authenticated session and
-    // its recognized device. The database function can only touch timestamps.
     const { error: activityError } = await supabase.rpc("touch_session_activity");
     if (activityError) {
       console.error("Nexora session activity update failed:", activityError.code || "UNKNOWN");
     }
   }
 
-  // Keep the customer and administrator experiences separate.
   if (isAdminArea && !isAdmin) {
     const target = request.nextUrl.clone();
     target.pathname = "/dashboard";
