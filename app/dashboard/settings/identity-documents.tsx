@@ -14,7 +14,7 @@ type IdentityDocument = {
 const labels: Record<IdentityDocument["document_type"], string> = {
   passport: "Passport",
   national_id: "National identity card",
-  drivers_license: "Driver's licence",
+  drivers_license: "Driver&apos;s licence",
 };
 
 export default function IdentityDocuments({ userId, initialDocuments }: {
@@ -115,7 +115,7 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
           <select value={documentType} onChange={(event) => setDocumentType(event.target.value as IdentityDocument["document_type"])}>
             <option value="passport">Passport</option>
             <option value="national_id">National identity card</option>
-            <option value="drivers_license">Driver's licence</option>
+            <option value="drivers_license">Driver&apos;s licence</option>
           </select>
         </label>
         <label>Choose document
