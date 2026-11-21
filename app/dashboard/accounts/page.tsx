@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Wallet } from "lucide-react";
 import { CopyButton } from "../copy-button";
@@ -11,6 +14,8 @@ function money(amountMinor: number, currency = "USD") {
 }
 
 export default async function AccountsPage() {
+  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const t = (value: string) => pageText(locale, value);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -24,23 +29,23 @@ export default async function AccountsPage() {
   return (
     <main className="workspace-shell">
       <header className="workspace-header">
-        <Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link>
-        <span className="workspace-overline">NEXORA BANK · PERSONAL</span>
+        <Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link>
+        <span className="workspace-overline">NEXORA BANK · {t("PERSONAL")}</span>
       </header>
       <section className="workspace-intro">
-        <div><span className="workspace-kicker">YOUR MONEY, ORGANIZED</span><h1>Accounts</h1><p>View your account details and available balances.</p></div>
-        <div className="workspace-total"><span>COMBINED USD BALANCE</span><strong>{money(total)}</strong></div>
+        <div><span className="workspace-kicker">{t("YOUR MONEY, ORGANIZED")}</span><h1>{t("Accounts")}</h1><p>{t("View your account details and available balances.")}</p></div>
+        <div className="workspace-total"><span>{t("COMBINED USD BALANCE")}</span><strong>{money(total)}</strong></div>
       </section>
-      {error ? <div className="workspace-alert">We couldn’t load your accounts. Please refresh and try again.</div> :
-        (accounts ?? []).length === 0 ? <div className="workspace-empty"><Wallet size={25}/><h2>No account yet</h2><p>Your checking account will appear here after registration is completed.</p></div> :
+      {error ? <div className="workspace-alert">{t("We couldn’t load your accounts. Please refresh and try again.")}</div> :
+        (accounts ?? []).length === 0 ? <div className="workspace-empty"><Wallet size={25}/><h2>{t("No account yet")}</h2><p>{t("Your checking account will appear here after registration is completed.")}</p></div> :
         <section className="account-list">
           {(accounts ?? []).map((account) => (
             <article className="account-detail-card" key={account.account_id}>
               <div className="account-detail-top"><span className="account-detail-icon"><Wallet size={20}/></span><span className={account.status === "active" ? "account-status" : "account-status inactive"}>{account.status}</span></div>
               <div className="account-detail-name"><span>{account.account_type} ACCOUNT</span><h2>{account.account_name}</h2></div>
               <strong className="account-detail-balance">{money(Number(account.balance_minor), account.currency)}</strong>
-              <div className="account-number-line"><div><span>ACCOUNT NUMBER</span><strong>{account.account_number}</strong></div><CopyButton value={account.account_number}/></div>
-              <div className="account-detail-foot"><span>{account.currency} · {account.account_type}</span><Link href="/dashboard/transfers">Make a transfer <ArrowUpRight size={14}/></Link></div>
+              <div className="account-number-line"><div><span>{t("ACCOUNT NUMBER")}</span><strong>{account.account_number}</strong></div><CopyButton value={account.account_number}/></div>
+              <div className="account-detail-foot"><span>{account.currency} · {account.account_type}</span><Link href="/dashboard/transfers">{t("Make a transfer")} <ArrowUpRight size={14}/></Link></div>
             </article>
           ))}
         </section>}
