@@ -18,11 +18,11 @@ const countries = [
 export default function BeneficiaryForm(){
   const [country,setCountry]=useState("US");
   const [bankName,setBankName]=useState("");
-  const [bankFocused,setBankFocused]=useState(false);
+  const [bankFocused,setBankFocused]=useState(false);\n  const [routingMessage,setRoutingMessage]=useState("");\n  const [routingLoading,setRoutingLoading]=useState(false);
   const selected=countries.find(item=>item.code===country)!;
   const isIban=["DE","FR","NL","ES","IE"].includes(country);
   const suggestions=useMemo(()=>searchBanks(country,bankName),[country,bankName]);
-  function changeCountry(value:string){
+  async function lookupUsRouting(value:string){\n    const routing=value.replace(/\\D/g,"");\n    if(country!=="US" || routing.length!==9) return;\n    setRoutingLoading(true);\n    setRoutingMessage("Looking up bank directory…");\n    try{\n      const response=await fetch(`/api/bank-directory/us?routing=${routing}`);\n      const result=await response.json();\n      if(!response.ok) throw new Error(result.error||"Bank lookup unavailable.");\n      setBankName(result.bankName);\n      setRoutingMessage(`Directory match: ${result.bankName}${result.city&&result.state?` · ${result.city}, ${result.state}`:""}. This does not verify the account holder.`);\n    }catch(error){\n      setRoutingMessage(error instanceof Error?error.message:"Bank lookup unavailable. Enter the bank name manually.");\n    }finally{setRoutingLoading(false);}\n  }\n  function changeCountry(value:string){
     setCountry(value);
     setBankName(value==="NX"?"Nexora Bank":"");
   }
@@ -42,7 +42,7 @@ export default function BeneficiaryForm(){
       <span className="form-hint">Suggestions are a reference list, not confirmation that a bank or account is reachable.</span>
     </label>
     {country==="US" && <>
-      <label>Routing number<input name="routing_number" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required placeholder="9-digit ABA routing number"/></label>
+      <label>Routing number<input name="routing_number" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required placeholder="9-digit ABA routing number" onBlur={event=>lookupUsRouting(event.target.value)}/></label>\n      {routingMessage&&<p className="form-hint" role="status">{routingLoading?"":routingMessage}</p>}
       <label>Account number<input name="account_number" inputMode="numeric" pattern="[0-9]{4,17}" maxLength={17} required placeholder="Bank account number"/></label>
     </>}
     {country==="GB" && <>
