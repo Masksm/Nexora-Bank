@@ -113,7 +113,7 @@ export default async function SettingsPage({ searchParams }: Props) {
           <ThemeToggle initialTheme={theme} labels={{light:t("Light mode"),dark:t("Dark mode"),description:t("Choose a comfortable appearance for every Nexora page.")}}/>
         </SettingsPopupSection>
 
-        <SettingsPopupSection title={t("Security and access") description={t("Review devices and protect your account.")} icon={<ShieldCheck size={18}/>}>
+        <SettingsPopupSection title={t("Security and access")} description={t("Review devices and protect your account.")} icon={<ShieldCheck size={18}/>}>
           <div className="settings-link-panel"><div><strong>{t("Security and devices")}</strong><span>{t("Review active sessions, recognised devices and sign-in activity.")}</span></div><Link href="/dashboard/security">{t("Manage security")} <ShieldCheck size={15}/></Link></div>
           <div className="settings-link-panel"><div><strong>{t("Account preferences")}</strong><span>{t("Your language is detected from your location and browser unless you choose a language manually.")}</span></div><span className="settings-link-note"><Settings2 size={15}/> {t("Profile preferences")}</span></div>
         </SettingsPopupSection>
