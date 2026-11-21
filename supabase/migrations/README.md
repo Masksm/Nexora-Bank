@@ -69,3 +69,17 @@ Additional migrations applied and source-controlled on 2026-11-21:
 - `20261121081003_harden_savings_goal_operations_and_indexes`: indexes savings entry foreign keys and hardens the movement RPC against null operation types.
 
 - `20261121081154_require_trusted_device_for_savings_movements`: applies the existing trusted-device session check to savings contributions and withdrawals so the new savings workflow cannot bypass Nexora's device security controls.
+
+
+Additional migrations applied and source-controlled on 2026-11-21:
+
+- `20261121190451_create_super_admin_and_scoped_staff_access`: introduces separate `super_admin` and `admin` roles, customer-to-staff assignment records, scoped row-level access policies, Super Admin role/assignment RPCs, and upgrades the existing `wiskwww@gmail.com` administrator to `super_admin`.
+- `20261121190541_enforce_staff_customer_scope_and_super_admin_directory`: adds guarded customer-scope checks to legacy privileged admin operations and the Super Admin directory RPC.
+- `20261121190711_complete_super_admin_rpc_authorization_and_staff_read_scope`: extends legacy admin RPC authorization to Super Admin, makes the account-balance view use invoker RLS, and grants assigned staff read access to customer banking features.
+- `20261121190737_scope_kyc_storage_and_remaining_admin_rpc_checks`: scopes private identity-document storage reads and remaining KYC/session/device admin operations.
+- `20261121190757_finish_scoping_kyc_transfer_review_and_savings_visibility`: completes KYC and transfer-review customer scope checks and allows assigned staff to inspect savings goal records.
+- `20261121190853_enforce_exclusive_staff_customer_ownership`: enforces one staff administrator per customer assignment.
+- `20261121190916_grant_authenticated_super_admin_rpc_entrypoints`: grants authenticated access to the guarded Super Admin RPC wrappers and assignment reads.
+- `20261121191000_enforce_transfer_review_assignment_guard`: adds the final source-and-recipient assignment check to privileged transfer review.
+
+Staff administrators can read and manage only customers assigned to them. Super Admin retains global oversight and access to the existing administrator tools. Role and assignment changes are audit logged. The existing customer accounts, balances, transactions, support messages and identity records are preserved.
