@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 
 type IdentityDocument = {
   id: string;
@@ -32,11 +34,11 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
     if (!file || busy) return;
     const allowed = ["application/pdf", "image/jpeg", "image/png"];
     if (!allowed.includes(file.type)) {
-      setMessage("Choose a PDF, JPG or PNG file.");
+      setMessage(t("Choose a PDF, JPG or PNG file."));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setMessage("The document must be 10 MB or smaller.");
+      setMessage(t("The document must be 10 MB or smaller."));
       return;
     }
 
@@ -50,7 +52,7 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
       upsert: false,
     });
     if (uploadError) {
-      setMessage("Document upload failed. Please try again.");
+      setMessage(t("Document upload failed. Please try again."));
       setBusy(false);
       return;
     }
@@ -66,7 +68,7 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
 
     if (recordError || !data) {
       await supabase.storage.from("identity-documents").remove([path]);
-      setMessage("The document could not be registered. Please try again.");
+      setMessage(t("The document could not be registered. Please try again."));
       setBusy(false);
       return;
     }
@@ -75,7 +77,7 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
     setFile(null);
     const input = document.getElementById("identity-file") as HTMLInputElement | null;
     if (input) input.value = "";
-    setMessage("Document uploaded securely.");
+    setMessage(t("Document uploaded securely."));
     setBusy(false);
   }
 
@@ -87,24 +89,24 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
     const { data: row, error: lookupError } = await supabase.from("identity_documents")
       .select("storage_path").eq("id", document.id).single();
     if (lookupError || !row) {
-      setMessage("Unable to locate that document.");
+      setMessage(t("Unable to locate that document."));
       setBusy(false);
       return;
     }
     const { error: storageError } = await supabase.storage.from("identity-documents").remove([row.storage_path]);
     if (storageError) {
-      setMessage("Unable to remove the stored file. Please try again.");
+      setMessage(t("Unable to remove the stored file. Please try again."));
       setBusy(false);
       return;
     }
     const { error: deleteError } = await supabase.from("identity_documents").delete().eq("id", document.id);
     if (deleteError) {
-      setMessage("The file was removed, but its record could not be updated. Contact support.");
+      setMessage(t("The file was removed, but its record could not be updated. Contact support."));
       setBusy(false);
       return;
     }
     setDocuments((current) => current.filter((item) => item.id !== document.id));
-    setMessage("Document removed.");
+    setMessage(t("Document removed."));
     setBusy(false);
   }
 
@@ -113,30 +115,30 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
       <form className="transfer-form identity-upload-form" onSubmit={uploadDocument}>
         <label>Document type
           <select value={documentType} onChange={(event) => setDocumentType(event.target.value as IdentityDocument["document_type"])}>
-            <option value="passport">Passport</option>
-            <option value="national_id">National identity card</option>
-            <option value="drivers_license">Driver&apos;s licence</option>
+            <option value="passport">{t("Passport")}</option>
+            <option value="national_id">{t("National identity card")}</option>
+            <option value="drivers_license">{t("Driver&apos;s licence")}</option>
           </select>
         </label>
         <label>Choose document
           <input id="identity-file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={(event) => setFile(event.target.files?.[0] ?? null)} required />
         </label>
-        <p>PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately and are accessible only to your account under the current access rules.</p>
+        <p>{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately and are accessible only to your account under the current access rules.")}</p>
         <button type="submit" disabled={!file || busy}>{busy ? "Uploading…" : "Upload identity document"}</button>
       </form>
       {message && <p className="identity-message" role="status">{message}</p>}
       <div className="identity-document-list">
         {documents.length === 0 ? (
-          <p className="identity-empty">No identity documents have been uploaded.</p>
+          <p className="identity-empty">{t("No identity documents have been uploaded.")}</p>
         ) : documents.map((document) => (
           <article key={document.id} className="identity-document-row">
             <div>
-              <strong>{labels[document.document_type]}</strong>
+              <strong>{t(labels[document.document_type])}</strong>
               <span>{document.file_name}</span>
               <small>{new Date(document.uploaded_at).toLocaleDateString()} · {document.review_status.replace("_", " ")}</small>
             </div>
             {document.review_status === "submitted" && (
-              <button type="button" onClick={() => removeDocument(document)} disabled={busy} aria-label={"Remove " + labels[document.document_type]}>
+              <button type="button" onClick={() => removeDocument(document)} disabled={busy} aria-label={"Remove " + t(labels[document.document_type])}>
                 Remove
               </button>
             )}
