@@ -22,7 +22,7 @@ export default async function SettingsPage({ searchParams }: Props) {
   if (!user) redirect("/login");
 
   const [{ data: profile }, { data: documents }, params] = await Promise.all([
-    supabase.from("profiles").select("first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,address_line2,city,region,postal_code,preferred_timezone").eq("user_id", user.id).maybeSingle(),
+    supabase.from("profiles").select("first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,address_line2,city,region,postal_code,preferred_timezone,preferred_language").eq("user_id", user.id).maybeSingle(),
     supabase.from("identity_documents").select("id,document_type,file_name,review_status,uploaded_at").eq("user_id", user.id).order("uploaded_at", { ascending: false }),
     searchParams,
   ]);
@@ -53,6 +53,14 @@ export default async function SettingsPage({ searchParams }: Props) {
             <label>Phone number<input name="phone" type="tel" defaultValue={profile?.phone ?? ""} maxLength={30} placeholder="+234..." autoComplete="tel"/></label>
             <label>Date of birth<input name="date_of_birth" type="date" defaultValue={profile?.date_of_birth ?? ""} max={new Date().toISOString().slice(0,10)} autoComplete="bday"/></label>
             <label>Country / region<select name="country_code" defaultValue={profile?.country_code?.trim() || "NG"}>{countries.map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select></label>
+            <label>Display language<select name="preferred_language" defaultValue={profile?.preferred_language || "auto"}>
+              <option value="auto">Automatic (based on browser and region)</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="pt">Português</option>
+              <option value="de">Deutsch</option>
+            </select></label>
           </div>
           <input type="hidden" name="address_line1" value={profile?.address_line1 ?? ""}/>
           <input type="hidden" name="address_line2" value={profile?.address_line2 ?? ""}/>
@@ -60,11 +68,12 @@ export default async function SettingsPage({ searchParams }: Props) {
           <input type="hidden" name="region" value={profile?.region ?? ""}/>
           <input type="hidden" name="postal_code" value={profile?.postal_code ?? ""}/>
           <input type="hidden" name="preferred_timezone" value={profile?.preferred_timezone ?? "Africa/Lagos"}/>
+          <input type="hidden" name="preferred_language" value={profile?.preferred_language || "auto"}/>
           <div className="settings-form-actions"><p>Your email address is managed through your sign-in credentials.</p><button type="submit"><Save size={15}/> Save personal details</button></div>
         </form>
       </section>
 
-      <section className="settings-section-heading"><div className="settings-section-icon"><MapPin size={18}/></div><div><h2>Residential address</h2><p>Your address and regional preferences.</p></div></section>
+      <section className="settings-section-heading"><div className="settings-section-icon"><MapPin size={18}/></div><div><h2>Residential address</h2><p>Your address, time zone and language preferences.</p></div></section>
       <section className="workspace-panel settings-panel">
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">ADDRESS DETAILS</span><h2>Where you live</h2></div></div>
         <form action={updateProfile} className="transfer-form settings-form">
@@ -82,6 +91,7 @@ export default async function SettingsPage({ searchParams }: Props) {
           <input type="hidden" name="phone" value={profile?.phone ?? ""}/>
           <input type="hidden" name="date_of_birth" value={profile?.date_of_birth ?? ""}/>
           <input type="hidden" name="country_code" value={profile?.country_code?.trim() || "NG"}/>
+          <input type="hidden" name="preferred_language" value={profile?.preferred_language || "auto"}/>
           <div className="settings-form-actions"><p>Address details are optional and can be updated at any time.</p><button type="submit"><Save size={15}/> Save address</button></div>
         </form>
       </section>
@@ -98,7 +108,7 @@ export default async function SettingsPage({ searchParams }: Props) {
         <Link href="/dashboard/security">Manage security <ShieldCheck size={15}/></Link>
       </section>
       <section className="workspace-panel settings-link-panel">
-        <div><strong>Account preferences</strong><span>Your regional details and time zone are saved with your profile.</span></div>
+        <div><strong>Account preferences</strong><span>Your language is detected from your browser and region unless you choose a language manually.</span></div>
         <span className="settings-link-note"><Settings2 size={15}/> Profile preferences</span>
       </section>
 
