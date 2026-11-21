@@ -5,7 +5,7 @@ import { isLanguagePreference, type SupportedLocale } from "@/lib/locale";
 import { redirect } from "next/navigation";
 import {
   ArrowDownLeft, ArrowUpRight, Bell, Contact, CreditCard, FileText, Activity, CalendarClock,
-  HelpCircle, LayoutDashboard, LogOut, Plus, Settings, ShieldCheck, Wallet,
+  HelpCircle, LayoutDashboard, LogOut, Plus, Settings, ShieldCheck, Wallet, PiggyBank,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
           <Link href="/dashboard/transactions"><FileText size={17}/> {t("nav.transactions")}</Link>
           <Link href="/dashboard/analytics"><Activity size={17}/> Analytics</Link>
           <Link href="/dashboard/statements"><FileText size={17}/> Statements</Link>
-          <Link href="/dashboard/scheduled-transfers"><CalendarClock size={17}/> Scheduled transfers</Link>
+          <Link href="/dashboard/scheduled-transfers"><CalendarClock size={17}/> Scheduled transfers</Link>\n          <Link href="/dashboard/savings"><PiggyBank size={17}/> Savings goals</Link>
         </nav>
         <div className="sidebar-label sidebar-bottom-label">{t("nav.preferences")}</div>
         <nav className="dashboard-nav">
@@ -174,7 +174,7 @@ export default async function DashboardPage() {
               <Link href="/dashboard/transactions"><span><FileText size={18}/></span>{t("nav.transactions")}</Link>
               <Link href="/dashboard/cards"><span><CreditCard size={18}/></span>{t("dashboard.manageCards")}</Link>
               <Link href="/dashboard/analytics"><span><Activity size={18}/></span>Spending analytics</Link>
-              <Link href="/dashboard/scheduled-transfers"><span><CalendarClock size={18}/></span>Schedule a transfer</Link>
+              <Link href="/dashboard/scheduled-transfers"><span><CalendarClock size={18}/></span>Schedule a transfer</Link>\n              <Link href="/dashboard/savings"><span><PiggyBank size={18}/></span>Savings goals</Link>
             </div>
           </article>
         </section>
