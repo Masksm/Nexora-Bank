@@ -46,3 +46,10 @@
 .kyc-reject-button{justify-self:start;color:#8b5547;background:#f8ece8}
 @media(max-width:850px){.kyc-review-actions{grid-template-columns:1fr 1fr}.kyc-reject-form{grid-column:1/-1}}
 @media(max-width:650px){.kyc-customer-details{grid-template-columns:1fr 1fr}.kyc-review-top{align-items:flex-start}.kyc-review-actions{grid-template-columns:1fr}.kyc-reject-form{grid-column:auto}.kyc-file-row{align-items:flex-start;flex-direction:column}.kyc-file-row>a{align-self:flex-start}}
+
+
+.kyc-profile-panel{margin-bottom:15px}
+.kyc-table-progress{display:flex;align-items:center;gap:9px;min-width:120px}
+.kyc-table-progress>span{width:30px;color:#4e7258;font-size:9px;font-weight:700}
+.kyc-table-progress>i{display:block;flex:1;height:5px;overflow:hidden;background:#edf2ed;border-radius:10px}
+.kyc-table-progress>i>b{display:block;height:100%;background:#76a184;border-radius:10px}
