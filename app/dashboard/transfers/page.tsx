@@ -11,8 +11,8 @@ type Props = { searchParams: Promise<{ error?: string; success?: string; review?
 
 export const dynamic = "force-dynamic";
 
-function money(minor: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(minor / 100);
+function money(minor: number, locale: SupportedLocale = "en") {
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(minor / 100);
 }
 
 export default async function TransfersPage({ searchParams }: Props) {
@@ -38,7 +38,7 @@ export default async function TransfersPage({ searchParams }: Props) {
       <section className="workspace-panel transfer-panel">
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("NEW PAYMENT")}</span><h2>{t("Transfer details")}</h2></div></div>
         <form action={submitTransfer} className="transfer-form">
-          <label>{t("Pay from")}<select name="account_id" required>{activeAccounts.map((account)=><option key={account.account_id} value={account.account_id}>{account.account_name} · {account.account_number} · {money(Number(account.balance_minor))}</option>)}</select></label>
+          <label>{t("Pay from")}<select name="account_id" required>{activeAccounts.map((account)=><option key={account.account_id} value={account.account_id}>{account.account_name} · {account.account_number} · {money(Number(account.balance_minor), locale)}</option>)}</select></label>
           <label>{t("Recipient account number")}<input name="recipient" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder={t("10-digit Nexora account number")} required/></label>
           <label>{t("Amount (USD)")}<input name="amount" type="number" min="0.01" step="0.01" placeholder="250.00" required/></label>
           <label>{t("Description (optional)")}<input name="description" maxLength={160} placeholder={t("What is this transfer for?")}/></label>
