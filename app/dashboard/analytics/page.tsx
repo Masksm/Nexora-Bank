@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ArrowLeft, ArrowDownLeft, ArrowUpRight, ChartNoAxesCombined } from "lucide-react";
+import { ArrowLeft, ArrowDownLeft, ArrowUpRight, Activity } from "lucide-react";
 import type { SupportedLocale } from "@/lib/locale";
-import { pageText } from "@/lib/page-translations";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +22,6 @@ function category(type: string, description: string | null) {
 
 export default async function AnalyticsPage() {
   const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
-  const t = (value: string) => pageText(locale, value);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -80,7 +78,7 @@ export default async function AnalyticsPage() {
           <div className="analytics-legend"><span><i className="legend-in"/> Money in</span><span><i className="legend-out"/> Money out</span></div>
         </article>
         <article className="workspace-panel analytics-panel"><div className="workspace-panel-heading"><div><span className="workspace-kicker">POSTED DEBITS</span><h2>Spending categories</h2></div></div>
-          {sortedCategories.length ? <div className="category-list">{sortedCategories.map(([name,value])=><div className="category-row" key={name}><div><strong>{name}</strong><b>{money(value,locale)}</b></div><span className="category-track"><i style={{width:(value/maxCategory*100)+"%"}}/></span></div>)}</div> : <div className="workspace-empty"><ChartNoAxesCombined size={24}/><p>Spending categories will appear after posted debits are recorded.</p></div>}
+          {sortedCategories.length ? <div className="category-list">{sortedCategories.map(([name,value])=><div className="category-row" key={name}><div><strong>{name}</strong><b>{money(value,locale)}</b></div><span className="category-track"><i style={{width:(value/maxCategory*100)+"%"}}/></span></div>)}</div> : <div className="workspace-empty"><Activity size={24}/><p>Spending categories will appear after posted debits are recorded.</p></div>}
         </article>
       </section>
     </>}
