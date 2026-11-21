@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type IdentityDocument = {
@@ -27,7 +27,7 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
-  async function uploadDocument(event: React.FormEvent<HTMLFormElement>) {
+  async function uploadDocument(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!file || busy) return;
     const allowed = ["application/pdf", "image/jpeg", "image/png"];
