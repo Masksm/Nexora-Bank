@@ -3,11 +3,11 @@ export type SupportedLocale = (typeof supportedLocales)[number];
 export type LanguagePreference = "auto" | SupportedLocale;
 
 const countryLocale: Record<string, SupportedLocale> = {
-  NG: "en", GH: "en", KE: "en", ZA: "en", US: "en", GB: "en", CA: "en",
-  ES: "es", MX: "es", AR: "es", CO: "es", CL: "es",
-  FR: "fr", BE: "fr",
+  NG: "en", GH: "en", KE: "en", ZA: "en", US: "en", GB: "en", CA: "en", IE: "en", AU: "en", NZ: "en", IN: "en", AE: "en", SG: "en",
+  ES: "es", MX: "es", AR: "es", CO: "es", CL: "es", PE: "es", VE: "es", EC: "es", UY: "es", CR: "es", PA: "es",
+  FR: "fr", BE: "fr", LU: "fr", MC: "fr",
   PT: "pt", BR: "pt",
-  DE: "de", AT: "de",
+  DE: "de", AT: "de", CH: "de",
 };
 
 export function isLanguagePreference(value: string): value is LanguagePreference {
@@ -23,6 +23,11 @@ export function resolveLocale(
     return preference as SupportedLocale;
   }
 
+  // In automatic mode, a detected country takes priority over browser language.
+  // The middleware supplies the edge country when available, then the saved profile country.
+  const countryLocaleMatch = countryLocale[(countryCode || "").toUpperCase()];
+  if (countryLocaleMatch) return countryLocaleMatch;
+
   const browserLanguages = (acceptLanguage || "")
     .split(",")
     .map((entry) => entry.split(";")[0].trim().toLowerCase())
@@ -33,5 +38,5 @@ export function resolveLocale(
     if ((supportedLocales as readonly string[]).includes(base)) return base as SupportedLocale;
   }
 
-  return countryLocale[(countryCode || "").toUpperCase()] || "en";
+  return "en";
 }
