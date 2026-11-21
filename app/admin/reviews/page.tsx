@@ -22,7 +22,7 @@ export default async function AdminReviewsPage({searchParams}:Props) {
   const {data:{user}} = await supabase.auth.getUser();
   const {data:claims,error:claimsError}=await supabase.auth.getClaims();
   const meta=claims?.claims?.app_metadata as {role?:string}|undefined;
-  if(!user||claimsError||meta?.role!=="admin") redirect("/login");
+  if(!user||claimsError||!["admin", "super_admin"].includes(meta?.role ?? "")) redirect("/login");
   const [{data:pending},{data:devices},{data:sessions},params]=await Promise.all([
     supabase.from("ledger_transactions").select("id,reference,description,metadata,created_at,status").eq("transaction_type","transfer").eq("status","pending").order("created_at",{ascending:true}),
     supabase.from("trusted_devices").select("id,user_id,device_label,user_agent,ip_address,is_trusted,first_seen_at,last_seen_at").order("last_seen_at",{ascending:false}).limit(100),
