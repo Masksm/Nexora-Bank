@@ -47,7 +47,7 @@ export default async function AdminKycPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   const { data: claims, error: claimsError } = await supabase.auth.getClaims();
   const meta = claims?.claims?.app_metadata as { role?: string } | undefined;
-  if (!user || claimsError || meta?.role !== "admin") redirect("/login");
+  if (!user || claimsError || !["admin", "super_admin"].includes(meta?.role ?? "")) redirect("/login");
 
   const [docsResult, params] = await Promise.all([
     supabase.from("identity_documents")
