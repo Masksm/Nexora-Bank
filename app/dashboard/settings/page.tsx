@@ -113,7 +113,7 @@ export default async function SettingsPage({ searchParams }: Props) {
       </section>
       <section className="workspace-panel settings-link-panel">
         <div><strong>{t("Account preferences")}</strong><span>{t("Your language is detected from your browser and region unless you choose a language manually.")}</span></div>
-        <span className="settings-link-note"><{t("Settings")}2 size={15}/> {t("Profile preferences")}</span>
+        <span className="settings-link-note"><Settings2 size={15}/> {t("Profile preferences")}</span>
       </section>
 
       <section className="workspace-panel settings-signout-panel">
