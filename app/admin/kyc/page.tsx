@@ -64,8 +64,8 @@ export default async function AdminKycPage({ searchParams }: Props) {
       .select("user_id,status,rejection_reason,submitted_at,reviewed_at").limit(200),
   ]);
 
-  const profileMap = new Map((profilesResult.data ?? []).map((profile) => [profile.user_id, profile as ProfileRow]));
-  const verificationMap = new Map((verificationsResult.data ?? []).map((verification) => [verification.user_id, verification]));
+  const profileMap = new Map((profilesResult.data ?? []).map((profile) => [profile.user_id, profile as ProfileRow] as const));
+  const verificationMap = new Map((verificationsResult.data ?? []).map((verification) => [verification.user_id, verification] as const));
   const profileRows = (profilesResult.data ?? []) as ProfileRow[];
   const signedEntries = await Promise.all(documents.map(async (doc) => {
     const { data } = await supabase.storage.from("identity-documents").createSignedUrl(doc.storage_path, 300);
