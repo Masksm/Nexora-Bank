@@ -3,9 +3,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { X, ArrowUpRight } from "lucide-react";
 
-type Props = { title: string; eyebrow: string; description: string; count: string | number; icon: ReactNode; children: ReactNode };
+type Props = { id?: string; title: string; eyebrow: string; description: string; count: string | number; icon: ReactNode; children: ReactNode };
 
-export function SuperAdminDialog({ title, eyebrow, description, count, icon, children }: Props) {
+export function SuperAdminDialog({ id, title, eyebrow, description, count, icon, children }: Props) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!open) return;
@@ -17,7 +17,7 @@ export function SuperAdminDialog({ title, eyebrow, description, count, icon, chi
 
   return (
     <>
-      <button type="button" className="super-section-card" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>
+      <button type="button" id={id} className="super-section-card" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>
         <span className="super-section-icon">{icon}</span>
         <span className="super-section-copy"><small>{eyebrow}</small><strong>{title}</strong><span>{description}</span></span>
         <span className="super-section-meta"><b>{count}</b><span>Open section <ArrowUpRight size={13}/></span></span>
