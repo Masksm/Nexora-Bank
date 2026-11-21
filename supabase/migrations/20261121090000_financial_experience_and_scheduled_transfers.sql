@@ -18,7 +18,9 @@ BEGIN
   END IF;
 END $$;
 
-CREATE OR REPLACE VIEW public.account_balances AS
+CREATE OR REPLACE VIEW public.account_balances
+WITH (security_invoker = true)
+AS
 SELECT a.id AS account_id, a.user_id, a.account_number, a.account_name,
        a.account_type, a.currency, a.status,
        COALESCE(sum(e.amount_minor) FILTER (WHERE t.status = 'posted'), 0)::bigint AS balance_minor,
