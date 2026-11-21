@@ -62,7 +62,7 @@ export default async function StatementsPage({searchParams}:Props){
       <div className="statement-totals"><div><span>Total credits</span><strong>{money(credits,locale)}</strong></div><div><span>Total debits</span><strong>{money(debits,locale)}</strong></div><div><span>Net movement</span><strong>{money(credits-debits,locale)}</strong></div></div>
       {invalidRange?<div className="workspace-alert">Enter valid dates and ensure the start date is on or before the end date.</div>:failed?<div className="workspace-alert">We could not load a complete statement. Refresh and try again.</div>:rows.length===0?<div className="workspace-empty"><p>No posted transactions were found for this period.</p></div>:
       <div className="statement-table-wrap"><table className="statement-table"><thead><tr><th>Date</th><th>Account</th><th>Description</th><th>Reference</th><th>Status</th><th className="numeric">Amount</th></tr></thead><tbody>{rows.map((row,index)=><tr key={row.transaction_id+"-"+row.account_id+"-"+index}><td>{new Date(row.created_at).toLocaleDateString(locale)}</td><td>{accountNames.get(row.account_id)||"Account"}</td><td>{row.transaction.description||row.transaction.transaction_type.replaceAll("_"," ")}</td><td>{row.transaction.reference}</td><td>Posted</td><td className="numeric">{money(Number(row.amount_minor),locale)}</td></tr>)}</tbody></table></div>}
-      <p className="statement-footnote">This statement is generated from Nexora's internal ledger records. It is not proof of a real-world deposit or payment.</p>
+      <p className="statement-footnote">This statement is generated from Nexora&apos;s internal ledger records. It is not proof of a real-world deposit or payment.</p>
     </section>
   </main>;
 }
