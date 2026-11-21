@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 
 type HistoryTransaction = {
   id: string;
@@ -33,6 +34,7 @@ function dateParts(value: string, locale: SupportedLocale) {
 }
 
 export default function TransactionHistory({ transactions, locale }: { transactions: HistoryTransaction[]; locale: SupportedLocale }) {
+  const t = (value: string) => pageText(locale, value);
   const latestDate = useMemo(() => {
     if (!transactions.length) return null;
     return dateParts(transactions.reduce((latest, item) =>
@@ -118,46 +120,46 @@ export default function TransactionHistory({ transactions, locale }: { transacti
     <>
       <div className="history-filter-panel">
         <div className="history-filter-heading">
-          <div><span className="workspace-kicker">FIND ACTIVITY</span><strong>Browse by date</strong></div>
-          <button type="button" className={!year ? "history-reset active" : "history-reset"} onClick={() => { setYear(null); setMonth(null); setDay(null); }}>All history</button>
+          <div><span className="workspace-kicker">{t("FIND ACTIVITY")}</span><strong>{t("Browse by date")}</strong></div>
+          <button type="button" className={!year ? "history-reset active" : "history-reset"} onClick={() => { setYear(null); setMonth(null); setDay(null); }}>{t("All history")}</button>
         </div>
         <div className="history-date-selectors">
           <label className="history-date-field">
-            <span>YEAR</span>
+            <span>{t("YEAR")}</span>
             <select value={year ?? ""} onChange={(event) => chooseYear(event.target.value)}>
-              <option value="">All years</option>
+              <option value="">{t("All years")}</option>
               {years.map((value) => <option key={value} value={value}>{value}</option>)}
             </select>
           </label>
           <label className="history-date-field">
-            <span>MONTH</span>
+            <span>{t("MONTH")}</span>
             <select value={month ?? ""} disabled={!year} onChange={(event) => chooseMonth(event.target.value)}>
-              <option value="">All months</option>
+              <option value="">{t("All months")}</option>
               {months.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </label>
           <label className="history-date-field">
-            <span>DAY</span>
+            <span>{t("DAY")}</span>
             <select value={day ?? ""} disabled={!year || !month} onChange={(event) => setDay(event.target.value || null)}>
-              <option value="">All days</option>
+              <option value="">{t("All days")}</option>
               {days.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </label>
         </div>
         <div className="history-filter-summary">
-          {year ? [year, month ? months.find(([value]) => value === month)?.[1] : null, day ? days.find(([value]) => value === day)?.[1] : null].filter(Boolean).join(" · ") : "Showing every recorded date"}
-          <span>{visible.length} {visible.length === 1 ? "transaction" : "transactions"}</span>
+          {year ? [year, month ? months.find(([value]) => value === month)?.[1] : null, day ? days.find(([value]) => value === day)?.[1] : null].filter(Boolean).join(" · ") : t("Showing every recorded date")}
+          <span>{visible.length} {visible.length === 1 ? t("transaction") : t("transactions")}</span>
         </div>
       </div>
 
-      {visible.length === 0 ? <div className="workspace-empty"><p>No transactions were recorded for this date.</p></div> :
+      {visible.length === 0 ? <div className="workspace-empty"><p>{t("No transactions were recorded for this date.")}</p></div> :
         <div className="transaction-list">
           {visible.map((transaction) => {
             const incoming = transaction.amount_minor > 0;
             return <Link href={`/dashboard/transactions/${transaction.id}`} className="transaction-row transaction-row-link" key={transaction.id}>
               <span className={incoming ? "transaction-icon incoming" : "transaction-icon"}>{incoming ? <ArrowDownLeft size={18}/> : <ArrowUpRight size={18}/>}</span>
               <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}</span></div>
-              <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(transaction.amount_minor, transaction.currency, locale)}</strong><span className={"transaction-status " + (transaction.review_required ? "review" : transaction.status)}>{transaction.review_required ? "Under review" : transaction.status}</span></div>
+              <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(transaction.amount_minor, transaction.currency, locale)}</strong><span className={"transaction-status " + (transaction.review_required ? "review" : transaction.status)}>{transaction.review_required ? t("Under review") : transaction.status}</span></div>
             </Link>;
           })}
         </div>}
