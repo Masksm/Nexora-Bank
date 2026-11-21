@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { Activity, Eye, LogOut, ShieldCheck, Users, UserCog, MessageSquare, LockKeyhole, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
-import { superAdminDeleteAccount, superAdminSetAssignment, superAdminSetRole } from "./actions";
+import { superAdminSetAssignment, superAdminSetRole } from "./actions";
 import { DeleteAccountForm } from "./delete-account-form";
 import { SuperAdminDialog } from "./section-dialog";
 
