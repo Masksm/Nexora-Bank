@@ -129,24 +129,24 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
         <label>{t("Choose document")}
           <input id="identity-file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={(event) => setFile(event.target.files?.[0] ?? null)} required />
         </label>
-        <p>{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.")}</p>
+        <p>{t("{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.")}")}</p>
         <button type="submit" disabled={!file || busy}>{busy ? t("Uploading…") : t("Upload identity document")}</button>
       </form>
       {message && <p className="identity-message" role="status">{message}</p>}
       <div className="identity-document-list">
         {documents.length === 0 ? (
-          <p className="identity-empty">{t("{t("No identity documents have been uploaded.")}")}</p>
+          <p className="identity-empty">{t("No identity documents have been uploaded.")}</p>
         ) : documents.map((document) => (
           <article key={document.id} className="identity-document-row">
             <div>
               <strong>{t(labels[document.document_type])}</strong>
               <span>{document.file_name}</span>
-              <small>{new Date(document.uploaded_at).toLocaleDateString()} · {t(document.review_status.replaceAll("_", " "))}</small>
+              <small>{new Date(document.uploaded_at).toLocaleDateString(locale)} · {t(document.review_status.replaceAll("_", " "))}</small>
               {document.review_status === "rejected" && document.rejection_reason && <p className="identity-rejection-reason">{document.rejection_reason}</p>}
             </div>
             {document.review_status === "submitted" && (
               <button type="button" onClick={() => removeDocument(document)} disabled={busy} aria-label={"Remove " + t(labels[document.document_type])}>
-                Remove
+                {t("Remove")}
               </button>
             )}
           </article>
