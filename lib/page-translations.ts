@@ -109,6 +109,24 @@ const dashboardLabels: Record<SupportedLocale, Record<string,string>> = {
  de:{"Analytics":"Analysen","Statements":"Kontoauszüge","Scheduled transfers":"Geplante Überweisungen","Savings goals":"Sparziele","Spending analytics":"Ausgabenanalyse","Schedule a transfer":"Überweisung planen","active":"aktiv","frozen":"gesperrt","closed":"geschlossen","checking":"Girokonto","savings":"Sparkonto","posted":"gebucht","pending":"ausstehend","failed":"fehlgeschlagen","cancelled":"storniert","admin adjustment":"Administrative Anpassung","transfer out":"Ausgehende Überweisung","transfer in":"Eingehende Überweisung","card funding":"Kartenaufladung","card purchase":"Kartenzahlung","savings contribution":"Sparbeitrag","savings withdrawal":"Sparentnahme"}
 };
 
+
+Object.assign(identityUiTranslations.es,{
+ "PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.":"PDF, JPG o PNG. Máximo 10 MB. Los archivos se guardan de forma privada y solo tú y el personal autorizado pueden acceder.",
+ "Document uploaded securely.":"Documento subido de forma segura.","not started":"no iniciado","Your profile details have been saved.":"Tus datos se han guardado.","Account preferences":"Preferencias de la cuenta","Automatic mode uses your detected country first, then your browser language.":"El modo automático utiliza primero el país detectado y después el idioma del navegador."
+});
+Object.assign(identityUiTranslations.fr,{
+ "PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.":"PDF, JPG ou PNG. Taille maximale de 10 Mo. Les fichiers sont stockés de manière privée et accessibles uniquement par vous et le personnel autorisé.",
+ "Document uploaded securely.":"Document envoyé en toute sécurité.","not started":"non commencé","Your profile details have been saved.":"Vos informations ont été enregistrées.","Account preferences":"Préférences du compte"
+});
+Object.assign(identityUiTranslations.pt,{
+ "PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.":"PDF, JPG ou PNG. Tamanho máximo de 10 MB. Os arquivos são armazenados em privado e acessíveis apenas por você e pela equipe autorizada.",
+ "Document uploaded securely.":"Documento enviado com segurança.","not started":"não iniciado","Your profile details have been saved.":"Seus dados foram salvos.","Account preferences":"Preferências da conta"
+});
+Object.assign(identityUiTranslations.de,{
+ "PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.":"PDF, JPG oder PNG. Maximal 10 MB. Die Dateien werden privat gespeichert und sind nur für Sie und autorisiertes Prüfpersonal zugänglich.",
+ "Document uploaded securely.":"Dokument sicher hochgeladen.","not started":"nicht begonnen","Your profile details have been saved.":"Ihre Angaben wurden gespeichert.","Account preferences":"Kontoeinstellungen"
+});
+
 export function pageText(locale: SupportedLocale, value: string): string {
   return dashboardLabels[locale]?.[value] ?? identityUiTranslations[locale]?.[value] ?? settingsAndHistoryTranslations[locale]?.[value] ?? extra[locale]?.[value] ?? dictionaries[locale]?.[value] ?? value;
 }
