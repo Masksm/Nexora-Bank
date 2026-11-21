@@ -87,3 +87,5 @@ Staff administrators can read and manage only customers assigned to them. Super 
 - `20261121191151_fix_super_admin_directory_return_types`: explicitly casts Auth email and directory fields to the public RPC's declared return types.
 
 - `20261121191342_scope_transfer_review_to_assigned_source_customer`: limits staff transfer-review authority to the assigned sender's customer account, without granting visibility into an unassigned recipient.
+
+- `20261121191457_clear_customer_assignment_when_promoting_staff`: removes any former customer assignment before promoting that account to staff administrator, preventing stale access links from surviving a role change.
