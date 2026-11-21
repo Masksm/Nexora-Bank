@@ -48,6 +48,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <Link className="selected" href="/super-admin"><Activity size={16}/> Overview</Link>
           <a href="#staff"><UserCog size={16}/> Staff administrators</a>
           <a href="#assignments"><Users size={16}/> Customer access</a>
+          <a href="#promote"><UserCog size={16}/> Role management</a>
           <a href="#oversight"><Eye size={16}/> Support oversight</a>
           <Link href="/admin"><LockKeyhole size={16}/> Legacy admin operations</Link>
         </nav>
@@ -64,7 +65,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <article><span><LockKeyhole size={17}/> ACTIVE ASSIGNMENTS</span><strong>{assignmentCount}</strong><small>Customer-to-admin access links</small></article>
         </section>
 
-        <SuperAdminDialog title="Staff administrators" eyebrow="STAFF AUTHORITY" description="Review staff administrator accounts and manage their access." count={staffCount} staf} icon={<UserCog size={20}/>}>
+        <SuperAdminDialog title="Staff administrators" eyebrow="STAFF AUTHORITY" description="Review staff administrator accounts and manage their access." count={staffCount} id="staff" icon={<UserCog size={20}/>}>
           <div className="admin-panel-heading"><div><span>STAFF AUTHORITY</span><h2>Staff administrator accounts</h2></div><span>{staffCount} staff</span></div>
           {directoryError ? <p className="admin-empty">Unable to load the administrator directory: {directoryError.message}</p> : !admins.length ? <p className="admin-empty">No staff administrators have been appointed yet.</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Staff administrator</th><th>Assigned customers</th><th>Access</th></tr></thead><tbody>
@@ -72,7 +73,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
             </tbody></table></div>}
         </SuperAdminDialog>
 
-        <SuperAdminDialog title="Customer access" eyebrow="ACCESS ALLOCATION" description="Review the customer directory and control which staff member can access each customer." count={customers.length} customer} icon={<Users size={20}/>}>
+        <SuperAdminDialog title="Customer access" eyebrow="ACCESS ALLOCATION" description="Review the customer directory and control which staff member can access each customer." count={customers.length} id="assignments" icon={<Users size={20}/>}>
           <div className="admin-panel-heading"><div><span>ACCESS ALLOCATION</span><h2>Assign customers to staff</h2></div><span>{customers.length} customers</span></div>
           <p className="admin-help">A staff administrator can only access the customers explicitly assigned here. Assigning a customer to a second staff member gives both staff members access to that customer.</p>
           {!admins.length ? <p className="admin-empty">Promote at least one customer to staff administrator before assigning customer accounts.</p> :
@@ -89,13 +90,13 @@ export default async function SuperAdminPage({ searchParams }: Props) {
             </tbody></table></div>}
         </SuperAdminDialog>
 
-        <SuperAdminDialog title="Promote customers" eyebrow="ROLE MANAGEMENT" description="Choose customer accounts to appoint as staff administrators." count={customers.length} eligibl} icon={<ShieldCheck size={20}/>}>
+        <SuperAdminDialog title="Promote customers" eyebrow="ROLE MANAGEMENT" description="Choose customer accounts to appoint as staff administrators." count={customers.length} id="promote" icon={<ShieldCheck size={20}/>}>
           <div className="admin-panel-heading"><div><span>ROLE MANAGEMENT</span><h2>Promote a customer to staff administrator</h2></div><UserCog size={18}/></div>
           <p className="admin-help">Promoting an account does not grant access to any customer records. You must separately assign customers above.</p>
           <div className="super-promote-list">{customers.map((person) => <form action={superAdminSetRole} key={person.user_id}><div><strong>{person.display_name}</strong><small>{person.email}</small></div><input type="hidden" name="user_id" value={person.user_id}/><input type="hidden" name="make_admin" value="true"/><button type="submit">Promote to staff admin</button></form>)}</div>
         </SuperAdminDialog>
 
-        <SuperAdminDialog title="Support oversight" eyebrow="GLOBAL CUSTOMER CARE" description="Read support conversations across Nexora without needing to open each staff workspace." count={tickets?.length ?? 0} conversation} icon={<MessageSquare size={20}/>}>
+        <SuperAdminDialog title="Support oversight" eyebrow="GLOBAL CUSTOMER CARE" description="Read support conversations across Nexora without needing to open each staff workspace." count={tickets?.length ?? 0} id="oversight" icon={<MessageSquare size={20}/>}>
           <div className="admin-panel-heading"><div><span>GLOBAL CUSTOMER CARE OVERSIGHT</span><h2>All support conversations</h2></div><span>{openCount} open · {tickets?.length ?? 0} recent</span></div>
           {ticketError ? <p className="admin-empty">Unable to load support conversations.</p> : !tickets?.length ? <p className="admin-empty">No support conversations have been opened.</p> :
             <div className="super-support-layout"><div className="admin-ticket-list">{tickets.map((ticket) => <Link href={"/super-admin?ticket=" + ticket.id + "#oversight"} key={ticket.id} className={selected?.id === ticket.id ? "admin-ticket selected" : "admin-ticket"}><strong>{ticket.subject}</strong><span>{personMap.get(ticket.user_id)?.email ?? ticket.user_id} · {ticket.category} · {ticket.status}</span><small>{new Date(ticket.updated_at).toLocaleString(locale)}</small></Link>)}</div>
