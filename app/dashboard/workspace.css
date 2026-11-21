@@ -169,3 +169,46 @@
 .kyc-customer-rejection span,.kyc-customer-pending,.kyc-customer-verified{color:#87958c;font-size:9px;line-height:1.6}
 .kyc-customer-pending,.kyc-customer-verified{margin:12px 0 0}
 .identity-rejection-reason{max-width:330px;margin:7px 0 0;padding:8px 9px;color:#87594e;background:#fbf1ed;border-radius:4px;font-size:9px;line-height:1.6;white-space:pre-wrap}
+
+/* Savings goals */
+.savings-intro{align-items:flex-end}
+.savings-overview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:0 0 18px}
+.savings-stat-card{display:grid;gap:9px;padding:17px 19px;background:#fff;border:1px solid #e9eee9;border-radius:8px}
+.savings-stat-card>span{display:flex;align-items:center;gap:7px;color:#829087;font-size:9px;font-weight:800;letter-spacing:1px}
+.savings-stat-card>span svg{color:#65866d}
+.savings-stat-card>strong{color:#304b39;font:600 22px Manrope,sans-serif}
+.savings-stat-card>small{color:#9aa69e;font-size:9px}
+.savings-create-panel{margin-bottom:24px}
+.savings-create-form{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:12px;align-items:end;padding:0 20px 20px}
+.savings-create-form label,.savings-money-actions label{display:grid;gap:6px;color:#6e8074;font-size:10px;font-weight:700}
+.savings-create-form input,.savings-money-actions input,.savings-money-actions select{width:100%;min-width:0;padding:11px 12px;border:1px solid #e4ebe4;border-radius:5px;background:#fff;color:#344b3b;font-size:12px;outline:none}
+.savings-create-form input:focus,.savings-money-actions input:focus,.savings-money-actions select:focus{border-color:#87a58c;box-shadow:0 0 0 3px #eaf2eb}
+.savings-create-form button,.savings-money-actions button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:39px;padding:0 14px;border:0;border-radius:5px;background:#355b41;color:#fff;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap}
+.savings-optional{color:#a2ada5;font-weight:400}
+.savings-section-heading{display:flex;align-items:flex-end;justify-content:space-between;margin:0 0 13px}
+.savings-section-heading h2{margin:5px 0 0;color:#344d3d;font:600 18px Manrope,sans-serif}
+.savings-goals-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.savings-goal-card{min-width:0;padding:19px 20px;background:#fff;border:1px solid #e8eee8;border-radius:8px;box-shadow:0 5px 18px #1d35200a}
+.savings-goal-top{display:flex;align-items:center;justify-content:space-between}
+.savings-goal-icon{display:grid;place-items:center;width:37px;height:37px;border-radius:7px;background:#edf4ed;color:#557b5e}
+.savings-goal-status{padding:5px 9px;border-radius:20px;background:#f2f4f2;color:#7d8b81;font-size:8px;font-weight:800;text-transform:capitalize}
+.savings-goal-status.completed{background:#eaf4eb;color:#477750}
+.savings-goal-card h3{margin:14px 0 8px;color:#344d3d;font:600 16px Manrope,sans-serif}
+.savings-goal-balance{color:#2f4b38;font:600 23px Manrope,sans-serif;overflow-wrap:anywhere}
+.savings-goal-balance small{color:#97a39a;font:400 10px Manrope,sans-serif}
+.savings-progress-track{height:7px;margin:14px 0 8px;overflow:hidden;background:#edf1ed;border-radius:20px}
+.savings-progress-track span{display:block;height:100%;background:#6e9875;border-radius:20px}
+.savings-progress-meta{display:flex;justify-content:space-between;gap:8px;color:#95a198;font-size:9px}
+.savings-progress-meta strong{color:#52765a}
+.savings-money-actions{margin-top:15px;padding-top:13px;border-top:1px solid #eef1ee}
+.savings-money-actions form{display:grid;grid-template-columns:1fr 1.2fr auto;gap:8px;align-items:end}
+.savings-money-actions input,.savings-money-actions select{padding:9px;font-size:10px}
+.savings-money-actions button{min-height:35px;padding:0 10px;font-size:9px}
+.savings-withdraw button{background:#f1f4f1;color:#536b59;border:1px solid #e3eae3}
+.savings-recent-entries{display:grid;gap:8px;margin-top:15px;padding-top:13px;border-top:1px solid #eef1ee}
+.savings-recent-entries>strong{color:#77877c;font-size:9px;text-transform:uppercase;letter-spacing:.7px}
+.savings-recent-entries>div{display:flex;justify-content:space-between;gap:8px;color:#8d9a90;font-size:9px}
+.savings-recent-entries b{color:#75867a;font-size:9px;white-space:nowrap}
+.savings-recent-entries b.positive{color:#4f8058}
+@media(max-width:900px){.savings-create-form{grid-template-columns:1fr 1fr}.savings-create-form button{grid-column:1/-1}.savings-money-actions form{grid-template-columns:1fr 1fr}.savings-money-actions button{grid-column:1/-1}}
+@media(max-width:650px){.savings-overview-grid,.savings-goals-grid,.savings-create-form,.savings-money-actions form{grid-template-columns:1fr}.savings-create-form button,.savings-money-actions button{grid-column:auto}.savings-goal-card{padding:16px}.savings-stat-card{padding:14px 16px}}
