@@ -229,3 +229,66 @@ SELECT cron.schedule(
   '* * * * *',
   'SELECT private.process_due_scheduled_transfers()'
 );
+
+
+-- Recheck available funds at approval time to prevent a pending transfer
+-- from overdrawing an account after other transactions have posted.
+
+CREATE OR REPLACE FUNCTION private.admin_review_transfer(p_transaction_id uuid, p_decision text, p_reason text)
+RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'pg_catalog', 'public'
+AS $function$
+DECLARE
+  v_admin uuid := auth.uid();
+  v_tx public.ledger_transactions%rowtype;
+  v_source_user uuid;
+  v_destination_user uuid;
+  v_source_status text;
+  v_destination_status text;
+  v_source_account_id uuid;
+  v_amount_minor bigint;
+  v_available_balance bigint;
+  v_new_status text;
+BEGIN
+  IF v_admin IS NULL OR ((select auth.jwt())->'app_metadata'->>'role') IS DISTINCT FROM 'admin' THEN RAISE EXCEPTION 'Administrator access required.'; END IF;
+  IF p_decision NOT IN ('approve','reject') THEN RAISE EXCEPTION 'Decision must be approve or reject.'; END IF;
+  IF p_reason IS NULL OR length(trim(p_reason)) < 8 THEN RAISE EXCEPTION 'A reason of at least 8 characters is required.'; END IF;
+  SELECT * INTO v_tx FROM public.ledger_transactions WHERE id=p_transaction_id FOR UPDATE;
+  IF NOT FOUND OR v_tx.transaction_type <> 'transfer' OR v_tx.status <> 'pending'
+    OR coalesce((v_tx.metadata->>'review_required')::boolean,false) IS NOT TRUE THEN RAISE EXCEPTION 'Transfer is not awaiting security review.'; END IF;
+  SELECT a.id,a.user_id,a.status,abs(e.amount_minor) INTO v_source_account_id,v_source_user,v_source_status,v_amount_minor
+  FROM public.ledger_entries e JOIN public.bank_accounts a ON a.id=e.account_id
+  WHERE e.transaction_id=v_tx.id AND e.amount_minor < 0 LIMIT 1;
+  SELECT a.user_id,a.status INTO v_destination_user,v_destination_status
+  FROM public.ledger_entries e JOIN public.bank_accounts a ON a.id=e.account_id
+  WHERE e.transaction_id=v_tx.id AND e.amount_minor > 0 LIMIT 1;
+  IF p_decision='approve' AND (v_source_status IS DISTINCT FROM 'active' OR v_destination_status IS DISTINCT FROM 'active') THEN
+    RAISE EXCEPTION 'Source or recipient account is no longer active. Transfer cannot be approved.';
+  END IF;
+  IF p_decision='approve' THEN
+    PERFORM 1 FROM public.bank_accounts WHERE id=v_source_account_id FOR UPDATE;
+    SELECT COALESCE(sum(e.amount_minor),0)::bigint INTO v_available_balance
+    FROM public.ledger_entries e JOIN public.ledger_transactions t ON t.id=e.transaction_id
+    WHERE e.account_id=v_source_account_id AND t.status='posted';
+    IF v_available_balance < v_amount_minor THEN RAISE EXCEPTION 'Available balance is no longer sufficient. Transfer cannot be approved.'; END IF;
+  END IF;
+  v_new_status := CASE WHEN p_decision='approve' THEN 'posted' ELSE 'failed' END;
+  UPDATE public.ledger_transactions SET status=v_new_status,
+    posted_at=CASE WHEN p_decision='approve' THEN now() ELSE NULL END,
+    metadata=metadata || jsonb_build_object('review_required',false,'review_decision',p_decision,
+      'review_reason',trim(p_reason),'reviewed_by',v_admin,'reviewed_at',now())
+  WHERE id=v_tx.id;
+  INSERT INTO public.notifications(user_id,title,body,category)
+  VALUES(v_source_user,CASE WHEN p_decision='approve' THEN 'Transfer approved' ELSE 'Transfer declined' END,
+    CASE WHEN p_decision='approve' THEN 'Your transfer passed security review and was posted.'
+      ELSE 'Your transfer was declined after security review. Contact customer care if you need help.' END,'security');
+  IF p_decision='approve' AND v_destination_user IS NOT NULL THEN
+    INSERT INTO public.notifications(user_id,title,body,category)
+    VALUES(v_destination_user,'Incoming transfer','A transfer has been posted to your Nexora account.','transactions');
+  END IF;
+  INSERT INTO public.admin_audit_logs(admin_user_id,action,entity_type,entity_id,reason,before_state,after_state)
+  VALUES(v_admin,'transfer_'||p_decision,'ledger_transaction',v_tx.id::text,trim(p_reason),
+    jsonb_build_object('status',v_tx.status,'reference',v_tx.reference),
+    jsonb_build_object('status',v_new_status,'review_decision',p_decision));
+  RETURN v_new_status;
+END;
+$function$;
