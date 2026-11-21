@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
     const locale = resolveLocale(
       profile?.preferred_language,
       request.headers.get("accept-language"),
-      profile?.country_code,
+      request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || profile?.country_code,
     );
     response.cookies.set("nexora_locale", locale, {
       path: "/",
@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
     const locale = resolveLocale(
       "auto",
       request.headers.get("accept-language"),
-      null,
+      request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || null,
     );
     response.cookies.set("nexora_locale", locale, {
       path: "/",
