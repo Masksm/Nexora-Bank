@@ -130,3 +130,26 @@ h2 { margin: 17px 0 0; font: 600 38px/1.2 'Manrope', sans-serif; letter-spacing:
 .super-support-thread .admin-panel-heading{padding:13px}
 @media(max-width:850px){.super-support-layout{grid-template-columns:1fr}}
 @media(max-width:600px){.super-promote-list form{align-items:flex-start;flex-direction:column}.super-assignment-form{min-width:190px}.super-support-layout{padding:8px}}
+
+/* Super Admin section launchers and modal workspaces */
+.super-section-card{display:flex;align-items:center;gap:16px;width:100%;min-width:0;margin:0 0 12px;padding:19px 21px;text-align:left;color:#30483a;background:#fff;border:1px solid #e5ebe6;border-radius:9px;cursor:pointer;transition:border-color .18s,box-shadow .18s,transform .18s}
+.super-section-card:hover{border-color:#b9cdbd;box-shadow:0 8px 24px #1b3d2810;transform:translateY(-1px)}
+.super-section-icon{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;color:#3e7254;background:#edf4ee;border-radius:9px}
+.super-section-copy{display:grid;gap:5px;min-width:0;flex:1}
+.super-section-copy>small,.super-dialog-header small{color:#87978d;font-size:8px;font-weight:800;letter-spacing:1.2px}
+.super-section-copy>strong{color:#344d3d;font:600 15px Manrope,sans-serif}
+.super-section-copy>span{color:#8a998f;font-size:10px;line-height:1.5}
+.super-section-meta{display:grid;justify-items:end;gap:8px;flex:0 0 auto;color:#839187;font-size:9px}
+.super-section-meta b{color:#466b50;font-size:11px}
+.super-section-meta>span{display:flex;align-items:center;gap:4px;color:#53775c;font-weight:700}
+.super-dialog-backdrop{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:24px;background:#10251dcc;backdrop-filter:blur(4px)}
+.super-dialog{display:flex;flex-direction:column;width:min(1120px,100%);max-height:min(88vh,900px);overflow:hidden;background:#f8faf7;border:1px solid #dce6dd;border-radius:12px;box-shadow:0 28px 90px #071b1260}
+.super-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:19px 23px;background:#fff;border-bottom:1px solid #e7ede7}
+.super-dialog-header h2{margin:5px 0 0;color:#304a39;font:600 20px Manrope,sans-serif;letter-spacing:-.5px}
+.super-dialog-header>button{display:grid;place-items:center;width:36px;height:36px;color:#607568;background:#f3f7f3;border:1px solid #e4ebe4;border-radius:7px;cursor:pointer}
+.super-dialog-content{overflow:auto;padding:18px 20px 22px;overscroll-behavior:contain}
+.super-dialog-content>.admin-panel{margin:0;border:0;background:transparent;box-shadow:none}
+.super-dialog-content>.admin-panel>.admin-panel-heading{padding:0 0 15px}
+.super-dialog-content>.admin-panel>.admin-panel-heading h2{font-size:16px}
+.super-dialog-content>.admin-panel>.admin-table-wrap{max-height:60vh;overflow:auto}
+@media(max-width:600px){.super-section-card{align-items:flex-start;gap:11px;padding:15px}.super-section-icon{flex-basis:37px;width:37px;height:37px}.super-section-copy>span{font-size:9px}.super-section-meta{font-size:8px}.super-dialog-backdrop{padding:8px}.super-dialog{max-height:94vh;border-radius:9px}.super-dialog-header{padding:15px}.super-dialog-content{padding:13px 10px 17px}.super-dialog-content .admin-table{min-width:650px}}
