@@ -61,6 +61,11 @@ CREATE INDEX IF NOT EXISTS scheduled_transfers_due_idx
   WHERE status = 'scheduled';
 CREATE INDEX IF NOT EXISTS scheduled_transfers_user_idx
   ON public.scheduled_transfers(user_id, scheduled_for DESC);
+CREATE INDEX IF NOT EXISTS scheduled_transfers_from_account_idx
+  ON public.scheduled_transfers(from_account_id);
+CREATE INDEX IF NOT EXISTS scheduled_transfers_last_transaction_idx
+  ON public.scheduled_transfers(last_transaction_id)
+  WHERE last_transaction_id IS NOT NULL;
 
 ALTER TABLE public.scheduled_transfers ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.scheduled_transfers FROM anon, public, authenticated;
