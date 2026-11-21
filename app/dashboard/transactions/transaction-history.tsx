@@ -47,7 +47,7 @@ export default function TransactionHistory({ transactions, locale }: { transacti
   const [day, setDay] = useState<string | null>(() => latestDate?.day ?? null);
 
   const years = useMemo(() => [...new Set(transactions.map((item) => dateParts(item.created_at, locale).year))]
-    .sort((a, b) => Number(b) - Number(a)), [transactions]);
+    .sort((a, b) => Number(b) - Number(a)), [transactions, locale]);
 
   const months = useMemo(() => {
     if (!year) return [];
