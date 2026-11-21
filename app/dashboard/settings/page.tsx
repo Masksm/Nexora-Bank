@@ -13,7 +13,7 @@ const countries = [
   ["NG", "Nigeria"], ["US", "United States"], ["GB", "United Kingdom"], ["ES", "Spain"],
   ["FR", "France"], ["DE", "Germany"], ["PT", "Portugal"], ["BR", "Brazil"],
   ["CA", "Canada"], ["GH", "Ghana"], ["KE", "Kenya"], ["ZA", "South Africa"],
-  ["IN", "India"], ["AE", "United Arab Emirates"], ["OTHER", "Other"],
+  ["IN", "India"], ["AE", "United Arab Emirates"], ["XX", "Other / not listed"],
 ];
 
 export default async function SettingsPage({ searchParams }: Props) {
@@ -54,6 +54,12 @@ export default async function SettingsPage({ searchParams }: Props) {
             <label>Date of birth<input name="date_of_birth" type="date" defaultValue={profile?.date_of_birth ?? ""} max={new Date().toISOString().slice(0,10)} autoComplete="bday"/></label>
             <label>Country / region<select name="country_code" defaultValue={profile?.country_code?.trim() || "NG"}>{countries.map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select></label>
           </div>
+          <input type="hidden" name="address_line1" value={profile?.address_line1 ?? ""}/>
+          <input type="hidden" name="address_line2" value={profile?.address_line2 ?? ""}/>
+          <input type="hidden" name="city" value={profile?.city ?? ""}/>
+          <input type="hidden" name="region" value={profile?.region ?? ""}/>
+          <input type="hidden" name="postal_code" value={profile?.postal_code ?? ""}/>
+          <input type="hidden" name="preferred_timezone" value={profile?.preferred_timezone ?? "Africa/Lagos"}/>
           <div className="settings-form-actions"><p>Your email address is managed through your sign-in credentials.</p><button type="submit"><Save size={15}/> Save personal details</button></div>
         </form>
       </section>
