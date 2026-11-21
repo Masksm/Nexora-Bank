@@ -86,12 +86,11 @@ export default async function TransactionsPage() {
       <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">NEXORA BANK · PERSONAL</span></header>
       <section className="workspace-intro"><div><span className="workspace-kicker">{t("A CLEAR RECORD")}</span><h1>{t("Transactions")}</h1><p>{t("Review all activity recorded against your accounts.")}</p></div></section>
       <section className="workspace-panel">
-        <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("ACCOUNT ACTIVITY")}</span><h2>{t("Transaction history")}</h2></div><div className="transaction-tools"><span className="workspace-count">{history.length} records</span><Link href="/dashboard/statements" className="workspace-download"><FileText size={14}/> Statements</Link><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> {t("Export CSV")}</Link></div></div>
-        {failed ? <div className="workspace-alert">We couldn’t load the complete transaction history. Please refresh and try again.</div> :
+        <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("ACCOUNT ACTIVITY")}</span><h2>{t("Transaction history")}</h2></div><div className="transaction-tools"><span className="workspace-count">{history.length} {t("records")}</span><Link href="/dashboard/statements" className="workspace-download"><FileText size={14}/> {t("Statements")}</Link><Link href="/dashboard/transactions/export" className="workspace-download"><Download size={14}/> {t("Export CSV")}</Link></div></div>
+        {failed ? <div className="workspace-alert">{t("We couldn’t load the complete transaction history. Please refresh and try again.")}</div> :
           history.length === 0 ? <div className="workspace-empty"><FileText size={25}/><h2>{t("No transactions yet")}</h2><p>{t("Once a transaction is posted, it will appear here.")}</p></div> :
           <TransactionHistory transactions={history} locale={locale}/>}
       </section>
-      <p className="workspace-disclaimer">This history reflects internal ledger activity only. It is not a bank statement or proof of real-world payment.</p>
     </main>
   );
 }
