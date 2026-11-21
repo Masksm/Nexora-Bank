@@ -111,7 +111,7 @@ export default async function SettingsPage({ searchParams }: Props) {
         <div className="kyc-progress-track"><span style={{ width: completionPercent + "%" }}/></div>
         <div className="kyc-summary-bottom"><span>{completedFields} of 8 profile details completed</span><span className={"kyc-customer-status " + kycStatus}>{kycStatus.replace("_", " ")}</span></div>
         {kycStatus === "rejected" && verification?.rejection_reason && <div className="kyc-customer-rejection"><strong>Action required</strong><p>{verification.rejection_reason}</p><span>Upload a corrected document below. Your previous submission remains in your record.</span></div>}
-        {kycStatus === "verified" && <p className="kyc-customer-verified">Your identity documents have passed Nexora's internal review.</p>}
+        {kycStatus === "verified" && <p className="kyc-customer-verified">Your identity documents have passed Nexora&apos;s internal review.</p>}
         {kycStatus === "submitted" && <p className="kyc-customer-pending">Your documents have been received and are waiting for review.</p>}
         {kycStatus === "under_review" && <p className="kyc-customer-pending">Your documents are currently being reviewed.</p>}
       </section>
