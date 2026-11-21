@@ -153,3 +153,15 @@ h2 { margin: 17px 0 0; font: 600 38px/1.2 'Manrope', sans-serif; letter-spacing:
 .super-dialog-content>.admin-panel>.admin-panel-heading h2{font-size:16px}
 .super-dialog-content>.admin-panel>.admin-table-wrap{max-height:60vh;overflow:auto}
 @media(max-width:600px){.super-section-card{align-items:flex-start;gap:11px;padding:15px}.super-section-icon{flex-basis:37px;width:37px;height:37px}.super-section-copy>span{font-size:9px}.super-section-meta{font-size:8px}.super-dialog-backdrop{padding:8px}.super-dialog{max-height:94vh;border-radius:9px}.super-dialog-header{padding:15px}.super-dialog-content{padding:13px 10px 17px}.super-dialog-content .admin-table{min-width:650px}}
+
+/* Super Admin account deletion controls */
+.super-delete-start{padding:8px 11px;color:#9b4038;background:#fff1ef;border:1px solid #f1d2ce;border-radius:5px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap}
+.super-delete-confirm{display:grid;gap:8px;min-width:190px}
+.super-delete-confirm label{display:grid;gap:5px;color:#7d8c82;font-size:9px}
+.super-delete-confirm label strong{color:#465b4d;font-size:9px;overflow-wrap:anywhere}
+.super-delete-confirm input{width:100%;min-width:0;padding:8px;border:1px solid #e3c7c3;border-radius:5px;font-size:10px}
+.super-delete-confirm>div{display:flex;gap:6px;justify-content:flex-end}
+.super-delete-cancel,.super-delete-submit{padding:7px 9px;border:0;border-radius:4px;font-size:9px;font-weight:800;cursor:pointer}
+.super-delete-cancel{color:#617166;background:#edf2ee}
+.super-delete-submit{color:#fff;background:#a13d35}
+@media(max-width:600px){.super-delete-confirm{min-width:180px}}
