@@ -44,3 +44,8 @@ Additional migration applied and source-controlled on 2026-11-21:
 Additional migration applied and source-controlled on 2026-11-21:
 
 - `20261121090000_financial_experience_and_scheduled_transfers`: adds customer-editable account nicknames, a private-owner-scoped scheduled transfer table, and a pg_cron worker that submits due transfers into the existing administrator security-review queue. Scheduled transfers do not post balances until an administrator approves the resulting ledger transaction. Recurring weekly/monthly schedules pause while the latest execution is awaiting review. The admin approval RPC rechecks the source account's available posted balance before posting, and a daily cron task retains only seven days of scheduler run history.
+
+ 
+Additional migration applied and source-controlled on 2026-11-21:
+
+- `20261121100000_add_customer_kyc_review_workflow`: adds customer verification status and rejection reasons, administrator-only document metadata review, administrator-only reads of private identity files through short-lived signed URLs, a submission trigger, an atomic administrator review function, and audit-log entries. Customers can read their own verification outcome but cannot change it. Rejected documents remain in the record; a newly uploaded replacement becomes the latest document for that document type.
