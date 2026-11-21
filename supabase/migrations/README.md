@@ -51,3 +51,5 @@ Additional migration applied and source-controlled on 2026-11-21:
 - `20261121100000_add_customer_kyc_review_workflow`: adds customer verification status and rejection reasons, administrator-only document metadata review, administrator-only reads of private identity files through short-lived signed URLs, a submission trigger, an atomic administrator review function, and audit-log entries. Customers can read their own verification outcome but cannot change it. Rejected documents remain in the record; a newly uploaded replacement becomes the latest document for that document type.
 
 - `20261121103000_notify_customers_of_kyc_review_outcomes`: sends an in-app security notification when a customer's latest identity submission is fully verified or requires correction. The aggregate customer status is calculated from the latest document for each document type.
+
+- `20261121104500_optimize_kyc_review_policies_and_indexes`: consolidates customer/admin read access into one ownership-or-admin policy per table and indexes reviewer foreign keys.
