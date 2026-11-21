@@ -43,7 +43,7 @@ export default async function Home() {
           <Link href="#experience">{t("Experience")}</Link>
           <Link href="#security">{t("Security")}</Link>
         </div>
-        <Link className="nav-cta" href="/login">Sign in <ArrowUpRight size={16} /></Link>
+        <Link className="nav-cta" href="/login">{t("Sign in")} <ArrowUpRight size={16} /></Link>
       </nav>
 
       <section className="hero shell">
