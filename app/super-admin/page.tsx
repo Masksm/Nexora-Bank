@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { Activity, ArrowLeft, Eye, LogOut, ShieldCheck, Users, UserCog, MessageSquare, LockKeyhole } from "lucide-react";
+import { Activity, Eye, LogOut, ShieldCheck, Users, UserCog, MessageSquare, LockKeyhole } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { superAdminSetAssignment, superAdminSetRole } from "./actions";
