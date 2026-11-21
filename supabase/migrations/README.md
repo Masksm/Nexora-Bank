@@ -53,3 +53,5 @@ Additional migration applied and source-controlled on 2026-11-21:
 - `20261121103000_notify_customers_of_kyc_review_outcomes`: sends an in-app security notification when a customer's latest identity submission is fully verified or requires correction. The aggregate customer status is calculated from the latest document for each document type.
 
 - `20261121104500_optimize_kyc_review_policies_and_indexes`: consolidates customer/admin read access into one ownership-or-admin policy per table and indexes reviewer foreign keys.
+
+- `20261121110000_allow_admin_customer_profile_kyc_review`: extends profile read access to authenticated administrators so the KYC workspace can calculate completion and compare submitted identity documents with customer-provided details. Customers retain access only to their own profile.
