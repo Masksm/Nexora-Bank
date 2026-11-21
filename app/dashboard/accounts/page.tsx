@@ -9,14 +9,16 @@ import { updateAccountNickname } from "../actions";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+type Props = { searchParams: Promise<{ error?: string; success?: string }> };
 
 function money(amountMinor: number, currency = "USD", locale: SupportedLocale = "en") {
   return new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: 2 }).format(amountMinor / 100);
 }
 
-export default async function AccountsPage() {
+export default async function AccountsPage({ searchParams }: Props) {
   const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
   const t = (value: string) => pageText(locale, value);
+  const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -37,6 +39,8 @@ export default async function AccountsPage() {
         <div><span className="workspace-kicker">{t("YOUR MONEY, ORGANIZED")}</span><h1>{t("Accounts")}</h1><p>{t("View your account details and available balances.")}</p></div>
         <div className="workspace-total"><span>{t("COMBINED USD BALANCE")}</span><strong>{money(total, "USD", locale)}</strong></div>
       </section>
+      {params.error && <div className="workspace-alert">{params.error}</div>}
+      {params.success && <div className="transfer-success">Account nickname updated.</div>}
       {error ? <div className="workspace-alert">{t("We couldn’t load your accounts. Please refresh and try again.")}</div> :
         (accounts ?? []).length === 0 ? <div className="workspace-empty"><Wallet size={25}/><h2>{t("No account yet")}</h2><p>{t("Your checking account will appear here after registration is completed.")}</p></div> :
         <section className="account-list">
