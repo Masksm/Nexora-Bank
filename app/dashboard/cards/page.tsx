@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
 import { ArrowLeft, CreditCard, Lock, Plus, Unlock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -8,6 +11,8 @@ export const dynamic="force-dynamic";
 type Props={searchParams:Promise<{error?:string;success?:string}>};
 
 export default async function CardsPage({searchParams}:Props){
+  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const t = (value: string) => pageText(locale, value);
   const supabase=await createClient();
   const {data:{user}}=await supabase.auth.getUser();
   if(!user)redirect("/login");
@@ -17,10 +22,10 @@ export default async function CardsPage({searchParams}:Props){
     searchParams,
   ]);
   const activeAccounts=(accounts??[]).filter(a=>a.status==="active");
-  return <main className="workspace-shell"><header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link><span className="workspace-overline">NEXORA BANK · CARDS</span></header><section className="workspace-intro"><div><span className="workspace-kicker">DIGITAL WALLET</span><h1>Virtual cards</h1><p>Manage your Nexora virtual card previews.</p></div></section>
-    {params.error&&<div className="workspace-alert">{params.error}</div>}{params.success&&<div className="transfer-success">Card settings updated.</div>}
+  return <main className="workspace-shell"><header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">NEXORA BANK · CARDS</span></header><section className="workspace-intro"><div><span className="workspace-kicker">{t("DIGITAL WALLET")}</span><h1>{t("Virtual cards")}</h1><p>{t("Manage your Nexora virtual card previews.")}</p></div></section>
+    {params.error&&<div className="workspace-alert">{params.error}</div>}{params.success&&<div className="transfer-success">{t("Card settings updated.")}</div>}
     <section className="card-preview-grid">{(cards??[]).map(card=><article key={card.id} className="virtual-card-preview"><div className="virtual-card-top"><span>NEXORA</span><CreditCard size={22}/></div><div className="virtual-card-chip"/><strong>•••• •••• •••• {card.last4}</strong><div className="virtual-card-bottom"><span>{card.cardholder_name}<small>CARDHOLDER</small></span><span>{String(card.expiry_month).padStart(2,"0")}/{String(card.expiry_year).slice(-2)}<small>VALID THRU</small></span></div><div className="virtual-card-controls"><span className={card.status==="active"?"account-status":"account-status inactive"}>{card.status}</span><form action={updateCardStatus}><input type="hidden" name="card_id" value={card.id}/><input type="hidden" name="status" value={card.status==="active"?"frozen":"active"}/><button type="submit" aria-label={card.status==="active"?"Freeze card":"Activate card"}>{card.status==="active"?<Lock size={15}/>:<Unlock size={15}/>}</button></form></div></article>)}</section>
-    <section className="workspace-panel card-create"><div className="workspace-panel-heading"><div><span className="workspace-kicker">CARD MANAGEMENT</span><h2>Create a virtual card preview</h2></div><Plus size={18}/></div><form action={createCard} className="transfer-form"><label>Linked account<select name="account_id" required>{activeAccounts.map(a=><option key={a.id} value={a.id}>{a.account_name} · {a.account_number}</option>)}</select></label><button type="submit" disabled={!activeAccounts.length}>Create card preview</button></form></section>
+    <section className="workspace-panel card-create"><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("CARD MANAGEMENT")}</span><h2>{t("Create a virtual card preview")}</h2></div><Plus size={18}/></div><form action={createCard} className="transfer-form"><label>{t("Linked account")}<select name="account_id" required>{activeAccounts.map(a=><option key={a.id} value={a.id}>{a.account_name} · {a.account_number}</option>)}</select></label><button type="submit" disabled={!activeAccounts.length}>{t("Create card preview")}</button></form></section>
     <p className="workspace-disclaimer">These are simulated card records showing masked digits only. They are not payment cards and cannot be used at merchants or ATMs.</p>
   </main>;
 }
