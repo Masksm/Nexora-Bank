@@ -37,7 +37,7 @@ export default function TransactionHistory({ transactions, locale }: { transacti
     if (!transactions.length) return null;
     return dateParts(transactions.reduce((latest, item) =>
       new Date(item.created_at).getTime() > new Date(latest.created_at).getTime() ? item : latest
-    ).created_at);
+    ).created_at, locale);
   }, [transactions]);
 
   const [year, setYear] = useState<string | null>(() => latestDate?.year ?? null);
