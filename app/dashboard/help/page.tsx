@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
 import { ArrowLeft, MessageCircle, Send, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -13,6 +16,8 @@ const categories = [
 
 
 export default async function HelpPage({ searchParams }: Props) {
+  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const t = (value: string) => pageText(locale, value);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -24,25 +29,25 @@ export default async function HelpPage({ searchParams }: Props) {
   const selected = (tickets ?? []).find((ticket)=>ticket.id===params.ticket) ?? (params.ticket ? null : (tickets ?? [])[0]);
   const { data: messages } = selected ? await supabase.from("support_messages").select("id,sender_role,body,created_at").eq("conversation_id",selected.id).order("created_at") : {data:[]};
   return <main className="workspace-shell">
-    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link><span className="workspace-overline">NEXORA BANK · SUPPORT</span></header>
-    <section className="workspace-intro"><div><span className="workspace-kicker">WE’RE HERE TO HELP</span><h1>Help centre</h1><p>Send a request and continue the conversation with customer care.</p></div></section>
+    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">NEXORA BANK · SUPPORT</span></header>
+    <section className="workspace-intro"><div><span className="workspace-kicker">{t("WE’RE HERE TO HELP")}</span><h1>{t("Help centre")}</h1><p>{t("Send a request and continue the conversation with customer care.")}</p></div></section>
     {params.error && <div className="workspace-alert">{params.error}</div>}
     <section className="support-layout">
       <div className="workspace-panel support-new">
-        <div className="workspace-panel-heading"><div><span className="workspace-kicker">GUIDED INTAKE</span><h2>Tell us what happened</h2></div><MessageCircle size={19}/></div>
+        <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("GUIDED INTAKE")}</span><h2>{t("Tell us what happened")}</h2></div><MessageCircle size={19}/></div>
         <form action={createSupportRequest} className="transfer-form">
-          <label>What do you need help with?<select name="category" defaultValue="general">{categories.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
-          <label>Subject<input name="subject" maxLength={120} placeholder="Briefly describe the issue" required/></label>
-          <label>Related account (optional)<select name="account_number" defaultValue=""><option value="">Not applicable</option>{(accounts ?? []).map((account)=><option key={account.account_number} value={account.account_number}>{account.account_number}</option>)}</select></label>
-          <label>How urgent is it?<select name="urgency"><option value="normal">Normal</option><option value="high">High</option><option value="critical">Urgent security concern</option></select></label>
-          <label>Explain the issue<textarea name="details" rows={4} minLength={10} maxLength={3500} placeholder="Include what happened, when it happened, and any error message. Do not include passwords or verification codes." required/></label>
-          <button type="submit">Send to customer care <Send size={15}/></button>
+          <label>{t("What do you need help with?")}<select name="category" defaultValue="general">{categories.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+          <label>{t("Subject")}<input name="subject" maxLength={120} placeholder={t("Briefly describe the issue")} required/></label>
+          <label>{t("Related account (optional)")}<select name="account_number" defaultValue=""><option value="">{t("Not applicable")}</option>{(accounts ?? []).map((account)=><option key={account.account_number} value={account.account_number}>{account.account_number}</option>)}</select></label>
+          <label>{t("How urgent is it?")}<select name="urgency"><option value="normal">{t("Normal")}</option><option value="high">{t("High")}</option><option value="critical">{t("Urgent security concern")}</option></select></label>
+          <label>{t("Explain the issue")}<textarea name="details" rows={4} minLength={10} maxLength={3500} placeholder="Include what happened, when it happened, and any error message. Do not include passwords or verification codes." required/></label>
+          <button type="submit">{t("Send to customer care")} <Send size={15}/></button>
         </form>
-        <div className="support-assistant"><ShieldCheck size={17}/><div><strong>Guided support assistant</strong><p>We route your request using the topic and urgency you select. A human administrator handles the reply. This intake currently uses fixed guidance, not a connected generative-AI model.</p></div></div>
+        <div className="support-assistant"><ShieldCheck size={17}/><div><strong>{t("Guided support assistant")}</strong><p>We route your request using the topic and urgency you select. A human administrator handles the reply. This intake currently uses fixed guidance, not a connected generative-AI model.</p></div></div>
       </div>
       <div className="workspace-panel support-tickets">
-        <div className="workspace-panel-heading"><div><span className="workspace-kicker">YOUR REQUESTS</span><h2>Support conversations</h2></div><span className="workspace-count">{tickets?.length ?? 0}</span></div>
-        {(tickets ?? []).length===0 ? <div className="workspace-empty"><MessageCircle size={24}/><h2>No requests yet</h2><p>New support requests will appear here.</p></div> : <div className="support-ticket-list">{(tickets ?? []).map((ticket)=><Link key={ticket.id} href={`/dashboard/help?ticket=${ticket.id}`} className={selected?.id===ticket.id?"support-ticket selected":"support-ticket"}><strong>{ticket.subject}</strong><span>{ticket.category.replaceAll("_"," ")} · {ticket.status.replaceAll("_"," ")}</span><small>{new Date(ticket.updated_at).toLocaleString()}</small></Link>)}</div>}
+        <div className="workspace-panel-heading"><div><span className="workspace-kicker">YOUR REQUESTS</span><h2>{t("Support conversations")}</h2></div><span className="workspace-count">{tickets?.length ?? 0}</span></div>
+        {(tickets ?? []).length===0 ? <div className="workspace-empty"><MessageCircle size={24}/><h2>{t("No requests yet")}</h2><p>{t("New support requests will appear here.")}</p></div> : <div className="support-ticket-list">{(tickets ?? []).map((ticket)=><Link key={ticket.id} href={`/dashboard/help?ticket=${ticket.id}`} className={selected?.id===ticket.id?"support-ticket selected":"support-ticket"}><strong>{ticket.subject}</strong><span>{ticket.category.replaceAll("_"," ")} · {ticket.status.replaceAll("_"," ")}</span><small>{new Date(ticket.updated_at).toLocaleString()}</small></Link>)}</div>}
       </div>
     </section>
     {selected && <section className="workspace-panel support-thread">
