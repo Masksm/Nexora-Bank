@@ -103,7 +103,7 @@ export default async function SettingsPage({ searchParams }: Props) {
       <section className="settings-section-heading"><div className="settings-section-icon"><FileCheck size={18}/></div><div><h2>{t("Identity documents")}</h2><p>{t("Submit an identity document for account records.")}</p></div></section>
       <section className="workspace-panel settings-panel">
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">IDENTITY RECORDS</span><h2>{t("Documents")}</h2></div><span className="workspace-count">{documents?.length ?? 0} uploaded</span></div>
-        <IdentityDocuments userId={user.id} initialDocuments={(documents ?? []) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";uploaded_at:string}>}/>
+        <IdentityDocuments userId={user.id} locale={locale} initialDocuments={(documents ?? []) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";uploaded_at:string}>}/>
       </section>
 
       <section className="settings-section-heading"><div className="settings-section-icon"><ShieldCheck size={18}/></div><div><h2>{t("Security and access")}</h2><p>{t("Review devices and protect your account.")}</p></div></section>
