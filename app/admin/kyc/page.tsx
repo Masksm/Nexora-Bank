@@ -56,18 +56,17 @@ export default async function AdminKycPage({ searchParams }: Props) {
     searchParams,
   ]);
   const documents = docsResult.data ?? [];
-  const userIds = [...new Set(documents.map((doc) => doc.user_id))];
   const [profilesResult, verificationsResult] = await Promise.all([
     supabase.from("profiles")
-      .select("user_id,first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,city,region")
-      .in("user_id", userIds),
+      .select("user_id,first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,city,region,created_at")
+      .order("created_at", { ascending: false }).limit(200),
     supabase.from("customer_verifications")
-      .select("user_id,status,rejection_reason,submitted_at,reviewed_at")
-      .in("user_id", userIds),
+      .select("user_id,status,rejection_reason,submitted_at,reviewed_at").limit(200),
   ]);
 
   const profileMap = new Map((profilesResult.data ?? []).map((profile) => [profile.user_id, profile as ProfileRow]));
   const verificationMap = new Map((verificationsResult.data ?? []).map((verification) => [verification.user_id, verification]));
+  const profileRows = (profilesResult.data ?? []) as ProfileRow[];
   const signedEntries = await Promise.all(documents.map(async (doc) => {
     const { data } = await supabase.storage.from("identity-documents").createSignedUrl(doc.storage_path, 300);
     return [doc.id, data?.signedUrl ?? null] as const;
@@ -100,6 +99,11 @@ export default async function AdminKycPage({ searchParams }: Props) {
           <article><span><FileText size={17}/> AWAITING REVIEW</span><strong>{pendingCount}</strong><small>Submitted or under review</small></article>
           <article><span><ShieldCheck size={17}/> VERIFIED DOCUMENTS</span><strong>{verifiedCount}</strong><small>Documents approved by an administrator</small></article>
           <article><span><UserRound size={17}/> REJECTED DOCUMENTS</span><strong>{rejectedCount}</strong><small>Replacement may be submitted by the customer</small></article>
+        </section>
+
+        <section className="admin-panel kyc-profile-panel">
+          <div className="admin-panel-heading"><div><span>CUSTOMER ONBOARDING</span><h2>Profile completion overview</h2></div><span>{profileRows.length} customers · latest 200</span></div>
+          {!profileRows.length ? <p className="admin-empty">No customer profiles were found.</p> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Customer</th><th>Contact</th><th>Profile completion</th><th>KYC status</th></tr></thead><tbody>{profileRows.map((profile) => { const status = verificationMap.get(profile.user_id)?.status || "not_started"; const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.display_name || "Name not provided"; return <tr key={profile.user_id}><td><strong>{name}</strong><small><code>{profile.user_id.slice(0, 12)}…</code></small></td><td>{profile.phone || "Not provided"}<small>{profile.country_code?.trim() || "Country not set"}</small></td><td><div className="kyc-table-progress"><span>{completion(profile)}%</span><i><b style={{ width: completion(profile) + "%" }}/></i></div></td><td><span className={"admin-status " + (status === "verified" ? "active" : status === "rejected" ? "blocked" : "pending")}>{status.replace("_", " ")}</span></td></tr>; })}</tbody></table></div>}
         </section>
 
         <section className="admin-panel kyc-panel">
