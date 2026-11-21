@@ -40,9 +40,9 @@ export default async function TransactionReceiptPage({ params }: Props) {
   if (!transaction) notFound();
 
   const accountById = new Map((accounts ?? []).map(account => [account.id, account]));
-  const total = entries.reduce((sum, entry) => sum + Number(entry.amount_minor), 0);
+  const metadata = transaction.metadata as { review_required?: boolean; source_account?: string; destination_account_number?: string; scheduled_execution?: boolean; amount_minor?: number } | null;
+  const total = Number(metadata?.amount_minor ?? Math.max(...entries.map((entry) => Math.abs(Number(entry.amount_minor)))));
   const incoming = entries.some(entry => Number(entry.amount_minor) > 0);
-  const metadata = transaction.metadata as { review_required?: boolean; source_account?: string; destination_account_number?: string; scheduled_execution?: boolean } | null;
   const review = metadata?.review_required === true;
   const statusLabel = review ? "Under review" : transaction.status.replaceAll("_", " ");
 
