@@ -57,3 +57,5 @@ Additional migration applied and source-controlled on 2026-11-21:
 - `20261121110000_allow_admin_customer_profile_kyc_review`: extends profile read access to authenticated administrators so the KYC workspace can calculate completion and compare submitted identity documents with customer-provided details. Customers retain access only to their own profile.
 
 - `20261121111500_restrict_kyc_review_rpc_entrypoint`: removes direct authenticated execution of the private review implementation and keeps only the authenticated public wrapper, which still enforces the administrator role check internally.
+
+- `20261121113000_keep_customer_kyc_status_in_sync`: recalculates aggregate verification status from the latest document of each type whenever a customer uploads or removes a pending document, preventing stale submitted/rejected states.
