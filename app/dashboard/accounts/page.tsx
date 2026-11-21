@@ -5,6 +5,7 @@ import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Wallet } from "lucide-react";
 import { CopyButton } from "../copy-button";
+import { updateAccountNickname } from "../actions";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function AccountsPage() {
   if (!user) redirect("/login");
 
   const { data: accounts, error } = await supabase.from("account_balances")
-    .select("account_id,account_number,account_name,account_type,currency,status,balance_minor")
+    .select("account_id,account_number,account_name,nickname,account_type,currency,status,balance_minor")
     .eq("user_id", user.id);
 
   const total = (accounts ?? []).reduce((sum, account) => sum + Number(account.balance_minor ?? 0), 0);
@@ -42,9 +43,10 @@ export default async function AccountsPage() {
           {(accounts ?? []).map((account) => (
             <article className="account-detail-card" key={account.account_id}>
               <div className="account-detail-top"><span className="account-detail-icon"><Wallet size={20}/></span><span className={account.status === "active" ? "account-status" : "account-status inactive"}>{account.status}</span></div>
-              <div className="account-detail-name"><span>{account.account_type} ACCOUNT</span><h2>{account.account_name}</h2></div>
+              <div className="account-detail-name"><span>{account.account_type} ACCOUNT</span><h2>{account.nickname || account.account_name}</h2></div>
               <strong className="account-detail-balance">{money(Number(account.balance_minor), account.currency, locale)}</strong>
               <div className="account-number-line"><div><span>{t("ACCOUNT NUMBER")}</span><strong>{account.account_number}</strong></div><CopyButton value={account.account_number}/></div>
+              <form action={updateAccountNickname} className="account-nickname-form"><input type="hidden" name="account_id" value={account.account_id}/><label>Account nickname<input name="nickname" defaultValue={account.nickname || ""} maxLength={40} minLength={2} placeholder={account.account_name}/></label><button type="submit">Save name</button></form>
               <div className="account-detail-foot"><span>{account.currency} · {account.account_type}</span><Link href="/dashboard/transfers">{t("Make a transfer")} <ArrowUpRight size={14}/></Link></div>
             </article>
           ))}
