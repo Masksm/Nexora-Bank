@@ -18,7 +18,7 @@ export default async function AdminSupportPage({searchParams}:Props){
   const {data:{user}}=await supabase.auth.getUser();
   const {data:claims,error:claimsError}=await supabase.auth.getClaims();
   const meta=claims?.claims?.app_metadata as {role?:string}|undefined;
-  if(!user||claimsError||meta?.role!=="admin")redirect("/login");
+  if(!user||claimsError||!["admin", "super_admin"].includes(meta?.role ?? ""))redirect("/login");
   const params=await searchParams;
   const {data:tickets}=await supabase.from("support_conversations").select("id,user_id,subject,category,status,intake_answers,created_at,updated_at").order("updated_at",{ascending:false}).limit(100);
   const selected=(tickets??[]).find(t=>t.id===params.ticket)??(tickets??[])[0];
