@@ -23,7 +23,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   const { data: { user } } = await supabase.auth.getUser();
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
   const appMetadata = claimsData?.claims?.app_metadata as { role?: string } | undefined;
-  if (!user || claimsError || appMetadata?.role !== "admin") redirect("/dashboard");
+  if (!user || claimsError || !["admin", "super_admin"].includes(appMetadata?.role ?? "")) redirect("/dashboard");
 
   const [{ data: accounts, error }, params] = await Promise.all([
     supabase.from("account_balances").select("account_id,user_id,account_number,account_name,account_type,currency,status,balance_minor").not("user_id", "is", null).order("account_number"),
