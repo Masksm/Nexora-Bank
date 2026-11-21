@@ -8,8 +8,6 @@ type Account = { account_id: string; account_number: string; nickname: string | 
 export default function ScheduleTransferForm({ accounts }: { accounts: Account[] }) {
   const [localDate, setLocalDate] = useState("");
   const [utcDate, setUtcDate] = useState("");
-  const minDate = new Date(Date.now() + 5 * 60 * 1000);
-  const minValue = new Date(minDate.getTime() - minDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   return (
     <form action={createScheduledTransfer} className="transfer-form">
       <label>Pay from
@@ -26,7 +24,7 @@ export default function ScheduleTransferForm({ accounts }: { accounts: Account[]
         <input name="amount" type="number" min="0.01" step="0.01" placeholder="250.00" required />
       </label>
       <label>Schedule date and time
-        <input type="datetime-local" min={minValue} value={localDate} onChange={(event) => {
+        <input type="datetime-local" value={localDate} onChange={(event) => {
           setLocalDate(event.target.value);
           setUtcDate(event.target.value ? new Date(event.target.value).toISOString() : "");
         }} required />
