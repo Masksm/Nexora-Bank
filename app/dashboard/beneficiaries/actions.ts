@@ -18,19 +18,19 @@ export async function addBeneficiary(formData:FormData){
   const account=String(formData.get("account_number")||"").trim();
   const routing=String(formData.get("routing_number")||"").replace(/[^0-9]/g,"");
   const sortCode=String(formData.get("sort_code")||"").replace(/[^0-9]/g,"");
-  const iban=String(formData.get("iban")||"").replace(/\\s/g,"").toUpperCase();
-  const bic=String(formData.get("bic")||"").replace(/\\s/g,"").toUpperCase();
+  const iban=String(formData.get("iban")||"").replace(/\s/g,"").toUpperCase();
+  const bic=String(formData.get("bic")||"").replace(/\s/g,"").toUpperCase();
 
   if(!supportedCountries.has(country) || name.length<2 || bank.length<2){
     redirect("/dashboard/beneficiaries?error=Enter%20a%20valid%20recipient%20name%2C%20country%20and%20bank.");
   }
-  if(country==="NX" && !/^\\d{10}$/.test(account)){
+  if(country==="NX" && !/^\d{10}$/.test(account)){
     redirect("/dashboard/beneficiaries?error=Enter%20a%2010-digit%20Nexora%20account%20number.");
   }
-  if(country==="US" && (!/^\\d{9}$/.test(routing) || !/^\\d{4,17}$/.test(account))){
+  if(country==="US" && (!/^\d{9}$/.test(routing) || !/^\d{4,17}$/.test(account))){
     redirect("/dashboard/beneficiaries?error=Enter%20a%209-digit%20US%20routing%20number%20and%20valid%20account%20number.");
   }
-  if(country==="GB" && (!/^\\d{6}$/.test(sortCode) || !/^\\d{8}$/.test(account))){
+  if(country==="GB" && (!/^\d{6}$/.test(sortCode) || !/^\d{8}$/.test(account))){
     redirect("/dashboard/beneficiaries?error=Enter%20a%206-digit%20UK%20sort%20code%20and%208-digit%20account%20number.");
   }
   if(["DE","FR","NL","ES","IE"].includes(country) && !/^[A-Z]{2}[0-9A-Z]{13,32}$/.test(iban)){
