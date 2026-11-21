@@ -158,8 +158,8 @@ export default function TransactionHistory({ transactions, locale }: { transacti
             const incoming = transaction.amount_minor > 0;
             return <Link href={`/dashboard/transactions/${transaction.id}`} className="transaction-row transaction-row-link" key={transaction.id}>
               <span className={incoming ? "transaction-icon incoming" : "transaction-icon"}>{incoming ? <ArrowDownLeft size={18}/> : <ArrowUpRight size={18}/>}</span>
-              <div className="transaction-description"><strong>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</strong><span>{new Date(transaction.created_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}</span></div>
-              <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(transaction.amount_minor, transaction.currency, locale)}</strong><span className={"transaction-status " + (transaction.review_required ? "review" : transaction.status)}>{transaction.review_required ? t("Under review") : transaction.status}</span></div>
+              <div className="transaction-description"><strong>{transaction.description || t(transaction.transaction_type.replaceAll("_", " "))}</strong><span>{new Date(transaction.created_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })} · {transaction.reference}</span></div>
+              <div className="transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(transaction.amount_minor, transaction.currency, locale)}</strong><span className={"transaction-status " + (transaction.review_required ? "review" : transaction.status)}>{transaction.review_required ? t("Under review") : t(transaction.status)}</span></div>
             </Link>;
           })}
         </div>}
