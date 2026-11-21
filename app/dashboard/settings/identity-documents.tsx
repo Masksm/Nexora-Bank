@@ -129,7 +129,7 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
         <label>{t("Choose document")}
           <input id="identity-file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={(event) => setFile(event.target.files?.[0] ?? null)} required />
         </label>
-        <p>{t("{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.")}")}</p>
+        <p>{t("PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately. You and authorised identity-review staff can access them.")}</p>
         <button type="submit" disabled={!file || busy}>{busy ? t("Uploading…") : t("Upload identity document")}</button>
       </form>
       {message && <p className="identity-message" role="status">{message}</p>}
