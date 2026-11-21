@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ id: string }> };
 
-function money(amountMinor: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(Math.abs(amountMinor) / 100);
+function money(amountMinor: number, currency = "USD", locale: SupportedLocale = "en") {
+  return new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: 2 }).format(Math.abs(amountMinor) / 100);
 }
 
 export default async function TransactionReceiptPage({ params }: Props) {
