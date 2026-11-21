@@ -121,7 +121,7 @@ export default function IdentityDocuments({ userId, initialDocuments }: {
         <label>Choose document
           <input id="identity-file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={(event) => setFile(event.target.files?.[0] ?? null)} required />
         </label>
-        <p>PDF, JPG or PNG. Maximum file size: 10 MB. Files are private and only accessible to your account and authorised review processes.</p>
+        <p>PDF, JPG or PNG. Maximum file size: 10 MB. Files are stored privately and are accessible only to your account under the current access rules.</p>
         <button type="submit" disabled={!file || busy}>{busy ? "Uploading…" : "Upload identity document"}</button>
       </form>
       {message && <p className="identity-message" role="status">{message}</p>}
