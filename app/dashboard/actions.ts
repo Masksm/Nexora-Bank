@@ -104,3 +104,22 @@ export async function signOutOtherSessions() {
   revalidatePath("/dashboard/security");
   redirect("/dashboard/security?success=1");
 }
+
+
+export async function updateAccountNickname(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const accountId = String(formData.get("account_id") || "");
+  const nickname = String(formData.get("nickname") || "").trim().slice(0, 40);
+  if (!accountId || (nickname && nickname.length < 2)) {
+    redirect("/dashboard/accounts?error=Enter%20a%20nickname%20between%202%20and%2040%20characters.");
+  }
+  const { error } = await supabase.from("bank_accounts")
+    .update({ nickname: nickname || null })
+    .eq("id", accountId).eq("user_id", user.id).eq("is_internal", false);
+  if (error) redirect("/dashboard/accounts?error=Unable%20to%20update%20the%20account%20nickname.");
+  revalidatePath("/dashboard/accounts");
+  revalidatePath("/dashboard");
+  redirect("/dashboard/accounts?success=nickname");
+}
