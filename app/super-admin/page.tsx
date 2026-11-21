@@ -106,8 +106,8 @@ export default async function SuperAdminPage({ searchParams }: Props) {
             </div>}
         </SuperAdminDialog>
 
-        <SuperAdminDialog title="Account management" eyebrow="ACCOUNT CONTROL" description="Permanently delete customer or staff accounts when they are eligible for closure." count={deletableUsers.length} id="accounts" icon={<Trash2 size={20}/>}>
-          <div className="admin-panel-heading"><div><span>ACCOUNT CONTROL</span><h2>Delete customer or staff accounts</h2></div><span>{deletableUsers.length} eligible accounts</span></div>
+        <SuperAdminDialog title="Account management" eyebrow="ACCOUNT CONTROL" description="Permanently delete customer or staff accounts when they are eligible for closure." count={deletableUsers.length + " accounts"} id="accounts" icon={<Trash2 size={20}/>}>
+          <div className="admin-panel-heading"><div><span>ACCOUNT CONTROL</span><h2>Delete customer or staff accounts</h2></div><span>{deletableUsers.length} accounts</span></div>
           <p className="admin-help">Deletion is permanent. Accounts with non-zero balances, pending financial transactions or money remaining in savings goals are blocked. Scheduled transfers are cancelled. Zero-balance bank accounts are closed and ledger history is retained for audit. Super Admin accounts cannot be deleted here.</p>
           {!deletableUsers.length ? <p className="admin-empty">There are no customer or staff accounts to manage.</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Account holder</th><th>Role</th><th>Bank accounts</th><th>Permanent deletion</th></tr></thead><tbody>
