@@ -56,6 +56,7 @@ export default async function AdminKycPage({ searchParams }: Props) {
     searchParams,
   ]);
   const documents = docsResult.data ?? [];
+  const documentUserIds = [...new Set(documents.map((doc) => doc.user_id))];
   const [profilesResult, verificationsResult] = await Promise.all([
     supabase.from("profiles")
       .select("user_id,first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,city,region,created_at")
@@ -64,10 +65,14 @@ export default async function AdminKycPage({ searchParams }: Props) {
       .select("user_id,status,rejection_reason,submitted_at,reviewed_at").limit(200),
   ]);
 
-  const profileMap = new Map((profilesResult.data ?? []).map((profile) => [profile.user_id, profile as ProfileRow] as const));
+  const documentProfilesResult = documentUserIds.length ? await supabase.from("profiles")
+    .select("user_id,first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,city,region")
+    .in("user_id", documentUserIds) : { data: [] };
+  const allProfiles = [...(profilesResult.data ?? []), ...(documentProfilesResult.data ?? [])];
+  const profileMap = new Map(allProfiles.map((profile) => [profile.user_id, profile as ProfileRow] as const));
   const verificationMap = new Map((verificationsResult.data ?? []).map((verification) => [verification.user_id, verification] as const));
   const profileRows = (profilesResult.data ?? []) as ProfileRow[];
-  const signedEntries = await Promise.all(documents.map(async (doc) => {
+  const signedEntries = await Promise.all(documents.filter((doc) => ["submitted", "under_review"].includes(doc.review_status)).map(async (doc) => {
     const { data } = await supabase.storage.from("identity-documents").createSignedUrl(doc.storage_path, 300);
     return [doc.id, data?.signedUrl ?? null] as const;
   }));
