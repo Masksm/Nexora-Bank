@@ -111,7 +111,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (isAdminArea && !isAdmin) {
+  if (isAdminArea && !isPrivileged) {
     const target = request.nextUrl.clone();
     target.pathname = isSuperAdmin ? "/super-admin" : "/dashboard";
     target.search = "";
