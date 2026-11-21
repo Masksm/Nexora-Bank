@@ -24,7 +24,7 @@ export default async function StatementsPage({searchParams}:Props){
   const {data:accounts,error:accountError}=await supabase.from("bank_accounts").select("id,account_number,account_name,nickname").eq("user_id",user.id);
   const ids=(accounts??[]).map(a=>a.id);
   const entries:Array<{transaction_id:string;account_id:string;amount_minor:number;currency:string;created_at:string}>=[];
-  let failed=Boolean(accountError);
+  let failed=Boolean(accountError||invalidRange);
   if(ids.length&&!failed){
     for(let offset=0;;offset+=1000){
       let query=supabase.from("ledger_entries").select("transaction_id,account_id,amount_minor,currency,created_at").in("account_id",ids).order("created_at",{ascending:false}).range(offset,offset+999);
@@ -55,7 +55,7 @@ export default async function StatementsPage({searchParams}:Props){
       <div className="statement-brand"><div><strong>NEXORA BANK</strong><span>ACCOUNT STATEMENT</span></div><FileText size={28}/></div>
       <div className="statement-meta"><div><span>ACCOUNT HOLDER</span><strong>{user.email}</strong></div><div><span>STATEMENT PERIOD</span><strong>{from||"All available"} to {to||"Present"}</strong></div><div><span>GENERATED</span><strong>{new Date().toLocaleDateString(locale,{dateStyle:"long"})}</strong></div></div>
       <div className="statement-totals"><div><span>Total credits</span><strong>{money(credits,locale)}</strong></div><div><span>Total debits</span><strong>{money(debits,locale)}</strong></div><div><span>Net movement</span><strong>{money(credits-debits,locale)}</strong></div></div>
-      {failed?<div className="workspace-alert">We could not load a complete statement. Refresh and try again.</div>:rows.length===0?<div className="workspace-empty"><p>No posted transactions were found for this period.</p></div>:
+      {invalidRange?<div className="workspace-alert">The start date must be on or before the end date.</div>:failed?<div className="workspace-alert">We could not load a complete statement. Refresh and try again.</div>:rows.length===0?<div className="workspace-empty"><p>No posted transactions were found for this period.</p></div>:
       <div className="statement-table-wrap"><table className="statement-table"><thead><tr><th>Date</th><th>Account</th><th>Description</th><th>Reference</th><th>Status</th><th className="numeric">Amount</th></tr></thead><tbody>{rows.map((row,index)=><tr key={row.transaction_id+"-"+row.account_id+"-"+index}><td>{new Date(row.created_at).toLocaleDateString(locale)}</td><td>{accountNames.get(row.account_id)||"Account"}</td><td>{row.transaction.description||row.transaction.transaction_type.replaceAll("_"," ")}</td><td>{row.transaction.reference}</td><td>Posted</td><td className="numeric">{money(Number(row.amount_minor),locale)}</td></tr>)}</tbody></table></div>}
       <p className="statement-footnote">This statement is generated from Nexora's internal ledger records. It is not proof of a real-world deposit or payment.</p>
     </section>
