@@ -38,7 +38,7 @@ export default function TransactionHistory({ transactions, locale }: { transacti
     return dateParts(transactions.reduce((latest, item) =>
       new Date(item.created_at).getTime() > new Date(latest.created_at).getTime() ? item : latest
     ).created_at, locale);
-  }, [transactions]);
+  }, [transactions, locale]);
 
   const [year, setYear] = useState<string | null>(() => latestDate?.year ?? null);
   const [month, setMonth] = useState<string | null>(() => latestDate?.month ?? null);
@@ -55,7 +55,7 @@ export default function TransactionHistory({ transactions, locale }: { transacti
       if (parts.year === year) values.set(parts.month, parts.monthLabel);
     });
     return [...values.entries()].sort(([a], [b]) => Number(a) - Number(b));
-  }, [transactions, year]);
+  }, [transactions, year, locale]);
 
   const days = useMemo(() => {
     if (!year || !month) return [];
@@ -65,14 +65,14 @@ export default function TransactionHistory({ transactions, locale }: { transacti
       if (parts.year === year && parts.month === month) values.set(parts.day, parts.dayLabel);
     });
     return [...values.entries()].sort(([a], [b]) => Number(b) - Number(a));
-  }, [transactions, year, month]);
+  }, [transactions, year, month, locale]);
 
   const visible = useMemo(() => transactions.filter((item) => {
     const parts = dateParts(item.created_at, locale);
     return (!year || parts.year === year) &&
       (!month || parts.month === month) &&
       (!day || parts.day === day);
-  }), [transactions, year, month, day]);
+  }), [transactions, year, month, day, locale]);
 
   function chooseYear(value: string) {
     if (!value) {
