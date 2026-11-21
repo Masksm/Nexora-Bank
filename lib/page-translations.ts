@@ -127,6 +127,17 @@ Object.assign(identityUiTranslations.de,{
  "Document uploaded securely.":"Dokument sicher hochgeladen.","not started":"nicht begonnen","Your profile details have been saved.":"Ihre Angaben wurden gespeichert.","Account preferences":"Kontoeinstellungen"
 });
 
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const labels: Record<string, Record<string,string>> = {
+    es: {"APPEARANCE":"APARIENCIA","Appearance":"Apariencia","Light mode":"Modo claro","Dark mode":"Modo oscuro","Choose a comfortable appearance for every Nexora page.":"Elige una apariencia cómoda para todas las páginas de Nexora."},
+    fr: {"APPEARANCE":"APPARENCE","Appearance":"Apparence","Light mode":"Mode clair","Dark mode":"Mode sombre","Choose a comfortable appearance for every Nexora page.":"Choisissez une apparence confortable pour toutes les pages Nexora."},
+    pt: {"APPEARANCE":"APARÊNCIA","Appearance":"Aparência","Light mode":"Modo claro","Dark mode":"Modo escuro","Choose a comfortable appearance for every Nexora page.":"Escolha uma aparência confortável para todas as páginas da Nexora."},
+    de: {"APPEARANCE":"DARSTELLUNG","Appearance":"Darstellung","Light mode":"Heller Modus","Dark mode":"Dunkler Modus","Choose a comfortable appearance for every Nexora page.":"Wählen Sie eine angenehme Darstellung für alle Nexora-Seiten."}
+  };
+  Object.assign(identityUiTranslations[locale], labels[locale]);
+}
+
 export function pageText(locale: SupportedLocale, value: string): string {
   return dashboardLabels[locale]?.[value] ?? identityUiTranslations[locale]?.[value] ?? settingsAndHistoryTranslations[locale]?.[value] ?? extra[locale]?.[value] ?? dictionaries[locale]?.[value] ?? value;
 }
