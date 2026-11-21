@@ -40,3 +40,42 @@
 .history-date-field select:focus{border-color:#80a58a;box-shadow:0 0 0 2px #eaf2eb}
 .history-date-field select:disabled{color:#aab5ad;background:#f3f6f3;cursor:not-allowed}
 @media(max-width:520px){.history-date-selectors{gap:7px}.history-date-field select{height:38px;padding:0 5px;font-size:10px}.history-date-field>span{font-size:7px;letter-spacing:1px}}
+
+
+/* Expanded customer account settings */
+.settings-shell{max-width:900px}
+.settings-section-heading{display:flex;align-items:center;gap:12px;margin:22px 0 12px}
+.settings-section-icon{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;color:#47745d;background:#edf4ef;border-radius:8px}
+.settings-section-heading h2{margin:0;color:#354f40;font:600 15px Manrope,sans-serif;letter-spacing:-.2px}
+.settings-section-heading p{margin:5px 0 0;color:#8b9a90;font-size:10px;line-height:1.5}
+.settings-panel{max-width:none}
+.settings-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.settings-form-grid label{display:grid;gap:7px;min-width:0;color:#65796c;font-size:10px;font-weight:700}
+.settings-form-grid input,.settings-form-grid select{width:100%;min-width:0;height:40px;padding:0 11px;color:#344b3d;background:#fbfcfb;border:1px solid #e3eae4;border-radius:5px;font:400 11px 'DM Sans',sans-serif;outline:none}
+.settings-form-grid input:focus,.settings-form-grid select:focus{border-color:#80a58a;box-shadow:0 0 0 2px #eaf2eb}
+.settings-form-grid input:disabled{color:#8c9991;background:#f2f5f2}
+.settings-span-two{grid-column:span 2}
+.settings-form-actions{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-top:5px}
+.settings-form-actions p{margin:0;color:#98a49b;font-size:9px;line-height:1.6}
+.settings-form-actions button{flex:0 0 auto}
+.settings-link-panel{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:12px;padding:18px 20px}
+.settings-link-panel>div{display:grid;gap:5px}
+.settings-link-panel strong{color:#40584a;font-size:11px}
+.settings-link-panel span{color:#91a096;font-size:9px;line-height:1.6}
+.settings-link-panel>a,.settings-link-note{display:inline-flex;align-items:center;gap:7px;color:#4d795e;font-size:10px;font-weight:700;white-space:nowrap}
+.settings-link-note{color:#8c9b91}
+.identity-document-content{padding:0 0 18px}
+.identity-upload-form{padding-top:18px}
+.identity-upload-form input[type=file]{height:auto;padding:10px;background:#fff}
+.identity-message{margin:0 20px 12px;color:#4e795a;font-size:10px}
+.identity-document-list{display:grid;padding:0 20px}
+.identity-document-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-top:1px solid #edf1ed}
+.identity-document-row>div{display:grid;gap:4px;min-width:0}
+.identity-document-row strong{color:#40584a;font-size:10px}
+.identity-document-row span{overflow-wrap:anywhere;color:#849389;font-size:9px}
+.identity-document-row small{color:#a0aaa3;font-size:8px;text-transform:capitalize}
+.identity-document-row button{padding:7px 10px;color:#8a5148;background:#fff7f5;border:1px solid #f0dfdb;border-radius:5px;font:600 9px 'DM Sans',sans-serif}
+.identity-document-row button:disabled{opacity:.5}
+.identity-empty,.identity-disclaimer{margin:0;padding:14px 20px;color:#98a49b;font-size:9px;line-height:1.7}
+.identity-disclaimer{padding-top:5px}
+@media(max-width:600px){.settings-form-grid{grid-template-columns:1fr}.settings-span-two{grid-column:auto}.settings-form-actions{align-items:stretch;flex-direction:column}.settings-form-actions button{width:100%}.settings-link-panel{align-items:flex-start;flex-direction:column}.settings-link-panel>a{white-space:normal}}
