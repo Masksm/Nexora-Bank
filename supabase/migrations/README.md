@@ -83,3 +83,5 @@ Additional migrations applied and source-controlled on 2026-11-21:
 - `20261121190929_enforce_transfer_review_assignment_guard`: adds the final source-and-recipient assignment check to privileged transfer review.
 
 Staff administrators can read and manage only customers assigned to them. Super Admin retains global oversight and access to the existing administrator tools. Role and assignment changes are audit logged. The existing customer accounts, balances, transactions, support messages and identity records are preserved.
+
+- `20261121191151_fix_super_admin_directory_return_types`: explicitly casts Auth email and directory fields to the public RPC's declared return types.
