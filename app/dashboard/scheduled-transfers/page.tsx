@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 
 type Props = { searchParams: Promise<{ error?: string; success?: string }> };
 
-function money(minor: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(minor / 100);
+function money(minor: number,currency="USD") {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(minor / 100);
 }
 
 export default async function ScheduledTransfersPage({ searchParams }: Props) {
