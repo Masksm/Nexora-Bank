@@ -24,7 +24,7 @@ export function MfaManager(){
   if(!factorId||!code.trim())return;
   setBusy(true);
   const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId});
-  if(challengeError){setBusy(false);setMessage(challengeError.message);return;}
+  if(challengeError){setBusy(false);setMessage(challengeError.message);void supabase.rpc("record_operations_event",{p_severity:"warning",p_category:"authentication",p_service:"MFA enrollment",p_operation:"challenge_failed",p_error_code:"MFA_CHALLENGE_FAILED",p_request_path:"/dashboard/security"});return;}
   setChallengeId(challenge.id);
   const {error}=await supabase.auth.mfa.verify({factorId,challengeId:challenge.id,code:code.trim()});
   setBusy(false);
