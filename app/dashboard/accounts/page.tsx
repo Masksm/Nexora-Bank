@@ -55,7 +55,7 @@ export default async function AccountsPage({ searchParams }: Props) {
             </article>
           ))}
         </section>}
-      <p className="workspace-disclaimer">{t("Balances are calculated from posted internal ledger entries. Nexora Bank does not hold or transfer real-world funds.")}</p>
+      
     </main>
   );
 }
