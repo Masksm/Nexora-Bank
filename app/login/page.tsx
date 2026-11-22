@@ -17,11 +17,11 @@ export default async function LoginPage({ searchParams }: Props) {
         <div className="auth-kicker">{t("WELCOME BACK")}</div>
         <h1>{t("Good to have")}<br /><em>{t("you back.")}</em></h1>
         <p className="auth-intro">{t("Sign in to access your Nexora account.")}</p>
-        {params.error && <p className="form-message error" role="alert">{params.error}</p>}
+        {params.error && <p className="form-message error" role="alert">{t(params.error)}</p>}
         <form action={signIn} className="auth-form">
           <input type="hidden" name="next" value={params.next ?? "/dashboard"} />
           <label htmlFor="email">{t("Email address")}</label>
-          <input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
+          <input id="email" name="email" type="email" autoComplete="email" placeholder={t("you@example.com")} required />
           <label htmlFor="password">{t("Password")}</label>
           <input id="password" name="password" type="password" autoComplete="current-password" minLength={8} required />
           <button className="auth-submit" type="submit">{t("Sign in")} <span>↗</span></button>
