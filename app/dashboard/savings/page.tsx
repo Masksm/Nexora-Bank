@@ -69,10 +69,10 @@ export default async function SavingsPage({ searchParams }: Props) {
           const target = Number(goal.target_minor);
           const percent = Math.min(100, Math.max(0, Math.round((balance / target) * 100)));
           return <article className="savings-goal-card" key={goal.id}>
-            <div className="savings-goal-top"><span className="savings-goal-icon"><Target size={19}/></span><span className={"savings-goal-status " + goal.status}>{goal.status}</span></div>
+            <div className="savings-goal-top"><span className="savings-goal-icon"><Target size={19}/></span><span className={"savings-goal-status " + goal.status}>{t(goal.status)}</span></div>
             <h3>{goal.name}</h3><div className="savings-goal-balance">{money(balance, locale)}<small> saved of {money(target, locale)}</small></div>
             <div className="savings-progress-track"><span style={{ width: percent + "%" }}/></div>
-            <div className="savings-progress-meta"><strong>{percent}%</strong><span>{goal.target_date ? "Target " + new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(goal.target_date + "T00:00:00")) : "No target date"}</span></div>
+            <div className="savings-progress-meta"><strong>{percent}%</strong><span>{goal.target_date ? "Target " + new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(goal.target_date + "T00:00:00")) : t("No target date")}</span></div>
             {goal.status === "active" && activeAccounts.length > 0 && <div className="savings-money-actions"><form action={moveSavingsGoalFunds}>
               <input type="hidden" name="goal_id" value={goal.id}/><input type="hidden" name="direction" value="contribution"/><input type="hidden" name="idempotency_key" value={randomUUID()}/>
               <label>{t("Add money")}<input name="amount" type="number" min="0.01" max="999999999" step="0.01" placeholder={t("Amount")} required/></label>
