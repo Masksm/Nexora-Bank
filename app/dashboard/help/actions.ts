@@ -46,3 +46,15 @@ export async function replySupportRequest(formData: FormData) {
   revalidatePath("/dashboard/help");
   redirect(`/dashboard/help?ticket=${conversationId}`);
 }
+
+
+export async function acknowledgePaymentProcedure(formData: FormData) {
+  const { supabase, user } = await customer();
+  const procedureId = String(formData.get("procedure_id") || "");
+  const conversationId = String(formData.get("conversation_id") || "");
+  if (!procedureId || !conversationId) redirect("/dashboard/help?error=Payment%20procedure%20not%20found.");
+  const { error } = await supabase.rpc("acknowledge_support_payment_procedure", { p_procedure_id: procedureId });
+  if (error) redirect("/dashboard/help?ticket=" + encodeURIComponent(conversationId) + "&error=" + encodeURIComponent(error.message));
+  revalidatePath("/dashboard/help");
+  redirect("/dashboard/help?ticket=" + encodeURIComponent(conversationId));
+}
