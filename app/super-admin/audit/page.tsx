@@ -8,7 +8,7 @@ import { pageText } from "@/lib/page-translations";
 
 export const dynamic = "force-dynamic";
 type Person = {user_id:string;email:string;role:string;display_name:string;account_count:number;assigned_customer_count:number};
-type Event = {id:string;created_at:string;event_name:string;event_source:string;entity_table:string;entity_id:string|null;actor_email:string|null;actor_role:string;details:unknown};
+type Event = {id:string;created_at:string;event_name:string;event_source:string;entity_table:string;entity_id:string|null;actor_email:string|null;actor_role:string;request_path:string|null;details:unknown};
 
 export default async function SuperAdminAuditPage({searchParams}:{searchParams:Promise<{role?:string;user?:string;year?:string;month?:string;day?:string}>}) {
   const supabase=await createClient();
@@ -28,16 +28,22 @@ export default async function SuperAdminAuditPage({searchParams}:{searchParams:P
   let receiptCards:Array<{id:string;original_filename:string;mime_type:string;file_size_bytes:number;review_status:string;submitted_at:string;review_note:string|null;signedUrl:string|null}>=[];
   let sourceError:string|null=null;
   if(selected){
-    const activityQuery=supabase.from("activity_audit_events").select("id,created_at,event_name,event_source,entity_table,entity_id,actor_email,actor_role,details").order("created_at",{ascending:false});
-    const [activity,legacy,logins]=await Promise.all([
-      role==="staff"?activityQuery.eq("actor_user_id",selected.user_id):activityQuery.or("actor_user_id.eq."+selected.user_id+",subject_user_id.eq."+selected.user_id),
-      role==="staff"?supabase.from("admin_audit_logs").select("id,action,entity_type,entity_id,reason,before_state,after_state,created_at").eq("admin_user_id",selected.user_id).order("created_at",{ascending:false}).limit(300):Promise.resolve({data:[],error:null}),
-      supabase.from("login_history").select("id,event_type,device_label,approximate_location,created_at").eq("user_id",selected.user_id).order("created_at",{ascending:false}).limit(300)
+    const activityRows:Event[]=[];
+    for(let offset=0;;offset+=1000){
+      let query=supabase.from("activity_audit_events").select("id,created_at,event_name,event_source,entity_table,entity_id,actor_email,actor_role,request_path,details").order("created_at",{ascending:false}).range(offset,offset+999);
+      query=query.or("actor_user_id.eq."+selected.user_id+",subject_user_id.eq."+selected.user_id);
+      const {data,error:activityError}=await query;
+      if(activityError){sourceError=activityError.message;break;}
+      activityRows.push(...(data??[]) as Event[]);
+      if(!data||data.length<1000)break;
+    }
+    const [legacy,logins]=await Promise.all([
+      role==="staff"?supabase.from("admin_audit_logs").select("id,action,entity_type,entity_id,reason,before_state,after_state,created_at").eq("admin_user_id",selected.user_id).order("created_at",{ascending:false}).limit(1000):Promise.resolve({data:[],error:null}),
+      supabase.from("login_history").select("id,event_type,device_label,approximate_location,created_at").eq("user_id",selected.user_id).order("created_at",{ascending:false}).limit(1000)
     ]);
-    if(activity.error) sourceError=activity.error.message;
-    events=(activity.data??[]).map(e=>({...e,actor_email:e.actor_email,details:e.details})) as Event[];
-    for(const item of legacy.data??[]) events.push({id:"legacy-"+item.id,created_at:item.created_at,event_name:item.action,event_source:"admin_audit_logs",entity_table:item.entity_type,entity_id:item.entity_id,actor_email:selected.email,actor_role:"admin",details:{reason:item.reason,before:item.before_state,after:item.after_state}});
-    for(const item of logins.data??[]) events.push({id:"login-"+item.id,created_at:item.created_at,event_name:"authentication."+item.event_type,event_source:"login_history",entity_table:"login_history",entity_id:item.id,actor_email:selected.email,actor_role:role==="staff"?"admin":"customer",details:{device:item.device_label,location:item.approximate_location}});
+    events=activityRows;
+    for(const item of legacy.data??[]) events.push({id:"legacy-"+item.id,created_at:item.created_at,event_name:item.action,event_source:"admin_audit_logs",entity_table:item.entity_type,entity_id:item.entity_id,actor_email:selected.email,actor_role:"admin",request_path:null,details:{reason:item.reason,before:item.before_state,after:item.after_state}});
+    for(const item of logins.data??[]) events.push({id:"login-"+item.id,created_at:item.created_at,event_name:"authentication."+item.event_type,event_source:"login_history",entity_table:"login_history",entity_id:item.id,actor_email:selected.email,actor_role:role==="staff"?"admin":"customer",request_path:null,details:{device:item.device_label,location:item.approximate_location}});
     const receiptQuery=supabase.from("support_payment_receipts").select("id,original_filename,mime_type,file_size_bytes,review_status,submitted_at,review_note,storage_path").order("submitted_at",{ascending:false}).limit(200);
     const {data:receipts}=role==="staff"?await receiptQuery.eq("reviewed_by",selected.user_id):await receiptQuery.eq("customer_user_id",selected.user_id);
     receiptCards=await Promise.all((receipts??[]).map(async receipt=>{const {data}=await supabase.storage.from("payment-receipts").createSignedUrl(receipt.storage_path,600);return {...receipt,signedUrl:data?.signedUrl??null};}));
@@ -57,7 +63,7 @@ export default async function SuperAdminAuditPage({searchParams}:{searchParams:P
         <section className="admin-panel"><div className="admin-panel-heading"><div><span>{role==="staff"?"STAFF ADMINISTRATOR":"MEMBER ACCOUNT"} · SELECTED PROFILE</span><h2>{selected.display_name||selected.email}</h2><p>{selected.email} · {selected.user_id}</p></div><Link href={"/super-admin/audit?role="+role}>Change account</Link></div>
           <form method="get" className="audit-date-filter"><input type="hidden" name="role" value={role}/><input type="hidden" name="user" value={selected.user_id}/><label>YEAR<select name="year" defaultValue={params.year??""}><option value="">All years</option>{years.map(y=><option key={y} value={y}>{y}</option>)}</select></label><label>MONTH<select name="month" defaultValue={params.month??""}><option value="">All months</option>{months.map(m=><option key={m} value={m}>{new Date(2000,Number(m)-1,1).toLocaleDateString(locale,{month:"long"})}</option>)}</select></label><label>DATE<select name="day" defaultValue={params.day??""}><option value="">All dates</option>{days.map(d=><option key={d} value={d}>{d}</option>)}</select></label><button type="submit"><CalendarDays size={15}/> Apply date filter</button><Link href={"/super-admin/audit?role="+role+"&user="+selected.user_id}>Clear</Link></form>
           <div className="audit-result-summary"><span>{visible.length} recorded events</span><span>{params.year||"All years"}{params.month?" · "+new Date(2000,Number(params.month)-1,1).toLocaleDateString(locale,{month:"long"}):""}{params.day?" · "+params.day:""}</span></div>
-          {sourceError?<p className="admin-alert error">Unable to load all activity records: {sourceError}</p>:!visible.length?<p className="admin-empty">No activity was recorded for this account and date selection.</p>:<div className="audit-event-list">{visible.map(event=><article className="audit-event" key={event.id}><div className="audit-event-top"><strong>{event.event_name.replaceAll("_"," ")}</strong><time>{new Date(event.created_at).toLocaleString(locale,{dateStyle:"medium",timeStyle:"medium"})}</time></div><div className="audit-event-meta"><span>{event.entity_table}</span><span>{event.event_source}</span><span>{event.actor_role}</span>{event.entity_id&&<code>{event.entity_id}</code>}</div><details><summary>View recorded details</summary><pre>{JSON.stringify(event.details,null,2)}</pre></details></article>)}</div>}
+          {sourceError?<p className="admin-alert error">Unable to load all activity records: {sourceError}</p>:!visible.length?<p className="admin-empty">No activity was recorded for this account and date selection.</p>:<div className="audit-event-list">{visible.map(event=><article className="audit-event" key={event.id}><div className="audit-event-top"><strong>{event.event_name.replaceAll("_"," ")}</strong><time>{new Date(event.created_at).toLocaleString(locale,{dateStyle:"medium",timeStyle:"medium"})}</time></div><div className="audit-event-meta"><span>{event.entity_table}</span><span>{event.event_source}</span><span>{event.actor_role}</span>{event.actor_email&&<span>{event.actor_email}</span>}{event.request_path&&<code>{event.request_path}</code>}{event.entity_id&&<code>{event.entity_id}</code>}</div><details><summary>View recorded details</summary><pre>{JSON.stringify(event.details,null,2)}</pre></details></article>)}</div>}
         </section>
         <section className="admin-panel audit-receipts"><div className="admin-panel-heading"><div><span>PAYMENT EVIDENCE ARCHIVE</span><h2>{role==="staff"?"Receipts reviewed by this staff member":"Receipts submitted by this member"}</h2></div><span>{receiptCards.length} files</span></div>{!receiptCards.length?<p className="admin-empty">No payment receipts are linked to this account.</p>:<div className="audit-receipt-list">{receiptCards.map(receipt=><article key={receipt.id}><div><strong>{receipt.original_filename}</strong><small>{new Date(receipt.submitted_at).toLocaleString(locale)} · {receipt.review_status.replaceAll("_"," ")} · {(receipt.file_size_bytes/1024/1024).toFixed(2)} MB</small>{receipt.review_note&&<p>{receipt.review_note}</p>}</div>{receipt.signedUrl?<a href={receipt.signedUrl} target="_blank" rel="noreferrer">View receipt</a>:<span>Preview unavailable</span>}</article>)}</div>}</section>
       </>}
