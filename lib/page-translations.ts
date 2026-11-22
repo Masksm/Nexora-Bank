@@ -477,6 +477,40 @@ for (const locale of ["es","fr","pt","de"] as const) {
     "ADMIN": ({es:"ADMINISTRACIÓN",fr:"ADMINISTRATION",pt:"ADMINISTRAÇÃO",de:"ADMINISTRATION"} as const)[locale]
   });
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const translations = {
+    es: {
+      "UK IBAN (optional for broader bank lookup)":"IBAN del Reino Unido (opcional para una búsqueda bancaria más amplia)",
+      "I agree to send the IBAN and recipient name to the verification provider for a name check.":"Acepto enviar el IBAN y el nombre del beneficiario al proveedor para comprobar el nombre.",
+      "Verify account-holder name":"Verificar el nombre del titular de la cuenta","Close name match":"Coincidencia parcial del nombre","Name does not match":"El nombre no coincide","Name check unavailable":"Comprobación del nombre no disponible",
+      "This IBAN does not have a fixed sandbox test result. Use a documented sandbox test IBAN.":"Este IBAN no tiene un resultado de prueba fijo. Utiliza un IBAN de prueba documentado.",
+      "The IBAN checksum is invalid.":"El dígito de control del IBAN no es válido.","This country is not supported by the verification sandbox.":"Este país no es compatible con el entorno de verificación.","Enter the recipient account-holder name.":"Introduce el nombre del titular de la cuenta.","Enter a valid IBAN.":"Introduce un IBAN válido."
+    },
+    fr: {
+      "UK IBAN (optional for broader bank lookup)":"IBAN britannique (facultatif pour une recherche bancaire plus large)",
+      "I agree to send the IBAN and recipient name to the verification provider for a name check.":"J’accepte d’envoyer l’IBAN et le nom du bénéficiaire au fournisseur pour vérifier le nom.",
+      "Verify account-holder name":"Vérifier le nom du titulaire","Close name match":"Correspondance partielle du nom","Name does not match":"Le nom ne correspond pas","Name check unavailable":"Vérification du nom indisponible",
+      "This IBAN does not have a fixed sandbox test result. Use a documented sandbox test IBAN.":"Cet IBAN ne dispose pas d’un résultat Sandbox prédéfini. Utilisez un IBAN de test documenté.",
+      "The IBAN checksum is invalid.":"La clé de contrôle de l’IBAN est invalide.","This country is not supported by the verification sandbox.":"Ce pays n’est pas pris en charge par le Sandbox de vérification.","Enter the recipient account-holder name.":"Saisissez le nom du titulaire du compte.","Enter a valid IBAN.":"Saisissez un IBAN valide."
+    },
+    pt: {
+      "UK IBAN (optional for broader bank lookup)":"IBAN do Reino Unido (opcional para pesquisa bancária alargada)",
+      "I agree to send the IBAN and recipient name to the verification provider for a name check.":"Concordo em enviar o IBAN e o nome do beneficiário ao fornecedor para verificação do nome.",
+      "Verify account-holder name":"Verificar nome do titular","Close name match":"Correspondência parcial do nome","Name does not match":"O nome não corresponde","Name check unavailable":"Verificação do nome indisponível",
+      "This IBAN does not have a fixed sandbox test result. Use a documented sandbox test IBAN.":"Este IBAN não tem um resultado de teste fixo. Utilize um IBAN de teste documentado.",
+      "The IBAN checksum is invalid.":"O dígito de controlo do IBAN é inválido.","This country is not supported by the verification sandbox.":"Este país não é suportado pelo ambiente de verificação.","Enter the recipient account-holder name.":"Introduza o nome do titular da conta.","Enter a valid IBAN.":"Introduza um IBAN válido."
+    },
+    de: {
+      "UK IBAN (optional for broader bank lookup)":"Britische IBAN (optional für eine umfassendere Banksuche)",
+      "I agree to send the IBAN and recipient name to the verification provider for a name check.":"Ich stimme zu, IBAN und Empfängername zur Namensprüfung an den Anbieter zu senden.",
+      "Verify account-holder name":"Kontoinhabernamen prüfen","Close name match":"Teilweise Namensübereinstimmung","Name does not match":"Name stimmt nicht überein","Name check unavailable":"Namensprüfung nicht verfügbar",
+      "This IBAN does not have a fixed sandbox test result. Use a documented sandbox test IBAN.":"Für diese IBAN gibt es kein festes Sandbox-Testergebnis. Verwenden Sie eine dokumentierte Test-IBAN.",
+      "The IBAN checksum is invalid.":"Die IBAN-Prüfziffer ist ungültig.","This country is not supported by the verification sandbox.":"Dieses Land wird von der Verifizierungs-Sandbox nicht unterstützt.","Enter the recipient account-holder name.":"Geben Sie den Kontoinhabernamen des Empfängers ein.","Enter a valid IBAN.":"Geben Sie eine gültige IBAN ein."
+    }
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], translations);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
