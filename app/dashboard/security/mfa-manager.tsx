@@ -7,7 +7,7 @@ type Factor={id:string,friendly_name?:string,status:string,factor_type:string};
 export function MfaManager(){
  const [factors,setFactors]=useState<Factor[]>([]);
  const [qr,setQr]=useState(""); const [secret,setSecret]=useState("");
- const [factorId,setFactorId]=useState(""); const [challengeId,setChallengeId]=useState("");
+ const [factorId,setFactorId]=useState("");
  const [code,setCode]=useState(""); const [message,setMessage]=useState(""); const [busy,setBusy]=useState(false);
  const supabase=createClient();
  async function refresh(){const {data,error}=await supabase.auth.mfa.listFactors();if(error){setMessage(error.message);return;}setFactors((data?.totp??[]) as Factor[]);}
@@ -25,11 +25,10 @@ export function MfaManager(){
   setBusy(true);
   const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId});
   if(challengeError){setBusy(false);setMessage(challengeError.message);void supabase.rpc("record_operations_event",{p_severity:"warning",p_category:"authentication",p_service:"MFA enrollment",p_operation:"challenge_failed",p_error_code:"MFA_CHALLENGE_FAILED",p_request_path:"/dashboard/security"});return;}
-  setChallengeId(challenge.id);
   const {error}=await supabase.auth.mfa.verify({factorId,challengeId:challenge.id,code:code.trim()});
   setBusy(false);
   if(error){setMessage(error.message);void supabase.rpc("record_operations_event",{p_severity:"warning",p_category:"authentication",p_service:"MFA enrollment",p_operation:"verification_failed",p_error_code:"MFA_VERIFY_FAILED",p_request_path:"/dashboard/security"});return;}
-  setQr("");setSecret("");setFactorId("");setChallengeId("");setCode("");setMessage("Authenticator MFA is now enabled for this account.");await refresh();
+  setQr("");setSecret("");setFactorId("");setCode("");setMessage("Authenticator MFA is now enabled for this account.");await refresh();
  }
  async function remove(id:string){
   setBusy(true);const {error}=await supabase.auth.mfa.unenroll({factorId:id});setBusy(false);
