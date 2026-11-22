@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,9 @@ type RoutingDirectoryResponse = {
 };
 
 export async function GET(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Sign in to use bank lookup." }, { status: 401 });
   const routing = (request.nextUrl.searchParams.get("routing") || "").trim();
   if (!/^\d{9}$/.test(routing)) {
     return NextResponse.json({ error: "Enter a 9-digit ABA routing number." }, { status: 400 });
