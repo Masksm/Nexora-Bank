@@ -29,7 +29,7 @@ export default async function HelpPage({ searchParams }: Props) {
   ]);
   const selected = (tickets ?? []).find((ticket)=>ticket.id===params.ticket) ?? (params.ticket ? null : (tickets ?? [])[0]);
   const { data: messages } = selected ? await supabase.from("support_messages").select("id,sender_role,body,created_at").eq("conversation_id",selected.id).order("created_at") : {data:[]};
-  const { data: paymentProcedures } = selected ? await supabase.from("support_payment_procedures").select("id,cryptocurrency,network,wallet_address,expected_amount,amount_currency,payment_reference,purpose,status,customer_acknowledged_at,created_at,cancellation_reason").eq("conversation_id",selected.id).order("created_at",{ascending:false}) : {data:[]};
+  const { data: paymentProcedures } = selected ? await supabase.from("support_payment_procedures").select("id,cryptocurrency,network,wallet_address,expected_amount,amount_currency,payment_reference,purpose,status,customer_acknowledged_at,created_at,cancellation_reason,verification_status,transaction_hash,verification_confirmations,verification_result").eq("conversation_id",selected.id).order("created_at",{ascending:false}) : {data:[]};
   return <main className="workspace-shell">
     <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">{t("NEXORA BANK · SUPPORT")}</span></header>
     <section className="workspace-intro"><div><span className="workspace-kicker">{t("WE’RE HERE TO HELP")}</span><h1>{t("Help centre")}</h1><p>{t("Send a request and continue the conversation with customer care.")}</p></div></section>
