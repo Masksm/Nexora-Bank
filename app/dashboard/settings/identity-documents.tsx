@@ -15,20 +15,33 @@ type IdentityDocument = {
   rejection_reason: string | null;
 };
 
+type VerificationAttempt = {
+  id: string;
+  identity_document_id: string;
+  provider: string;
+  provider_reference: string | null;
+  provider_launch_url: string | null;
+  status: string;
+  result_summary: string | null;
+  created_at: string;
+};
+
 const labels: Record<IdentityDocument["document_type"], string> = {
   passport: "Passport",
   national_id: "National identity card",
   drivers_license: "Driver's licence",
 };
 
-export default function IdentityDocuments({ userId, initialDocuments, locale }: {
+export default function IdentityDocuments({ userId, initialDocuments, initialAttempts, locale }: {
   userId: string;
   initialDocuments: IdentityDocument[];
+  initialAttempts: VerificationAttempt[];
   locale: SupportedLocale;
 }) {
   const t = (value: string) => pageText(locale, value);
   const router = useRouter();
   const [documents, setDocuments] = useState(initialDocuments);
+  const [attempts, setAttempts] = useState(initialAttempts);
   const [documentType, setDocumentType] = useState<IdentityDocument["document_type"]>("passport");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -85,6 +98,30 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
     setMessage(t("Document uploaded securely."));
     setBusy(false);
     router.refresh();
+  }
+
+  async function startVerification(document: IdentityDocument) {
+    if (busy) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/identity-verification/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentId: document.id }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || t("Unable to start verification."));
+      const attempt = result.attempt as VerificationAttempt;
+      setAttempts((current) => [attempt, ...current.filter((item) => item.id !== attempt.id)]);
+      setMessage(t("Identity verification has started."));
+      if (result.launchUrl) window.open(result.launchUrl, "_blank", "noopener,noreferrer");
+      router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : t("Unable to start verification."));
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function removeDocument(document: IdentityDocument) {
@@ -144,15 +181,30 @@ export default function IdentityDocuments({ userId, initialDocuments, locale }: 
               <small>{new Date(document.uploaded_at).toLocaleDateString(locale)} · {t(document.review_status.replaceAll("_", " "))}</small>
               {document.review_status === "rejected" && document.rejection_reason && <p className="identity-rejection-reason">{document.rejection_reason}</p>}
             </div>
-            {document.review_status === "submitted" && (
-              <button type="button" onClick={() => removeDocument(document)} disabled={busy} aria-label={"Remove " + t(labels[document.document_type])}>
-                {t("Remove")}
-              </button>
-            )}
+            <div className="identity-document-actions">
+              {document.review_status !== "verified" && (() => {
+                const latest = attempts.find((item) => item.identity_document_id === document.id);
+                return latest?.status === "pending" ? (
+                  <div className="identity-verification-state">
+                    <span>{t("Verification in progress")}</span>
+                    {latest.provider_launch_url && <a href={latest.provider_launch_url} target="_blank" rel="noreferrer">{t("Continue verification")}</a>}
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => startVerification(document)} disabled={busy}>
+                    {t(latest ? "Retry verification" : "Start verification")}
+                  </button>
+                );
+              })()}
+              {document.review_status === "submitted" && (
+                <button type="button" onClick={() => removeDocument(document)} disabled={busy} aria-label={"Remove " + t(labels[document.document_type])}>
+                  {t("Remove")}
+                </button>
+              )}
+            </div>
           </article>
         ))}
       </div>
-      <p className="identity-disclaimer">{t("Uploading a document does not mean your identity has been verified. Verification status will only change after an authorised review.")}</p>
+
     </div>
   );
 }
