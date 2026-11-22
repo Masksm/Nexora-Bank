@@ -32,7 +32,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   const rows = accounts ?? [];
   const search = (params.q || "").trim().toLowerCase();
   const displayedRows = search ? rows.filter((row) => row.account_number.toLowerCase().includes(search) || row.account_name.toLowerCase().includes(search) || row.user_id.toLowerCase().includes(search)) : rows;
-  const totalMinor = rows.reduce((sum, row) => sum + Number(row.balance_minor || 0), 0);
+  const currencyTotals = new Map<string, number>();\n  for (const row of rows) currencyTotals.set(row.currency, (currencyTotals.get(row.currency) || 0) + Number(row.balance_minor || 0));\n  const totalDisplay = [...currencyTotals.entries()].map(([currency, amount]) => money(amount, currency)).join(" · ") || "—";
   const activeCount = rows.filter((row) => row.status === "active").length;
 
   return (
@@ -49,7 +49,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         {params.message && <div className={params.kind === "error" ? "admin-alert error" : "admin-alert success"}>{params.message}</div>}
         <section className="admin-stats">
           <article><span><Users size={17}/> {t("CUSTOMER ACCOUNTS")}</span><strong>{rows.length}</strong><small>{t("Accounts in the ledger")}</small></article>
-          <article><span><Wallet size={17}/> {t("AGGREGATE BALANCE")}</span><strong>{money(totalMinor)}</strong><small>{t("Across listed USD accounts")}</small></article>
+          <article><span><Wallet size={17}/> {t("BALANCES BY CURRENCY")}</span><strong>{totalDisplay}</strong><small>{t("Separate totals by account currency")}</small></article>
           <article><span><ShieldCheck size={17}/> {t("ACTIVE ACCOUNTS")}</span><strong>{activeCount}</strong><small>{t("Currently permitted status")}</small></article>
         </section>
 
@@ -58,7 +58,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           <form className="admin-search" action="/admin" method="get"><input name="q" defaultValue={params.q || ""} placeholder={t("Search account number, name or customer ID")}/><button type="submit">{t("Search")}</button></form>
           {error ? <p className="admin-empty">{t("Could not load customer accounts. Check the administrator database policies.")}</p> : rows.length === 0 ? <p className="admin-empty">{t("No customer accounts have been created yet.")}</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>{t("Account")}</th><th>{t("Account number")}</th><th>{t("Balance")}</th><th>{t("Status")}</th><th>{t("Customer ID")}</th></tr></thead><tbody>
-              {displayedRows.map((row) => <tr key={row.account_id}><td><strong>{row.account_name}</strong><small>{row.account_type} · {row.currency}</small></td><td>{row.account_number}</td><td>{money(Number(row.balance_minor))}</td><td><span className={"admin-status " + row.status}>{t(row.status)}</span></td><td><code>{row.user_id.slice(0, 8)}…</code></td></tr>)}
+              {displayedRows.map((row) => <tr key={row.account_id}><td><strong>{row.account_name}</strong><small>{row.account_type} · {row.currency}</small></td><td>{row.account_number}</td><td>{money(Number(row.balance_minor), row.currency)}</td><td><span className={"admin-status " + row.status}>{t(row.status)}</span></td><td><code>{row.user_id.slice(0, 8)}…</code></td></tr>)}
             </tbody></table></div>}
         </section>
 
