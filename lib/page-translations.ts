@@ -588,7 +588,7 @@ for (const locale of ["es","fr","pt","de"] as const) {
     pt:"Não foi possível concluir a ação. Reveja os dados e tente novamente.",
     de:"Die Aktion konnte nicht abgeschlossen werden. Prüfen Sie die Angaben und versuchen Sie es erneut."
   } as const;
-  dynamicErrorTranslations[locale].push([/(failed|could not|unable to|unexpected error|operation error)/i, generic[locale]]);
+  dynamicErrorTranslations[locale].push([/(error|failed|could not|unable to|unexpected|operation error)/i, generic[locale]]);
   dynamicErrorTranslations[locale].push([/(not allowed|not configured|unsupported|invalid .*|cannot |can't |must be )/i, generic[locale]]);
 }
 
