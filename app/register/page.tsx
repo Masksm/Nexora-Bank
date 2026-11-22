@@ -17,13 +17,13 @@ export default async function RegisterPage({ searchParams }: Props) {
         <div className="auth-kicker">{t("GET STARTED")}</div>
         <h1>{t("A better way")}<br /><em>{t("to manage money.")}</em></h1>
         <p className="auth-intro">{t("Create your Nexora profile in a few steps.")}</p>
-        {params.error && <p className="form-message error" role="alert">{params.error}</p>}
-        {params.success && <p className="form-message success" role="status">{params.success}</p>}
+        {params.error && <p className="form-message error" role="alert">{t(params.error)}</p>}
+        {params.success && <p className="form-message success" role="status">{t(params.success)}</p>}
         <form action={signUp} className="auth-form">
           <label htmlFor="fullName">{t("Full name")}</label>
           <input id="fullName" name="fullName" type="text" autoComplete="name" placeholder={t("Your full name")} minLength={2} required />
           <label htmlFor="email">{t("Email address")}</label>
-          <input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
+          <input id="email" name="email" type="email" autoComplete="email" placeholder={t("you@example.com")} required />
           <label htmlFor="password">{t("Create password")}</label>
           <input id="password" name="password" type="password" autoComplete="new-password" minLength={10} required />
           <label htmlFor="confirmPassword">{t("Confirm password")}</label>
