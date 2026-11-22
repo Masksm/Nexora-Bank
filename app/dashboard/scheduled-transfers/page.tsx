@@ -31,27 +31,27 @@ export default async function ScheduledTransfersPage({ searchParams }: Props) {
   const accountNames = new Map((accountResult.data ?? []).map((a) => [a.account_id, a.nickname || a.account_name]));
   const schedules = scheduleResult.data ?? [];
   return <main className="workspace-shell">
-    <header className="workspace-header"><Link href="/dashboard/transfers" className="workspace-back"><ArrowLeft size={16}/> {t("Transfers")}</Link><span className="workspace-overline">NEXORA BANK · PAYMENTS</span></header>
-    <section className="workspace-intro"><div><span className="workspace-kicker">PLAN AHEAD</span><h1>Scheduled transfers</h1><p>Set up one-time or recurring transfers for a future date.</p></div></section>
+    <header className="workspace-header"><Link href="/dashboard/transfers" className="workspace-back"><ArrowLeft size={16}/> {t("Transfers")}</Link><span className="workspace-overline">{t("NEXORA BANK · PAYMENTS")}</span></header>
+    <section className="workspace-intro"><div><span className="workspace-kicker">{t("PLAN AHEAD")}</span><h1>{t("Scheduled transfers")}</h1><p>{t("Set up one-time or recurring transfers for a future date.")}</p></div></section>
     {params.error && <div className="workspace-alert">{params.error}</div>}
     {params.success && <div className="transfer-success">{params.success === "cancelled" ? "Scheduled transfer cancelled." : "Your scheduled transfer has been saved."}</div>}
-    {scheduleResult.error && <div className="workspace-alert">Scheduled transfers could not be loaded. Refresh the page.</div>}
+    {scheduleResult.error && <div className="workspace-alert">{t("Scheduled transfers could not be loaded. Refresh the page.")}</div>}
     <section className="workspace-panel transfer-panel">
-      <div className="workspace-panel-heading"><div><span className="workspace-kicker">NEW SCHEDULE</span><h2>Create a scheduled transfer</h2></div></div>
-      {accounts.length ? <ScheduleTransferForm accounts={accounts}/> : <div className="workspace-alert">No active account is available for scheduling.</div>}
+      <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("NEW SCHEDULE")}</span><h2>{t("Create a scheduled transfer")}</h2></div></div>
+      {accounts.length ? <ScheduleTransferForm accounts={accounts}/> : <div className="workspace-alert">{t("No active account is available for scheduling.")}</div>}
     </section>
     <section className="workspace-panel scheduled-list-panel">
-      <div className="workspace-panel-heading"><div><span className="workspace-kicker">YOUR PAYMENT PLAN</span><h2>Scheduled activity</h2></div><span className="workspace-count">{schedules.length} schedules</span></div>
-      {schedules.length === 0 ? <div className="workspace-empty"><CalendarClock size={25}/><h2>No scheduled transfers</h2><p>Future payments you create will appear here.</p></div> :
+      <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("YOUR PAYMENT PLAN")}</span><h2>{t("Scheduled activity")}</h2></div><span className="workspace-count">{schedules.length} schedules</span></div>
+      {schedules.length === 0 ? <div className="workspace-empty"><CalendarClock size={25}/><h2>{t("No scheduled transfers")}</h2><p>{t("Future payments you create will appear here.")}</p></div> :
         <div className="scheduled-list">{schedules.map((item) => <article className="scheduled-row" key={item.id}>
           <div className="scheduled-row-main"><strong>{item.description || "Scheduled transfer"}</strong><span>{accountNames.get(item.from_account_id) || "Account"} · To ••••{item.recipient_account_number.slice(-4)}</span><small>{new Date(item.scheduled_for).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })} · {item.frequency}</small></div>
           <div className="scheduled-row-side"><strong>{money(Number(item.amount_minor))}</strong><span className={"scheduled-status " + item.status}>{item.status.replaceAll("_", " ")}</span>
-            {item.status === "scheduled" && <form action={cancelScheduledTransfer}><input type="hidden" name="schedule_id" value={item.id}/><button type="submit" aria-label="Cancel scheduled transfer"><XCircle size={15}/> Cancel</button></form>}
+            {item.status === "scheduled" && <form action={cancelScheduledTransfer}><input type="hidden" name="schedule_id" value={item.id}/><button type="submit" aria-label={t("Cancel scheduled transfer")}><XCircle size={15}/> {t("Cancel")}</button></form>}
             {item.last_error && <small className="scheduled-error">{item.last_error}</small>}
-            {item.last_transaction_id && <Link href={"/dashboard/transactions/" + item.last_transaction_id}>View transaction</Link>}
+            {item.last_transaction_id && <Link href={"/dashboard/transactions/" + item.last_transaction_id}>{t("View transaction")}</Link>}
           </div>
         </article>)}</div>}
     </section>
-    <p className="workspace-disclaimer">At the scheduled time, Nexora submits the transfer for security review. Balances change only after approval. Recurring schedules pause while the latest transfer is awaiting review.</p>
+    <p className="workspace-disclaimer">{t("At the scheduled time, Nexora submits the transfer for security review. Balances change only after approval. Recurring schedules pause while the latest transfer is awaiting review.")}</p>
   </main>;
 }
