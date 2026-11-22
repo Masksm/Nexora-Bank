@@ -72,3 +72,21 @@ html[data-theme="dark"] .kyc-provider-result-form{border-color:#304238}
 html[data-theme="dark"] .kyc-provider-result-form label{color:#b7c7bc}
 html[data-theme="dark"] .kyc-provider-result-form select,html[data-theme="dark"] .kyc-provider-result-form textarea{background:#101a14;color:#e7eee9;border-color:#3a5143}
 @media(max-width:650px){.kyc-provider-result-form{grid-template-columns:1fr}}
+
+
+.admin-payment-procedure{margin:12px 0 15px;border:1px solid #dce8df;border-radius:8px;background:#f8fbf8;overflow:hidden}
+.admin-payment-procedure>summary{padding:12px 14px;color:#315b43;font-size:11px;font-weight:800;cursor:pointer;list-style:none}
+.admin-payment-procedure>summary::-webkit-details-marker{display:none}
+.admin-payment-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;padding:14px;border-top:1px solid #e4ece5}
+.admin-payment-form>p,.admin-payment-form>small{grid-column:1/-1;margin:0;color:#7d8d82;font-size:9px;line-height:1.5}
+.admin-payment-form label{display:grid;gap:5px;color:#566c5c;font-size:9px;font-weight:700}
+.admin-payment-form label:nth-of-type(3),.admin-payment-form label:nth-of-type(5){grid-column:1/-1}
+.admin-payment-form input,.admin-payment-form textarea,.admin-payment-form select{width:100%;min-width:0;padding:9px;border:1px solid #dce6de;border-radius:6px;background:#fff;color:#30483a;font:10px 'DM Sans',sans-serif}
+.admin-payment-form textarea{resize:vertical}
+.admin-payment-form button{justify-self:start;padding:10px 13px;border:0;border-radius:6px;background:#174d40;color:#fff;font-size:9px;font-weight:800;cursor:pointer}
+html[data-theme="dark"] .admin-payment-procedure{background:#15231a;border-color:#30483a}
+html[data-theme="dark"] .admin-payment-procedure>summary{color:#b6d9bf}
+html[data-theme="dark"] .admin-payment-form{border-color:#304238}
+html[data-theme="dark"] .admin-payment-form label{color:#b8c9bd}
+html[data-theme="dark"] .admin-payment-form input,html[data-theme="dark"] .admin-payment-form textarea,html[data-theme="dark"] .admin-payment-form select{background:#101a14;border-color:#3a5143;color:#e7eee9}
+@media(max-width:650px){.admin-payment-form{grid-template-columns:1fr}.admin-payment-form label:nth-of-type(3),.admin-payment-form label:nth-of-type(5){grid-column:auto}}
