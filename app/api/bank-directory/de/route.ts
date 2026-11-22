@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const SOURCE = "https://www.bundesbank.de/resource/blob/926192/2feadedd079726ffbe1eedaf6c74ff76/472B63F073F071307366337C94F8C870/blz-aktuell-csv-data.csv";
+const SOURCE = "https://www.bundesbank.de/resource/blob/602632/3a97fff9893732591adbbfcb70c1c4e8/472B63F073F071307366337C94F8C870/blz-aktuell-txt-data.txt";
 
 export async function GET(request: NextRequest) {
   const blz = (request.nextUrl.searchParams.get("blz") || "").replace(/\D/g, "");
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(SOURCE, {
-      headers: { Accept: "text/plain, text/csv, */*" },
+      headers: { Accept: "text/plain, */*" },
       next: { revalidate: 86400 },
       signal: AbortSignal.timeout(10000),
     });
