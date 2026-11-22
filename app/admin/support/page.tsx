@@ -23,7 +23,14 @@ export default async function AdminSupportPage({searchParams}:Props){
   const meta=claims?.claims?.app_metadata as {role?:string}|undefined;
   if(!user||claimsError||!["admin", "super_admin"].includes(meta?.role ?? ""))redirect("/login");
   const params=await searchParams;
-  const {data:tickets}=await supabase.from("support_conversations").select("id,user_id,subject,category,status,intake_answers,created_at,updated_at").order("updated_at",{ascending:false}).limit(100);
+  type TicketRow={id:string;user_id:string;subject:string;category:string;status:string;intake_answers:Record<string,unknown>|null;created_at:string;updated_at:string};
+  const tickets:TicketRow[]=[];
+  for(let offset=0;;offset+=500){
+    const {data,error}=await supabase.from("support_conversations").select("id,user_id,subject,category,status,intake_answers,created_at,updated_at").order("updated_at",{ascending:false}).range(offset,offset+499);
+    if(error)break;
+    tickets.push(...(data??[]) as TicketRow[]);
+    if(!data||data.length<500)break;
+  }
   const selected=(tickets??[]).find(t=>t.id===params.ticket)??null;
   const {data:messages}=selected?await supabase.from("support_messages").select("id,sender_role,body,created_at").eq("conversation_id",selected.id).order("created_at"):{data:[]};
   const {data:procedures}=selected?await supabase.from("support_payment_procedures").select("id,cryptocurrency,network,wallet_address,expected_amount,amount_currency,payment_reference,status,verification_status,transaction_hash,verification_confirmations,verification_checked_at,verification_result,created_at").eq("conversation_id",selected.id).order("created_at",{ascending:false}):{data:[]};
