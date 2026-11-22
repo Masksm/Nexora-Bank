@@ -106,11 +106,12 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: procedure, error: procedureError } = await admin
       .from("support_payment_procedures")
-      .select("id,conversation_id,customer_user_id,cryptocurrency,network,wallet_address,expected_amount,amount_currency,status,transaction_hash")
+      .select("id,conversation_id,customer_user_id,cryptocurrency,network,wallet_address,expected_amount,amount_currency,status,transaction_hash,verification_status")
       .eq("id", procedureId).maybeSingle();
     if (procedureError || !procedure) return json(404, { error: "Payment instruction not found." });
     if (procedure.customer_user_id !== user.id) return json(403, { error: "This payment instruction does not belong to your account." });
     if (procedure.status !== "awaiting_payment") return json(409, { error: "This payment instruction is no longer awaiting payment." });
+    if (procedure.verification_status === "verified") return json(409, { error: "This payment instruction already has a verified blockchain transaction." });
 
     const asset = String(procedure.cryptocurrency).toUpperCase();
     const network = String(procedure.network).toUpperCase();
