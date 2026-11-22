@@ -14,13 +14,14 @@ export async function createScheduledTransfer(formData: FormData) {
   const amountText = String(formData.get("amount") || "").trim();
   const description = String(formData.get("description") || "").trim().slice(0, 160);
   const frequency = String(formData.get("frequency") || "once");
+  const pin = String(formData.get("pin") || "").trim();
   const scheduledFor = String(formData.get("scheduled_for_utc") || "");
   const amountMinor = Math.round(Number(amountText) * 100);
   const due = new Date(scheduledFor);
 
   if (!accountId || !/^\d{10}$/.test(recipient) || !/^\d+(\.\d{1,2})?$/.test(amountText) ||
       !Number.isSafeInteger(amountMinor) || amountMinor <= 0 ||
-      !["once", "weekly", "monthly"].includes(frequency) || !scheduledFor || Number.isNaN(due.getTime())) {
+      !["once", "weekly", "monthly"].includes(frequency) || !/^\d{6}$/.test(pin) || !scheduledFor || Number.isNaN(due.getTime())) {
     redirect("/dashboard/scheduled-transfers?error=Check%20the%20transfer%20details.");
   }
   const now = Date.now();
@@ -28,16 +29,20 @@ export async function createScheduledTransfer(formData: FormData) {
     redirect("/dashboard/scheduled-transfers?error=Choose%20a%20date%20at%20least%205%20minutes%20ahead%20and%20within%2012%20months.");
   }
 
-  const { error } = await supabase.from("scheduled_transfers").insert({
-    user_id: user.id,
-    from_account_id: accountId,
-    recipient_account_number: recipient,
-    amount_minor: amountMinor,
-    description: description || null,
-    frequency,
-    scheduled_for: due.toISOString(),
+  const { data, error } = await supabase.rpc("create_scheduled_transfer_with_pin", {
+    p_from_account_id: accountId,
+    p_recipient_account_number: recipient,
+    p_amount_minor: amountMinor,
+    p_description: description || null,
+    p_frequency: frequency,
+    p_scheduled_for: due.toISOString(),
+    p_pin: pin,
   });
-  if (error) redirect("/dashboard/scheduled-transfers?error=Unable%20to%20save%20this%20schedule.%20Check%20the%20source%20account.");
+  if (error) {
+    await supabase.rpc("record_operations_event", { p_severity: "warning", p_category: "transfer", p_service: "Scheduled transfers", p_operation: "schedule_creation_failed", p_error_code: error.code || "SCHEDULE_CREATE_FAILED", p_request_path: "/dashboard/scheduled-transfers" });
+    redirect("/dashboard/scheduled-transfers?error=" + encodeURIComponent(error.message));
+  }
+  if (!data) redirect("/dashboard/scheduled-transfers?error=Incorrect%20PIN%20or%20PIN%20temporarily%20locked.");
   revalidatePath("/dashboard/scheduled-transfers");
   redirect("/dashboard/scheduled-transfers?success=1");
 }
