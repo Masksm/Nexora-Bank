@@ -533,6 +533,23 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], translations);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "Your document has been submitted for review. You will receive an update when the review is complete.": ({
+      es:"Tu documento se ha enviado para revisión. Recibirás una actualización cuando termine la revisión.",
+      fr:"Votre document a été soumis à examen. Vous recevrez une mise à jour lorsque l’examen sera terminé.",
+      pt:"O seu documento foi enviado para análise. Receberá uma atualização quando a análise estiver concluída.",
+      de:"Ihr Dokument wurde zur Prüfung eingereicht. Sie erhalten eine Nachricht, sobald die Prüfung abgeschlossen ist."
+    } as const)[locale],
+    "Complete the identity provider's sandbox session, then return for staff review.": ({
+      es:"Completa la sesión de prueba del proveedor de identidad y vuelve para la revisión del personal.",
+      fr:"Terminez la session Sandbox du fournisseur d’identité, puis revenez pour l’examen par le personnel.",
+      pt:"Conclua a sessão Sandbox do fornecedor de identidade e regresse para a análise da equipa.",
+      de:"Schließen Sie die Sandbox-Sitzung des Identitätsanbieters ab und kehren Sie anschließend zur Mitarbeiterprüfung zurück."
+    } as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
