@@ -42,7 +42,7 @@ export async function createScheduledTransfer(formData: FormData) {
     await supabase.rpc("record_operations_event", { p_severity: "warning", p_category: "transfer", p_service: "Scheduled transfers", p_operation: "schedule_creation_failed", p_error_code: error.code || "SCHEDULE_CREATE_FAILED", p_request_path: "/dashboard/scheduled-transfers" });
     redirect("/dashboard/scheduled-transfers?error=" + encodeURIComponent(error.message));
   }
-  if (!data) redirect("/dashboard/scheduled-transfers?error=Incorrect%20PIN%20or%20PIN%20temporarily%20locked.");
+  if (!data) { await supabase.rpc("record_operations_event", { p_severity: "warning", p_category: "authentication", p_service: "Transaction authorization", p_operation: "pin_rejected", p_error_code: "PIN_REJECTED", p_request_path: "/dashboard/scheduled-transfers" }); redirect("/dashboard/scheduled-transfers?error=Incorrect%20PIN%20or%20PIN%20temporarily%20locked."); }
   revalidatePath("/dashboard/scheduled-transfers");
   redirect("/dashboard/scheduled-transfers?success=1");
 }
