@@ -97,13 +97,13 @@ export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
     }finally{setRoutingLoading(false);}
   }
 
-  async function lookupIban(value:string){
+  async function lookupIban(value:string, lookupCountry=country){
     const iban=value.replace(/\s/g,"").toUpperCase();
-    if(!isIban || iban.length<15) return;
+    if((!isIban && lookupCountry!=="GB") || iban.length<15) return;
     setRoutingLoading(true);
     setRoutingMessage("Looking up bank directory…");
     try{
-      if(country==="DE"){
+      if(lookupCountry==="DE"){
         const bankCode=iban.slice(4,12);
         const response=await fetch(`/api/bank-directory/de?blz=${bankCode}`);
         const result=await response.json();
@@ -164,6 +164,10 @@ export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
       <label>{t("Sort code")}<input name="sort_code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required placeholder={t("6 digits, without spaces")} onBlur={event=>lookupUkSortCode(event.target.value)}/></label>
       {routingMessage&&<p className="form-hint" role="status">{routingLoading?t("Searching directory…"):t(routingMessage)}</p>}
       <label>{t("Account number")}<input name="account_number" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required placeholder={t("8-digit account number")}/></label>
+      <label>{t("UK IBAN (optional for broader bank lookup)")}<input autoCapitalize="characters" maxLength={22} placeholder="GB…" onBlur={event=>lookupIban(event.target.value,"GB")}/></label>
+      <label className="directory-consent-row"><input type="checkbox" checked={externalLookupConsent} onChange={event=>setExternalLookupConsent(event.target.checked)}/> {t("I agree to send this IBAN to the external directory provider for bank identification.")}</label>
+      <input type="hidden" name="bic" value={bic}/>
+      {routingMessage&&<p className="form-hint" role="status">{routingLoading?t("Searching directory…"):t(routingMessage)}</p>}
     </>}
     {isIban && <>
       <label>{t("IBAN")}<input name="iban" autoCapitalize="characters" minLength={15} maxLength={34} required placeholder={t("Enter IBAN")} onBlur={event=>lookupIban(event.target.value)}/></label>
