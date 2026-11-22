@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Select a valid beneficiary." }, { status: 400 });
   }
   if (body.consent !== true) {
-    return NextResponse.json({ error: "Consent is required before sending the IBAN and recipient name to the verification sandbox." }, { status: 400 });
+    return NextResponse.json({ error: "Consent is required before sending the IBAN and recipient name to the verification provider." }, { status: 400 });
   }
 
   const { data: beneficiary, error } = await supabase.from("beneficiaries")
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   if (error || !beneficiary) return NextResponse.json({ error: "Beneficiary not found." }, { status: 404 });
   if (!beneficiary.iban || !supportedCountries.has(beneficiary.country_code)) {
-    return NextResponse.json({ error: "Sandbox name verification supports IBANs from the UK and 20 SEPA countries only." }, { status: 400 });
+    return NextResponse.json({ error: "Account-name verification is currently available for IBANs from the UK and 20 SEPA countries." }, { status: 400 });
   }
   if (beneficiary.iban.slice(0, 2) !== beneficiary.country_code || !validIban(beneficiary.iban)) {
     return NextResponse.json({ error: "Enter a valid IBAN before checking the account-holder name." }, { status: 400 });
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const messages: Record<string,string> = {
-        SANDBOX_NOT_SUPPORTED_IBAN: "This IBAN does not have a fixed sandbox test result. Use a documented sandbox test IBAN.",
+        SANDBOX_NOT_SUPPORTED_IBAN: "No account-name result is available for this IBAN.",
         INVALID_IBAN_CHECKSUM: "The IBAN checksum is invalid.",
         COUNTRY_NOT_SUPPORTED: "This country is not supported by the verification sandbox.",
         MISSING_INPUT_NAME: "Enter the recipient account-holder name.",
@@ -93,6 +93,6 @@ export async function POST(request: NextRequest) {
       sandbox: true,
     });
   } catch {
-    return NextResponse.json({ error: "The verification sandbox could not be reached. Try again." }, { status: 503 });
+    return NextResponse.json({ error: "The account-name service could not be reached. Try again." }, { status: 503 });
   }
 }
