@@ -4,8 +4,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-const supportedCountries = new Set(["NX","US","GB","DE","FR","NL","ES","IE"]);
-const ibanLengths:Record<string,number>={DE:22,FR:27,NL:18,ES:24,IE:22};
+const ibanLengths:Record<string,number>={
+  AD:24, AE:23, AL:28, AT:20, AZ:28, BA:20, BE:16, BG:22, BH:22, BR:29,
+  CH:21, CR:22, CY:28, CZ:24, DE:22, DK:18, DO:28, EE:20, ES:24, FI:18,
+  FO:18, FR:27, GB:22, GE:22, GI:23, GL:18, GR:27, GT:28, HR:21, HU:28,
+  IE:22, IL:23, IS:26, IT:27, JO:30, KW:30, KZ:20, LB:28, LC:32, LI:21,
+  LT:20, LU:20, LV:21, MC:27, MD:24, ME:22, MK:19, MR:27, MT:31, MU:30,
+  NL:18, NO:15, PK:24, PL:28, PS:29, PT:25, QA:29, RO:24, RS:22, SA:24,
+  SC:31, SE:24, SI:19, SK:24, SM:27, ST:25, SV:28, TL:23, TN:24, TR:26,
+  UA:29, VA:22, VG:24, XK:20
+};
+const ibanCountries = new Set(Object.keys(ibanLengths));
+const supportedCountries = new Set(["NX","US","GB",...ibanCountries]);
 
 function validIban(value:string){
   if(!/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/.test(value)) return false;
@@ -51,7 +61,7 @@ export async function addBeneficiary(formData:FormData){
   if(country==="GB" && (!/^\d{6}$/.test(sortCode) || !/^\d{8}$/.test(account))){
     redirect("/dashboard/beneficiaries?error=Enter%20a%206-digit%20UK%20sort%20code%20and%208-digit%20account%20number.");
   }
-  if(["DE","FR","NL","ES","IE"].includes(country) && (iban.length!==ibanLengths[country] || !validIban(iban))){
+  if(ibanCountries.has(country) && (iban.length!==ibanLengths[country] || !validIban(iban) || iban.slice(0,2)!==country)){
     redirect("/dashboard/beneficiaries?error=Enter%20a%20valid%20IBAN.");
   }
   if(bic && !/^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(bic)){
@@ -64,10 +74,10 @@ export async function addBeneficiary(formData:FormData){
     bank_name:bank,
     nickname:nickname||null,
     country_code:country,
-    account_number:country==="DE"||country==="FR"||country==="NL"||country==="ES"||country==="IE" ? null : account,
+    account_number:ibanCountries.has(country) ? null : account,
     routing_number:country==="US"?routing:null,
     sort_code:country==="GB"?sortCode:null,
-    iban:["DE","FR","NL","ES","IE"].includes(country)?iban:null,
+    iban:ibanCountries.has(country)?iban:null,
     bic:bic||null,
     verification_status:"unverified",
     verification_method:null,
