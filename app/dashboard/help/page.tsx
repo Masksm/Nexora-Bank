@@ -43,7 +43,7 @@ export default async function HelpPage({ searchParams }: Props) {
           <label>{t("Explain the issue")}<textarea name="details" rows={4} minLength={10} maxLength={3500} placeholder={t("Include what happened, when it happened, and any error message. Do not include passwords or verification codes.")} required/></label>
           <button type="submit">{t("Send to customer care")} <Send size={15}/></button>
         </form>
-        <div className="support-assistant"><ShieldCheck size={17}/><div><strong>{t("Guided support assistant")}</strong><p>{t("We route your request using the topic and urgency you select. A human administrator handles the reply. This intake currently uses fixed guidance, not a connected generative-AI model.")}</p></div></div>
+        <div className="support-assistant"><ShieldCheck size={17}/><div><strong>{t("Guided support assistant")}</strong></div></div>
       </div>
       <div className="workspace-panel support-tickets">
         <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("YOUR REQUESTS")}</span><h2>{t("Support conversations")}</h2></div><span className="workspace-count">{tickets?.length ?? 0}</span></div>
