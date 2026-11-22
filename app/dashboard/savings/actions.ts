@@ -30,6 +30,7 @@ export async function createSavingsGoal(formData: FormData) {
 
   const { error } = await supabase.rpc("create_savings_goal", { p_name: name, p_target_minor: targetMinor, p_target_date: targetDate });
   if (error) redirect("/dashboard/savings?error=" + encodeURIComponent(error.message));
+  if (!data) redirect("/dashboard/savings?error=Incorrect%20PIN%20or%20PIN%20temporarily%20locked.");
   revalidatePath("/dashboard/savings");
   revalidatePath("/dashboard");
   redirect("/dashboard/savings?success=goal_created");
@@ -42,13 +43,14 @@ export async function moveSavingsGoalFunds(formData: FormData) {
   const direction = String(formData.get("direction") ?? "");
   const amountMinor = amountToMinor(formData.get("amount"));
   const idempotencyKey = String(formData.get("idempotency_key") ?? "");
-  if (!goalId || !accountId || !["contribution", "withdrawal"].includes(direction) || !amountMinor || idempotencyKey.length < 8) {
+  const pin = String(formData.get("pin") ?? "").trim();
+  if (!goalId || !accountId || !["contribution", "withdrawal"].includes(direction) || !amountMinor || idempotencyKey.length < 8 || !/^\\d{6}$/.test(pin)) {
     redirect("/dashboard/savings?error=Check%20the%20savings%20amount%20and%20account%20details.");
   }
 
-  const { error } = await supabase.rpc("move_savings_goal_funds", {
+  const { error } = await supabase.rpc("move_savings_goal_funds_with_pin", {
     p_goal_id: goalId, p_account_id: accountId, p_amount_minor: amountMinor,
-    p_direction: direction, p_idempotency_key: idempotencyKey,
+    p_direction: direction, p_idempotency_key: idempotencyKey, p_pin: pin,
   });
   if (error) redirect("/dashboard/savings?error=" + encodeURIComponent(error.message));
   revalidatePath("/dashboard/savings");
