@@ -18,7 +18,7 @@ export default async function TransfersPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const [{ data: accounts }, { data: beneficiaries }, params] = await Promise.all([
-    supabase.from("account_balances").select("account_id,account_number,account_name,status,balance_minor").eq("user_id", user.id),
+    supabase.from("account_balances").select("account_id,account_number,account_name,status,balance_minor,currency").eq("user_id", user.id),
     supabase.from("beneficiaries").select("id,beneficiary_name,bank_name,country_code,account_number,routing_number,sort_code,iban,bic,verification_status").eq("user_id",user.id).order("created_at",{ascending:false}),
     searchParams,
   ]);
