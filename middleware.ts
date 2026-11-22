@@ -38,6 +38,16 @@ export async function middleware(request: NextRequest) {
   const isPrivileged = isAdmin || isSuperAdmin;
 
   if (claims?.sub) {
+    const { error: auditRequestError } = await supabase.rpc("record_activity_request", {
+      p_path: path,
+      p_method: request.method,
+    });
+    if (auditRequestError) {
+      console.error("Nexora request audit failed:", auditRequestError.code || "UNKNOWN");
+    }
+  }
+
+  if (claims?.sub) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("preferred_language,country_code")
