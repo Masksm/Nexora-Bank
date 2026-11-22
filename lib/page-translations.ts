@@ -560,7 +560,4 @@ export function pageText(locale: SupportedLocale, value: string): string {
   for (const [pattern, translation] of dynamicErrorTranslations[locale] || []) {
     if (pattern.test(value)) return translation;
   }
-  return value;
-}(locale: SupportedLocale, value: string): string {
-  return dashboardLabels[locale]?.[value] ?? identityUiTranslations[locale]?.[value] ?? settingsAndHistoryTranslations[locale]?.[value] ?? extra[locale]?.[value] ?? dictionaries[locale]?.[value] ?? value;
-}
+  return value;}
