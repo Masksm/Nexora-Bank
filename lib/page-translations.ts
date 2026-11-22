@@ -683,6 +683,13 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], translations);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "Not started": ({es:"No iniciado",fr:"Non commencé",pt:"Não iniciado",de:"Nicht gestartet"} as const)[locale],
+    "Not checked": ({es:"No comprobado",fr:"Non vérifié",pt:"Não verificado",de:"Nicht geprüft"} as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
