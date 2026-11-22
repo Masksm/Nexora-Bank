@@ -17,6 +17,7 @@ export async function saveTransactionPin(formData: FormData) {
   ? await supabase.rpc("change_transaction_pin",{p_current_pin:current,p_new_pin:next})
   : await supabase.rpc("set_transaction_pin",{p_pin:next});
  if(result.error) redirect("/dashboard/security?error="+encodeURIComponent(result.error.message));
+ if(exists && result.data!==true) redirect("/dashboard/security?error=The%20current%20PIN%20was%20incorrect%20or%20is%20temporarily%20locked.");
  revalidatePath("/dashboard/security");
  redirect("/dashboard/security?pin_saved=1");
 }
