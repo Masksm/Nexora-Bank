@@ -49,13 +49,19 @@ export default async function AdminKycPage({ searchParams }: Props) {
   const meta = claims?.claims?.app_metadata as { role?: string } | undefined;
   if (!user || claimsError || !["admin", "super_admin"].includes(meta?.role ?? "")) redirect("/login");
 
-  const [docsResult, params] = await Promise.all([
+  const [docsResult, attemptsResult, params] = await Promise.all([
     supabase.from("identity_documents")
       .select("id,user_id,document_type,storage_path,file_name,content_type,file_size_bytes,review_status,rejection_reason,uploaded_at,reviewed_at")
       .order("uploaded_at", { ascending: false }).limit(200),
+    supabase.from("identity_verification_attempts")
+      .select("id,user_id,identity_document_id,provider,provider_reference,status,document_integrity_status,document_authenticity_status,liveness_status,decision_source,result_summary,created_at,reviewed_at")
+      .order("created_at", { ascending: false }).limit(300),
     searchParams,
   ]);
   const documents = docsResult.data ?? [];
+  const attempts = attemptsResult.data ?? [];
+  const attemptMap = new Map<string, (typeof attempts)[number]>();
+  for (const attempt of attempts) if (!attemptMap.has(attempt.identity_document_id)) attemptMap.set(attempt.identity_document_id, attempt);
   const documentUserIds = [...new Set(documents.map((doc) => doc.user_id))];
   const [profilesResult, verificationsResult] = await Promise.all([
     supabase.from("profiles")
@@ -140,6 +146,18 @@ export default async function AdminKycPage({ searchParams }: Props) {
                       <div><FileText size={16}/><span><strong>{doc.file_name}</strong><small>{doc.content_type} · {(Number(doc.file_size_bytes) / 1024 / 1024).toFixed(2)} MB</small></span></div>
                       {url ? <Link href={url} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open private document</Link> : <span className="kyc-file-unavailable">Preview unavailable</span>}
                     </div>
+                    {(() => {
+                      const attempt = attemptMap.get(doc.id);
+                      return attempt ? (
+                        <div className="kyc-automated-result">
+                          <div><span>VERIFICATION PROVIDER</span><strong>{attempt.provider === "persona_sandbox" ? "Persona" : "Nexora verification workflow"}</strong></div>
+                          <div><span>PROVIDER STATUS</span><strong>{attempt.status.replaceAll("_", " ")}</strong></div>
+                          <div><span>DOCUMENT CHECK</span><strong>{attempt.document_authenticity_status.replaceAll("_", " ")}</strong></div>
+                          <div><span>LIVENESS CHECK</span><strong>{attempt.liveness_status.replaceAll("_", " ")}</strong></div>
+                          <p>{attempt.result_summary || "No additional provider result."}</p>
+                        </div>
+                      ) : <p className="kyc-automated-result-empty">No automated verification attempt has been started.</p>;
+                    })()}
                     {doc.review_status === "rejected" && doc.rejection_reason && <div className="kyc-rejection-note"><strong>Recorded rejection reason</strong><p>{doc.rejection_reason}</p></div>}
                     {canReview && <div className="kyc-review-actions">
                       {doc.review_status === "submitted" && <form action={reviewIdentityDocument}><input type="hidden" name="document_id" value={doc.id}/><button name="decision" value="under_review" type="submit" className="kyc-secondary-button">Mark under review</button></form>}
@@ -151,7 +169,6 @@ export default async function AdminKycPage({ searchParams }: Props) {
               })}
             </div>}
         </section>
-        <p className="admin-disclaimer">Identity files are private. Preview links expire after five minutes. Review decisions are recorded in the administrator audit log. A document approval is an internal review outcome, not an external identity-provider or regulatory certification.</p>
       </section>
     </main>
   );
