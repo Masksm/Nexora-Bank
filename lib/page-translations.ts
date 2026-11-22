@@ -402,6 +402,20 @@ for (const locale of ["es","fr","pt","de"] as const) {
     "A digital banking experience.": ({es:"Una experiencia de banca digital.",fr:"Une expérience bancaire numérique.",pt:"Uma experiência bancária digital.",de:"Ein digitales Banking-Erlebnis."} as const)[locale]
   });
 }
+
+Object.assign(settingsAndHistoryTranslations.es, {
+ "Analytics are calculated from posted internal ledger entries. Pending and rejected transfers are excluded. Categories are estimated from transaction descriptions and types.":"Los análisis se calculan a partir de los movimientos registrados. Se excluyen las transferencias pendientes y rechazadas. Las categorías se estiman según las descripciones y los tipos de transacción."
+});
+Object.assign(settingsAndHistoryTranslations.fr, {
+ "Analytics are calculated from posted internal ledger entries. Pending and rejected transfers are excluded. Categories are estimated from transaction descriptions and types.":"Les analyses sont calculées à partir des écritures comptabilisées. Les virements en attente ou rejetés sont exclus. Les catégories sont estimées à partir des descriptions et des types de transaction."
+});
+Object.assign(settingsAndHistoryTranslations.pt, {
+ "Analytics are calculated from posted internal ledger entries. Pending and rejected transfers are excluded. Categories are estimated from transaction descriptions and types.":"As análises são calculadas a partir dos movimentos registados. As transferências pendentes e rejeitadas são excluídas. As categorias são estimadas com base nas descrições e nos tipos de transação."
+});
+Object.assign(settingsAndHistoryTranslations.de, {
+ "Analytics are calculated from posted internal ledger entries. Pending and rejected transfers are excluded. Categories are estimated from transaction descriptions and types.":"Analysen basieren auf gebuchten Hauptbucheinträgen. Ausstehende und abgelehnte Überweisungen werden ausgeschlossen. Kategorien werden anhand von Transaktionsbeschreibungen und -typen geschätzt."
+});
+
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
