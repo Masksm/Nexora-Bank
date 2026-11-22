@@ -395,6 +395,13 @@ for (const locale of ["es","fr","pt","de"] as const) {
   Object.assign(settingsAndHistoryTranslations[locale], authAndPolicyTranslations[locale]);
 }
 
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "Nexora Bank home": ({es:"Inicio de Nexora Bank",fr:"Accueil Nexora Bank",pt:"Início da Nexora Bank",de:"Nexora-Bank-Startseite"} as const)[locale],
+    "A digital banking experience.": ({es:"Una experiencia de banca digital.",fr:"Une expérience bancaire numérique.",pt:"Uma experiência bancária digital.",de:"Ein digitales Banking-Erlebnis."} as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
