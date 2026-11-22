@@ -511,6 +511,28 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], translations);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const translations = {
+    es: {
+      "No additional provider result.":"No hay resultados adicionales del proveedor.","Provider reference":"Referencia del proveedor","Document authenticity result":"Resultado de autenticidad del documento","Liveness result":"Resultado de prueba de vida","Passed":"Aprobado","Failed":"Fallido","Needs manual review":"Requiere revisión manual","Unavailable":"No disponible","Provider review notes":"Notas de revisión del proveedor","Save provider results":"Guardar resultados del proveedor","Sandbox verification results saved.":"Resultados de verificación de prueba guardados.",
+      "Consent is required before sending the IBAN and recipient name to the verification sandbox.":"Se requiere consentimiento antes de enviar el IBAN y el nombre del beneficiario al entorno de verificación.","Sandbox name verification supports IBANs from the UK and 20 SEPA countries only.":"La verificación de nombres de prueba solo admite IBAN del Reino Unido y de 20 países SEPA.","The verification sandbox could not be reached. Try again.":"No se pudo acceder al entorno de verificación. Inténtalo de nuevo.","The UK IBAN does not match the sort code and account number.":"El IBAN del Reino Unido no coincide con el código bancario y el número de cuenta."
+    },
+    fr: {
+      "No additional provider result.":"Aucun résultat supplémentaire du fournisseur.","Provider reference":"Référence du fournisseur","Document authenticity result":"Résultat d’authenticité du document","Liveness result":"Résultat du contrôle de présence","Passed":"Réussi","Failed":"Échec","Needs manual review":"Examen manuel requis","Unavailable":"Indisponible","Provider review notes":"Notes d’examen du fournisseur","Save provider results":"Enregistrer les résultats du fournisseur","Sandbox verification results saved.":"Résultats de vérification Sandbox enregistrés.",
+      "Consent is required before sending the IBAN and recipient name to the verification sandbox.":"Le consentement est requis avant l’envoi de l’IBAN et du nom du bénéficiaire au Sandbox de vérification.","Sandbox name verification supports IBANs from the UK and 20 SEPA countries only.":"La vérification Sandbox des noms prend uniquement en charge les IBAN du Royaume-Uni et de 20 pays SEPA.","The verification sandbox could not be reached. Try again.":"Impossible de joindre le Sandbox de vérification. Réessayez.","The UK IBAN does not match the sort code and account number.":"L’IBAN britannique ne correspond pas au code de tri et au numéro de compte."
+    },
+    pt: {
+      "No additional provider result.":"Sem resultados adicionais do fornecedor.","Provider reference":"Referência do fornecedor","Document authenticity result":"Resultado de autenticidade do documento","Liveness result":"Resultado da prova de vida","Passed":"Aprovado","Failed":"Falhou","Needs manual review":"Necessita de revisão manual","Unavailable":"Indisponível","Provider review notes":"Notas de revisão do fornecedor","Save provider results":"Guardar resultados do fornecedor","Sandbox verification results saved.":"Resultados de verificação Sandbox guardados.",
+      "Consent is required before sending the IBAN and recipient name to the verification sandbox.":"É necessário consentimento antes de enviar o IBAN e o nome do beneficiário para o ambiente de verificação.","Sandbox name verification supports IBANs from the UK and 20 SEPA countries only.":"A verificação de nomes Sandbox suporta apenas IBAN do Reino Unido e de 20 países SEPA.","The verification sandbox could not be reached. Try again.":"Não foi possível contactar o ambiente de verificação. Tente novamente.","The UK IBAN does not match the sort code and account number.":"O IBAN do Reino Unido não corresponde ao código bancário e ao número da conta."
+    },
+    de: {
+      "No additional provider result.":"Keine weiteren Anbieterergebnisse.","Provider reference":"Anbieterreferenz","Document authenticity result":"Ergebnis der Dokumentenechtheit","Liveness result":"Ergebnis der Lebenderkennung","Passed":"Bestanden","Failed":"Fehlgeschlagen","Needs manual review":"Manuelle Prüfung erforderlich","Unavailable":"Nicht verfügbar","Provider review notes":"Prüfnotizen des Anbieters","Save provider results":"Anbieterergebnisse speichern","Sandbox verification results saved.":"Sandbox-Prüfergebnisse gespeichert.",
+      "Consent is required before sending the IBAN and recipient name to the verification sandbox.":"Vor dem Senden von IBAN und Empfängername an die Verifizierungs-Sandbox ist eine Zustimmung erforderlich.","Sandbox name verification supports IBANs from the UK and 20 SEPA countries only.":"Die Sandbox-Namensprüfung unterstützt nur IBANs aus dem Vereinigten Königreich und 20 SEPA-Ländern.","The verification sandbox could not be reached. Try again.":"Die Verifizierungs-Sandbox ist nicht erreichbar. Versuchen Sie es erneut.","The UK IBAN does not match the sort code and account number.":"Die britische IBAN stimmt nicht mit Bankleitzahl und Kontonummer überein."
+    }
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], translations);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
