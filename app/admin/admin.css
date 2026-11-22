@@ -132,3 +132,25 @@ html[data-theme="dark"] .audit-event pre{background:#101a14;color:#dbe6dd}
 @media(max-width:650px){.audit-account{align-items:flex-start}.audit-account-meta{display:none}.audit-date-filter{display:grid;grid-template-columns:1fr 1fr}.audit-date-filter label:first-of-type{grid-column:1/-1}.audit-date-filter button,.audit-date-filter>a{justify-content:center}.audit-event-top{display:grid}.audit-event-top time{text-align:left}}
 
 .admin-payment-address-help{display:block;padding:10px 12px;border-radius:9px;background:rgba(59,130,246,.08);font-size:12px;line-height:1.55;color:inherit}.admin-receipt-item code{overflow-wrap:anywhere;word-break:break-all}
+
+
+/* Customer conversation picker modal */
+.admin-support-inbox-launcher{display:flex;justify-content:flex-start;align-items:flex-start}
+.admin-conversation-open{width:min(440px,100%);display:flex;align-items:center;gap:13px;text-align:left;padding:17px 18px;border:1px solid #dce8df;border-radius:17px;background:linear-gradient(135deg,#fff 0%,#f0f8f2 100%);color:#193e31;box-shadow:0 12px 30px rgba(21,64,47,.08);cursor:pointer;transition:transform .18s,box-shadow .18s}
+.admin-conversation-open:hover{transform:translateY(-2px);box-shadow:0 17px 36px rgba(21,64,47,.13)}
+.admin-conversation-open-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#dcefe3;color:#176b4d}
+.admin-conversation-open>span:nth-child(2){flex:1;display:grid;gap:4px}.admin-conversation-open strong{font-size:14px}.admin-conversation-open small{font-size:11px;color:#718177}.admin-conversation-open>b{min-width:30px;height:30px;padding:0 8px;display:grid;place-items:center;border-radius:30px;background:#176b4d;color:white}
+.admin-conversation-backdrop{position:fixed;inset:0;z-index:1100;background:rgba(7,24,17,.66);backdrop-filter:blur(6px);display:grid;place-items:center;padding:18px}
+.admin-conversation-modal{width:min(720px,100%);max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:23px;box-shadow:0 30px 100px rgba(0,0,0,.3);color:#193e31}
+.admin-conversation-modal>header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:23px 25px 18px;background:linear-gradient(130deg,#103d30,#1b6248);color:#fff}
+.admin-conversation-modal>header span{font-size:10px;letter-spacing:.17em;font-weight:800;color:#b5e4c6}.admin-conversation-modal>header h2{margin:7px 0;font-size:23px}.admin-conversation-modal>header p{margin:0;color:#d0e5d8;font-size:13px}
+.admin-conversation-modal>header button{width:36px;height:36px;border:1px solid #ffffff45;border-radius:50%;background:#ffffff18;color:#fff;display:grid;place-items:center;cursor:pointer}
+.admin-conversation-search{margin:16px 20px 8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid #dce7df;border-radius:12px;color:#6c7f73}.admin-conversation-search input{width:100%;border:0;outline:0;background:transparent;color:#193e31;font:inherit}
+.admin-conversation-results{overflow:auto;padding:6px 14px 14px}
+.admin-conversation-result{display:flex;align-items:center;gap:13px;padding:14px 12px;border-radius:14px;text-decoration:none;color:#193e31;border-bottom:1px solid #edf1ed}
+.admin-conversation-result:hover,.admin-conversation-result.selected{background:#eff8f1}
+.admin-conversation-avatar{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#e2f1e7;color:#176b4d}
+.admin-conversation-result-main{flex:1;min-width:0;display:grid;gap:5px}.admin-conversation-result-main strong{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.admin-conversation-result-main small{display:flex;align-items:center;gap:5px;color:#718177;font-size:11px;overflow-wrap:anywhere}.admin-conversation-chevron{font-size:24px;color:#779184}
+.admin-conversation-modal>footer{padding:13px 22px;border-top:1px solid #e8eee9;color:#718177;font-size:11px}
+.admin-support-layout{display:block}.admin-support-messages{max-height:440px;overflow-y:auto}.admin-support-reply{display:none}
+@media(max-width:640px){.admin-conversation-modal{border-radius:17px}.admin-conversation-modal>header{padding:18px}.admin-conversation-modal>header h2{font-size:19px}.admin-conversation-backdrop{padding:10px}}
