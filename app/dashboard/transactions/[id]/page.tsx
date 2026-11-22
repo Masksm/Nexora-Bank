@@ -53,7 +53,7 @@ export default async function TransactionReceiptPage({ params }: Props) {
       <div className="receipt-status"><span className={review ? "receipt-status-icon pending" : "receipt-status-icon"}>{review ? <Clock3 size={22}/> : <CheckCircle2 size={22}/>}</span><strong>{statusLabel}</strong><small>{transaction.posted_at ? "Posted " + new Date(transaction.posted_at).toLocaleString(locale) : "Recorded " + new Date(transaction.created_at).toLocaleString(locale)}</small></div>
       <div className="receipt-amount"><span>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</span><strong>{incoming ? "+" : ""}{money(total, entries[0].currency, locale)}</strong></div>
       <div className="receipt-details">
-        <div><span>{t("REFERENCE NUMBER")}</span><strong>{transaction.reference}</strong><CopyButton value={transaction.reference}/></div>
+        <div><span>{t("REFERENCE NUMBER")}</span><strong>{transaction.reference}</strong><CopyButton value={transaction.reference} locale={locale}/></div>
         <div><span>{t("TRANSACTION TYPE")}</span><strong>{transaction.transaction_type.replaceAll("_", " ")}</strong></div>
         <div><span>{t("DATE & TIME")}</span><strong>{new Date(transaction.created_at).toLocaleString(locale)}</strong></div>
         <div><span>{t("STATUS")}</span><strong className="receipt-capitalize">{statusLabel}</strong></div>
