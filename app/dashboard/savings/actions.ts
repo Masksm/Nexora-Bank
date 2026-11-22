@@ -52,7 +52,7 @@ export async function moveSavingsGoalFunds(formData: FormData) {
     p_direction: direction, p_idempotency_key: idempotencyKey, p_pin: pin,
   });
   if (error) redirect("/dashboard/savings?error=" + encodeURIComponent(error.message));
-  if (!data) redirect("/dashboard/savings?error=Incorrect%20PIN%20or%20PIN%20temporarily%20locked.");
+  if (!data) { await supabase.rpc("record_operations_event", { p_severity: "warning", p_category: "authentication", p_service: "Transaction authorization", p_operation: "pin_rejected", p_error_code: "PIN_REJECTED", p_request_path: "/dashboard/savings" }); redirect("/dashboard/savings?error=Incorrect%20PIN%20or%20PIN%20temporarily%20locked."); }
   revalidatePath("/dashboard/savings");
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/accounts");
