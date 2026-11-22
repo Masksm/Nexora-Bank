@@ -282,6 +282,22 @@ export async function issueSupportPaymentProcedure(formData: FormData) {
   if (!conversationId || !selected || !selected.addressPattern.test(walletAddress) || !validAmount || !Number.isFinite(amount) || amount <= 0 || purpose.length < 3 || purpose.length > 500) {
     redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("Choose a supported asset/network, enter an address in the accepted format, and provide a valid amount and purpose."));
   }
+  let addressChecksumValid = false;
+  try {
+    const validationResponse = selected.cryptocurrency === "USDT"
+      ? await fetch("https://api.trongrid.io/wallet/validateaddress", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address: walletAddress, visible: true }) })
+      : await fetch("https://mempool.space/api/v1/validate-address/" + encodeURIComponent(walletAddress));
+    if (!validationResponse.ok) throw new Error("Address validation service unavailable.");
+    const validation = await validationResponse.json();
+    addressChecksumValid = selected.cryptocurrency === "USDT" ? validation.result === true : validation.isvalid === true;
+  } catch {
+    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("The network address validator is temporarily unavailable. No payment instruction was issued; try again later."));
+  }
+  if (!addressChecksumValid) {
+    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("The address checksum or network format is invalid. Recheck the receiving address in the selected wallet."));
+  }
+    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("Choose a supported asset/network, enter an address in the accepted format, and provide a valid amount and purpose."));
+  }
   const { error } = await supabase.rpc("create_support_payment_procedure", { p_conversation_id: conversationId, p_cryptocurrency: selected.cryptocurrency, p_network: selected.network, p_wallet_address: walletAddress, p_expected_amount: amountRaw, p_amount_currency: selected.cryptocurrency, p_purpose: purpose });
   if (error) redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent(error.message));
   revalidatePath("/admin/support");
