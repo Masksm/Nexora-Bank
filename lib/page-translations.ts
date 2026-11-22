@@ -703,6 +703,17 @@ for (const locale of ["es","fr","pt","de"] as const) {
     "Nexora verification workflow": ({es:"Flujo de verificación de Nexora",fr:"Parcours de vérification Nexora",pt:"Fluxo de verificação Nexora",de:"Nexora-Verifizierungsablauf"} as const)[locale]
   });
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "Enter a valid IBAN before checking the account-holder name.": ({
+      es:"Introduce un IBAN válido antes de comprobar el nombre del titular.",
+      fr:"Saisissez un IBAN valide avant de vérifier le nom du titulaire.",
+      pt:"Introduza um IBAN válido antes de verificar o nome do titular.",
+      de:"Geben Sie eine gültige IBAN ein, bevor Sie den Kontoinhabernamen prüfen."
+    } as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
