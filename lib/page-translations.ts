@@ -470,6 +470,13 @@ Object.assign(settingsAndHistoryTranslations.de, {
  "Review staff administrator accounts and manage their access.":"Überprüfen Sie Mitarbeiteradministratorkonten und verwalten Sie deren Zugriffe.","Staff administrator accounts":"Mitarbeiteradministratorkonten","Review the customer directory and control which staff member can access each customer.":"Überprüfen Sie das Kundenverzeichnis und steuern Sie, welcher Mitarbeiter auf welchen Kunden zugreifen kann.","Choose customer accounts to appoint as staff administrators.":"Wählen Sie Kundenkonten aus, die zu Mitarbeiteradministratoren ernannt werden sollen.","GLOBAL CUSTOMER CARE":"GLOBALE KUNDENBETREUUNG","Read support conversations across Nexora without needing to open each staff workspace.":"Lesen Sie Supportgespräche in Nexora, ohne jeden Mitarbeiterbereich öffnen zu müssen.","Permanently delete customer or staff accounts when they are eligible for closure.":"Löschen Sie Kunden- oder Mitarbeiterkonten dauerhaft, wenn sie die Voraussetzungen für eine Schließung erfüllen.","Deletion is permanent. Accounts with non-zero balances, pending financial transactions or money remaining in savings goals are blocked. Scheduled transfers are cancelled. Zero-balance bank accounts are closed and ledger history is retained for audit. Super Admin accounts cannot be deleted here.":"Die Löschung ist dauerhaft. Konten mit einem Saldo ungleich null, ausstehenden Finanztransaktionen oder Guthaben in Sparzielen sind gesperrt. Geplante Überweisungen werden storniert. Bankkonten mit Saldo null werden geschlossen; die Hauptbuchhistorie bleibt für Prüfzwecke erhalten. Super-Admin-Konten können hier nicht gelöscht werden.","Super Admin oversight is read-only for customer conversations. Staff administrators remain responsible for replying to their assigned customers. All role and assignment changes are recorded in the audit log.":"Die Super-Admin-Übersicht für Kundengespräche ist schreibgeschützt. Mitarbeiteradministratoren bleiben für Antworten an ihre zugewiesenen Kunden verantwortlich. Alle Rollen- und Zuordnungsänderungen werden im Auditprotokoll erfasst."
 });
 
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "Customer": ({es:"Cliente",fr:"Client",pt:"Cliente",de:"Kunde"} as const)[locale],
+    "ADMIN": ({es:"ADMINISTRACIÓN",fr:"ADMINISTRATION",pt:"ADMINISTRAÇÃO",de:"ADMINISTRATION"} as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
