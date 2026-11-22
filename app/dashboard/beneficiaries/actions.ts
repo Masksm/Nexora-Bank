@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const ibanLengths:Record<string,number>={
   GB:22,AT:20,BE:16,BG:22,CH:21,CY:28,CZ:24,DE:22,DK:18,EE:20,ES:24,FI:18,
-  FR:27,GB:22,GR:27,HR:21,HU:28,IE:22,IS:26,IT:27,LI:21,LT:20,LU:20,
+  FR:27,GR:27,HR:21,HU:28,IE:22,IS:26,IT:27,LI:21,LT:20,LU:20,
   LV:21,MC:27,MD:24,ME:22,MK:19,MT:31,NL:18,NO:15,PL:28,PT:25,RO:24,
   RS:22,SE:24,SI:19,SK:24,SM:27,TR:26,UA:29,VA:22
 };
@@ -78,10 +78,6 @@ export async function addBeneficiary(formData:FormData){
     sort_code:country==="GB"?sortCode:null,
     iban:country==="GB"&&iban?iban:ibanCountries.has(country)?iban:null,
     bic:bic||null,
-    verification_status:"unverified",
-    verification_method:null,
-    verified_at:null,
-    provider_reference:null,
   };
   const {error}=await supabase.from("beneficiaries").insert(payload);
   if(error)redirect(`/dashboard/beneficiaries?error=${encodeURIComponent(error.message)}`);
