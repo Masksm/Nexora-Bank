@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       provider = "persona_sandbox";
       providerReference = payload.data.id;
       launchUrl = payload.meta?.["one-time-link"] || null;
-      resultSummary = "Complete the identity provider's sandbox session, then return for staff review.";
+      resultSummary = "Complete the identity verification session, then return for staff review.";
     } catch {
       return NextResponse.json({ error: "The identity provider could not be reached. Please try again." }, { status: 503 });
     }
