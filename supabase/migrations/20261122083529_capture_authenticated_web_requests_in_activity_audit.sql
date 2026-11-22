@@ -1,3 +1,7 @@
+drop trigger if exists activity_audit_capture on public.support_payment_receipts;
+create trigger activity_audit_capture after insert or update or delete on public.support_payment_receipts
+for each row execute function private.capture_activity_audit_event();
+
 create or replace function private.record_activity_request(p_path text,p_method text)
 returns void language plpgsql security definer set search_path=''
 as $$
