@@ -24,7 +24,7 @@ export default async function SuperAdminAuditPage({searchParams}:{searchParams:P
   const people=(directory??[]) as Person[];
   const accounts=people.filter(p=>role==="staff"?p.role==="admin":!["admin","super_admin"].includes(p.role));
   const selected=accounts.find(p=>p.user_id===params.user)??null;
-  let events:Event[]=[];
+  let events:Event[]=[];\n  let receiptCards:Array<{id:string;original_filename:string;mime_type:string;file_size_bytes:number;review_status:string;submitted_at:string;review_note:string|null;signedUrl:string|null}>=[];
   let sourceError:string|null=null;
   if(selected){
     const activityQuery=supabase.from("activity_audit_events").select("id,created_at,event_name,event_source,entity_table,entity_id,actor_email,actor_role,details").order("created_at",{ascending:false});
