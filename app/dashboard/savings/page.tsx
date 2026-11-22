@@ -89,6 +89,6 @@ export default async function SavingsPage({ searchParams }: Props) {
           </article>;
         })}</div>}
     </section>
-    <p className="workspace-disclaimer">{t("Savings contributions and withdrawals are recorded as balanced entries in your Nexora ledger. Only posted transactions change account balances.")}</p>
+    <p className="workspace-disclaimer">{t("Contributions and withdrawals update your savings balance after they are processed.")}</p>
   </main>;
 }
