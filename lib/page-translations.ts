@@ -298,6 +298,89 @@ Object.assign(settingsAndHistoryTranslations.de, {
  "Bundesbank directory match":"Treffer im Bundesbank-Verzeichnis","not listed":"nicht aufgeführt","No matching German bank code was found.":"Kein passender deutscher Bankcode gefunden.","Bank lookup unavailable.":"Banksuche nicht verfügbar.","UK bank lookup unavailable. Enter the bank name manually.":"Britische Banksuche nicht verfügbar. Geben Sie den Banknamen manuell ein.","Bank lookup unavailable. Enter the bank name manually.":"Banksuche nicht verfügbar. Geben Sie den Banknamen manuell ein."
 });
 
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "Settings": ({es:"Configuración",fr:"Paramètres",pt:"Definições",de:"Einstellungen"} as const)[locale],
+    "Print / Save as PDF": ({es:"Imprimir / Guardar como PDF",fr:"Imprimer / Enregistrer en PDF",pt:"Imprimir / Guardar como PDF",de:"Drucken / Als PDF speichern"} as const)[locale],
+    "Copy account number": ({es:"Copiar número de cuenta",fr:"Copier le numéro de compte",pt:"Copiar número da conta",de:"Kontonummer kopieren"} as const)[locale],
+    "Copied account number": ({es:"Número de cuenta copiado",fr:"Numéro de compte copié",pt:"Número da conta copiado",de:"Kontonummer kopiert"} as const)[locale],
+    "Copied": ({es:"Copiado",fr:"Copié",pt:"Copiado",de:"Kopiert"} as const)[locale],
+    "Name not independently verified": ({es:"Nombre no verificado de forma independiente",fr:"Nom non vérifié de manière indépendante",pt:"Nome não verificado de forma independente",de:"Name nicht unabhängig verifiziert"} as const)[locale],
+    "Start verification": ({es:"Iniciar verificación",fr:"Démarrer la vérification",pt:"Iniciar verificação",de:"Verifizierung starten"} as const)[locale],
+    "Retry verification": ({es:"Reintentar verificación",fr:"Réessayer la vérification",pt:"Tentar novamente",de:"Verifizierung erneut versuchen"} as const)[locale],
+    "Close section": ({es:"Cerrar sección",fr:"Fermer la section",pt:"Fechar secção",de:"Bereich schließen"} as const)[locale],
+    "Open section": ({es:"Abrir sección",fr:"Ouvrir la section",pt:"Abrir secção",de:"Bereich öffnen"} as const)[locale]
+  });
+}
+
+const dynamicErrorTranslations: Record<SupportedLocale, Array<[RegExp,string]>> = {
+  en: [],
+  es: [
+    [/row.level security|permission denied|not authorized|unauthorized/i,"No tienes permiso para realizar esta acción."],
+    [/duplicate key|already exists|unique constraint/i,"Este registro ya existe."],
+    [/insufficient funds|insufficient balance|not enough balance/i,"El saldo disponible es insuficiente."],
+    [/invalid input syntax|violates check constraint|invalid.*format/i,"Algunos datos no son válidos. Comprueba la información introducida."],
+    [/network|fetch failed|timeout|temporarily unavailable/i,"Se produjo un error de conexión. Inténtalo de nuevo."],
+    [/foreign key|still referenced|linked to other/i,"Este registro está vinculado a otra actividad de la cuenta y no se puede modificar."],
+    [/not found|does not exist/i,"No se encontró el registro solicitado."],
+    [/invalid login credentials/i,"El correo electrónico o la contraseña son incorrectos."],
+    [/email not confirmed/i,"Confirma tu correo electrónico antes de iniciar sesión."],
+    [/too many requests|rate limit|too many attempts/i,"Demasiados intentos. Espera antes de volver a intentarlo."],
+    [/session.*expired|auth session missing/i,"Tu sesión ha caducado. Inicia sesión de nuevo."]
+  ],
+  fr: [
+    [/row.level security|permission denied|not authorized|unauthorized/i,"Vous n’êtes pas autorisé à effectuer cette action."],
+    [/duplicate key|already exists|unique constraint/i,"Cet enregistrement existe déjà."],
+    [/insufficient funds|insufficient balance|not enough balance/i,"Le solde disponible est insuffisant."],
+    [/invalid input syntax|violates check constraint|invalid.*format/i,"Certaines informations sont invalides. Vérifiez les données saisies."],
+    [/network|fetch failed|timeout|temporarily unavailable/i,"Une erreur de connexion s’est produite. Réessayez."],
+    [/foreign key|still referenced|linked to other/i,"Cet enregistrement est lié à une autre activité du compte et ne peut pas être modifié."],
+    [/not found|does not exist/i,"L’enregistrement demandé est introuvable."],
+    [/invalid login credentials/i,"L’adresse e-mail ou le mot de passe est incorrect."],
+    [/email not confirmed/i,"Confirmez votre adresse e-mail avant de vous connecter."],
+    [/too many requests|rate limit|too many attempts/i,"Trop de tentatives. Attendez avant de réessayer."],
+    [/session.*expired|auth session missing/i,"Votre session a expiré. Reconnectez-vous."]
+  ],
+  pt: [
+    [/row.level security|permission denied|not authorized|unauthorized/i,"Não tem permissão para realizar esta ação."],
+    [/duplicate key|already exists|unique constraint/i,"Este registo já existe."],
+    [/insufficient funds|insufficient balance|not enough balance/i,"O saldo disponível é insuficiente."],
+    [/invalid input syntax|violates check constraint|invalid.*format/i,"Alguns dados são inválidos. Verifique as informações introduzidas."],
+    [/network|fetch failed|timeout|temporarily unavailable/i,"Ocorreu um erro de ligação. Tente novamente."],
+    [/foreign key|still referenced|linked to other/i,"Este registo está associado a outra atividade da conta e não pode ser alterado."],
+    [/not found|does not exist/i,"O registo solicitado não foi encontrado."],
+    [/invalid login credentials/i,"O e-mail ou a palavra-passe estão incorretos."],
+    [/email not confirmed/i,"Confirme o seu e-mail antes de iniciar sessão."],
+    [/too many requests|rate limit|too many attempts/i,"Demasiadas tentativas. Aguarde antes de tentar novamente."],
+    [/session.*expired|auth session missing/i,"A sua sessão expirou. Inicie sessão novamente."]
+  ],
+  de: [
+    [/row.level security|permission denied|not authorized|unauthorized/i,"Sie sind nicht berechtigt, diese Aktion auszuführen."],
+    [/duplicate key|already exists|unique constraint/i,"Dieser Eintrag existiert bereits."],
+    [/insufficient funds|insufficient balance|not enough balance/i,"Das verfügbare Guthaben reicht nicht aus."],
+    [/invalid input syntax|violates check constraint|invalid.*format/i,"Einige Angaben sind ungültig. Bitte überprüfen Sie Ihre Eingaben."],
+    [/network|fetch failed|timeout|temporarily unavailable/i,"Es ist ein Verbindungsfehler aufgetreten. Bitte versuchen Sie es erneut."],
+    [/foreign key|still referenced|linked to other/i,"Dieser Eintrag ist mit anderen Kontovorgängen verknüpft und kann nicht geändert werden."],
+    [/not found|does not exist/i,"Der angeforderte Eintrag wurde nicht gefunden."],
+    [/invalid login credentials/i,"E-Mail-Adresse oder Passwort sind falsch."],
+    [/email not confirmed/i,"Bestätigen Sie Ihre E-Mail-Adresse, bevor Sie sich anmelden."],
+    [/too many requests|rate limit|too many attempts/i,"Zu viele Versuche. Warten Sie, bevor Sie es erneut versuchen."],
+    [/session.*expired|auth session missing/i,"Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."]
+  ]
+};
+
 export function pageText(locale: SupportedLocale, value: string): string {
+  const exact = dashboardLabels[locale]?.[value]
+    ?? identityUiTranslations[locale]?.[value]
+    ?? settingsAndHistoryTranslations[locale]?.[value]
+    ?? extra[locale]?.[value]
+    ?? dictionaries[locale]?.[value];
+  if (exact !== undefined) return exact;
+  for (const [pattern, translation] of dynamicErrorTranslations[locale] || []) {
+    if (pattern.test(value)) return translation;
+  }
+  return value;
+}(locale: SupportedLocale, value: string): string {
   return dashboardLabels[locale]?.[value] ?? identityUiTranslations[locale]?.[value] ?? settingsAndHistoryTranslations[locale]?.[value] ?? extra[locale]?.[value] ?? dictionaries[locale]?.[value] ?? value;
 }
