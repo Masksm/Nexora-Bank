@@ -714,6 +714,56 @@ for (const locale of ["es","fr","pt","de"] as const) {
     } as const)[locale]
   });
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const translations = {
+    es: {
+      "Complete the identity verification session, then return for staff review.":"Completa la sesión de verificación de identidad y vuelve para la revisión del personal.",
+      "Account-name verification is currently available for IBANs from the UK and 20 SEPA countries.":"La verificación del nombre de la cuenta está disponible actualmente para IBAN del Reino Unido y de 20 países SEPA.",
+      "No account-name result is available for this IBAN.":"No hay un resultado de verificación del nombre disponible para este IBAN.",
+      "The account-name service could not be reached. Try again.":"No se pudo acceder al servicio de verificación del nombre. Inténtalo de nuevo.",
+      "Consent is required before sending the IBAN and recipient name to the verification provider.":"Se requiere consentimiento antes de enviar el IBAN y el nombre del beneficiario al proveedor de verificación.",
+      "Account-name verification is not configured yet.":"La verificación del nombre de la cuenta aún no está configurada.",
+      "The linked account number does not match the saved beneficiary account.":"El número de cuenta vinculado no coincide con la cuenta del beneficiario guardada.",
+      "The account-holder name matched the name returned by the provider.":"El nombre del titular coincide con el nombre devuelto por el proveedor.",
+      "The saved recipient name did not exactly match the account-holder name returned by the provider.":"El nombre del beneficiario guardado no coincide exactamente con el nombre del titular devuelto por el proveedor."
+    },
+    fr: {
+      "Complete the identity verification session, then return for staff review.":"Terminez la session de vérification d’identité, puis revenez pour l’examen par le personnel.",
+      "Account-name verification is currently available for IBANs from the UK and 20 SEPA countries.":"La vérification du nom du compte est actuellement disponible pour les IBAN du Royaume-Uni et de 20 pays SEPA.",
+      "No account-name result is available for this IBAN.":"Aucun résultat de vérification du nom n’est disponible pour cet IBAN.",
+      "The account-name service could not be reached. Try again.":"Le service de vérification du nom est inaccessible. Réessayez.",
+      "Consent is required before sending the IBAN and recipient name to the verification provider.":"Le consentement est requis avant l’envoi de l’IBAN et du nom du bénéficiaire au fournisseur de vérification.",
+      "Account-name verification is not configured yet.":"La vérification du nom du compte n’est pas encore configurée.",
+      "The linked account number does not match the saved beneficiary account.":"Le numéro de compte connecté ne correspond pas au compte bénéficiaire enregistré.",
+      "The account-holder name matched the name returned by the provider.":"Le nom du titulaire correspond au nom renvoyé par le fournisseur.",
+      "The saved recipient name did not exactly match the account-holder name returned by the provider.":"Le nom du bénéficiaire enregistré ne correspond pas exactement au nom du titulaire renvoyé par le fournisseur."
+    },
+    pt: {
+      "Complete the identity verification session, then return for staff review.":"Conclua a sessão de verificação de identidade e regresse para a análise da equipa.",
+      "Account-name verification is currently available for IBANs from the UK and 20 SEPA countries.":"A verificação do nome da conta está atualmente disponível para IBAN do Reino Unido e de 20 países SEPA.",
+      "No account-name result is available for this IBAN.":"Não existe um resultado de verificação do nome disponível para este IBAN.",
+      "The account-name service could not be reached. Try again.":"Não foi possível contactar o serviço de verificação do nome. Tente novamente.",
+      "Consent is required before sending the IBAN and recipient name to the verification provider.":"É necessário consentimento antes de enviar o IBAN e o nome do beneficiário ao fornecedor de verificação.",
+      "Account-name verification is not configured yet.":"A verificação do nome da conta ainda não está configurada.",
+      "The linked account number does not match the saved beneficiary account.":"O número da conta ligada não corresponde à conta do beneficiário guardada.",
+      "The account-holder name matched the name returned by the provider.":"O nome do titular corresponde ao nome devolvido pelo fornecedor.",
+      "The saved recipient name did not exactly match the account-holder name returned by the provider.":"O nome do beneficiário guardado não corresponde exatamente ao nome do titular devolvido pelo fornecedor."
+    },
+    de: {
+      "Complete the identity verification session, then return for staff review.":"Schließen Sie die Identitätsprüfung ab und kehren Sie anschließend zur Mitarbeiterprüfung zurück.",
+      "Account-name verification is currently available for IBANs from the UK and 20 SEPA countries.":"Die Kontoinhaberprüfung ist derzeit für IBANs aus dem Vereinigten Königreich und 20 SEPA-Ländern verfügbar.",
+      "No account-name result is available for this IBAN.":"Für diese IBAN ist kein Ergebnis zur Kontoinhaberprüfung verfügbar.",
+      "The account-name service could not be reached. Try again.":"Der Kontoinhaberdienst ist nicht erreichbar. Versuchen Sie es erneut.",
+      "Consent is required before sending the IBAN and recipient name to the verification provider.":"Vor dem Senden von IBAN und Empfängername an den Prüfungsanbieter ist eine Zustimmung erforderlich.",
+      "Account-name verification is not configured yet.":"Die Kontoinhaberprüfung ist noch nicht eingerichtet.",
+      "The linked account number does not match the saved beneficiary account.":"Die verknüpfte Kontonummer stimmt nicht mit dem gespeicherten Empfängerkonto überein.",
+      "The account-holder name matched the name returned by the provider.":"Der Kontoinhabername stimmt mit dem vom Anbieter zurückgegebenen Namen überein.",
+      "The saved recipient name did not exactly match the account-holder name returned by the provider.":"Der gespeicherte Empfängername stimmt nicht exakt mit dem vom Anbieter zurückgegebenen Kontoinhabernamen überein."
+    }
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], translations);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
