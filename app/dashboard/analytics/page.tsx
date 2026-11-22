@@ -27,7 +27,7 @@ export default async function AnalyticsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const { data: accounts, error: accountError } = await supabase.from("bank_accounts").select("id").eq("user_id", user.id);
+  const { data: accounts, error: accountError } = await supabase.from("bank_accounts").select("id").eq("user_id", user.id).eq("currency","USD");
   const accountIds = (accounts ?? []).map((a) => a.id);
   const entries: Array<{ transaction_id: string; account_id: string; amount_minor: number; created_at: string }> = [];
   let failed = Boolean(accountError);
@@ -69,6 +69,7 @@ export default async function AnalyticsPage() {
     <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">{t("NEXORA BANK · INSIGHTS")}</span></header>
     <section className="workspace-intro"><div><span className="workspace-kicker">{t("YOUR MONEY, AT A GLANCE")}</span><h1>{t("Spending analytics")}</h1><p>{t("Understand how money moves across your accounts.")}</p></div><Link href="/dashboard/statements" className="workspace-download">{t("View statements")}</Link></section>
     {failed ? <div className="workspace-alert">{t("We couldn’t load complete account activity. Refresh and try again.")}</div> : <>
+      <p className="workspace-disclaimer">These analytics currently summarize USD accounts only. Other currency balances remain separate in Multi-currency accounts.</p>
       <section className="analytics-summary">
         <article className="analytics-stat"><span>{t("This month · Money in")}</span><strong>{money(income,locale)}</strong><small><ArrowDownLeft size={14}/> {t("Posted credits")}</small></article>
         <article className="analytics-stat"><span>{t("This month · Money out")}</span><strong>{money(spending,locale)}</strong><small><ArrowUpRight size={14}/> {t("Posted debits")}</small></article>
