@@ -271,32 +271,22 @@ export async function reviewIdentityDocument(formData: FormData) {
 export async function issueSupportPaymentProcedure(formData: FormData) {
   const supabase = await requireAdmin();
   const conversationId = String(formData.get("conversation_id") || "");
-  const cryptocurrency = String(formData.get("cryptocurrency") || "").trim().toUpperCase();
-  const network = String(formData.get("network") || "").trim();
+  const pair = String(formData.get("payment_pair") || "");
   const walletAddress = String(formData.get("wallet_address") || "").trim();
   const amountRaw = String(formData.get("expected_amount") || "").trim();
   const purpose = String(formData.get("purpose") || "").trim();
+  const selected = pair === "USDT_TRON" ? { cryptocurrency: "USDT", network: "TRON (TRC20)", decimals: 6, addressPattern: /^T[1-9A-HJ-NP-Za-km-z]{33}$/ } : pair === "BTC_BITCOIN" ? { cryptocurrency: "BTC", network: "BITCOIN", decimals: 8, addressPattern: /^(bc1[ac-hj-np-z02-9]{11,87}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/ } : null;
+  const parts = amountRaw.split(".");
+  const validAmount = parts.length <= 2 && /^(0|[1-9]\d*)$/.test(parts[0] || "") && (parts.length === 1 || (parts[1].length > 0 && parts[1].length <= (selected?.decimals ?? 0) && /^\d+$/.test(parts[1])));
   const amount = Number(amountRaw);
-  if (!conversationId || !cryptocurrency || !network || !walletAddress || !purpose
-      || !/^(?:0|[1-9]\d*)(?:\.\d{1,18})?$/.test(amountRaw)
-      || !Number.isFinite(amount) || amount <= 0 || walletAddress.length > 256
-      || purpose.length < 3 || purpose.length > 500) {
-    redirect("/admin/support?kind=error&message=" + encodeURIComponent("Complete every payment field and enter a positive amount."));
+  if (!conversationId || !selected || !selected.addressPattern.test(walletAddress) || !validAmount || !Number.isFinite(amount) || amount <= 0 || purpose.length < 3 || purpose.length > 500) {
+    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("Choose a supported asset/network, enter an address in the accepted format, and provide a valid amount and purpose."));
   }
-  const { error } = await supabase.rpc("create_support_payment_procedure", {
-    p_conversation_id: conversationId,
-    p_cryptocurrency: cryptocurrency,
-    p_network: network,
-    p_wallet_address: walletAddress,
-    p_expected_amount: amountRaw,
-    p_amount_currency: cryptocurrency,
-    p_purpose: purpose,
-  });
+  const { error } = await supabase.rpc("create_support_payment_procedure", { p_conversation_id: conversationId, p_cryptocurrency: selected.cryptocurrency, p_network: selected.network, p_wallet_address: walletAddress, p_expected_amount: amountRaw, p_amount_currency: selected.cryptocurrency, p_purpose: purpose });
   if (error) redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent(error.message));
   revalidatePath("/admin/support");
-  redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=success&message=" + encodeURIComponent("Automated payment procedure issued and recorded."));
+  redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=success&message=" + encodeURIComponent("Payment instruction issued. The selected network and address format were validated."));
 }
-
 
 export async function reviewSupportPaymentReceipt(formData: FormData) {
   const supabase = await requireAdmin();
