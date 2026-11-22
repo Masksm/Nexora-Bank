@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { resolveLocale } from "../lib/locale.ts";
+import { pageText } from "../lib/page-translations.ts";
 
 test("manual language preference overrides country and browser", () => {
   assert.equal(resolveLocale("fr", "de-DE,de;q=0.9", "ES"), "fr");
@@ -21,4 +22,20 @@ test("automatic language falls back to English when no supported signal exists",
 
 test("invalid preference does not override valid country detection", () => {
   assert.equal(resolveLocale("xx", "en-US", "PT"), "pt");
+});
+
+test("settings and common banking labels are translated", () => {
+  assert.equal(pageText("es", "Settings"), "Configuración");
+  assert.equal(pageText("fr", "Settings"), "Paramètres");
+  assert.equal(pageText("de", "Dark mode"), "Dunkler Modus");
+});
+
+test("unknown server errors fall back to a localized safe message", () => {
+  assert.notEqual(pageText("pt", "Database error saving profile"), "Database error saving profile");
+});
+
+test("composite KYC file-check messages are translated", () => {
+  const message = pageText("es", "File signature check passed. Your document has been submitted for review. You will receive an update when the review is complete.");
+  assert.match(message, /firma del archivo/);
+  assert.match(message, /Tu documento se ha enviado/);
 });
