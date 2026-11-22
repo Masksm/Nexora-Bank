@@ -690,6 +690,13 @@ for (const locale of ["es","fr","pt","de"] as const) {
     "Not checked": ({es:"No comprobado",fr:"Non vérifié",pt:"Não verificado",de:"Nicht geprüft"} as const)[locale]
   });
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "persona sandbox": "Persona Sandbox",
+    "nexora sandbox": ({es:"Nexora Sandbox",fr:"Nexora Sandbox",pt:"Nexora Sandbox",de:"Nexora Sandbox"} as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
