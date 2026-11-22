@@ -29,7 +29,7 @@ export default function PlaidNameCheck({ beneficiaryId, locale }: {
   const [matched, setMatched] = useState<boolean | null>(null);
 
   async function startCheck() {
-    if (busy) return;
+    if (!consent || busy) return;
     if (!window.Plaid) {
       setMessage(t("Bank connection is still loading. Try again."));
       return;
