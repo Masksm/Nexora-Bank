@@ -41,28 +41,28 @@ export default async function SavingsPage({ searchParams }: Props) {
   const activeCount = goals.filter((goal) => goal.status === "active").length;
 
   return <main className="workspace-shell savings-shell">
-    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">NEXORA BANK · PERSONAL FINANCE</span></header>
-    <section className="workspace-intro savings-intro"><div><span className="workspace-kicker">SAVE WITH PURPOSE</span><h1>Savings goals</h1><p>Give your plans a target, a timeline and a clear place to grow.</p></div><div className="workspace-total"><span>TOTAL SAVED IN GOALS</span><strong>{money(totalSaved, locale)}</strong></div></section>
+    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">{t("NEXORA BANK · PERSONAL FINANCE")}</span></header>
+    <section className="workspace-intro savings-intro"><div><span className="workspace-kicker">{t("SAVE WITH PURPOSE")}</span><h1>{t("Savings goals")}</h1><p>{t("Give your plans a target, a timeline and a clear place to grow.")}</p></div><div className="workspace-total"><span>{t("TOTAL SAVED IN GOALS")}</span><strong>{money(totalSaved, locale)}</strong></div></section>
     {params.error && <div className="workspace-alert">{params.error}</div>}
     {params.success && <div className="transfer-success">{params.success === "goal_created" ? "Your savings goal has been created." : params.success === "contribution" ? "Your contribution has been posted." : "Your withdrawal has been posted."}</div>}
-    {(goalResult.error || entryResult.error || accountResult.error) && <div className="workspace-alert">Savings information could not be loaded completely. Refresh the page and try again.</div>}
+    {(goalResult.error || entryResult.error || accountResult.error) && <div className="workspace-alert">{t("Savings information could not be loaded completely. Refresh the page and try again.")}</div>}
     <section className="savings-overview-grid">
-      <article className="savings-stat-card"><span><PiggyBank size={17}/> TOTAL SAVED</span><strong>{money(totalSaved, locale)}</strong><small>Across all your savings goals</small></article>
-      <article className="savings-stat-card"><span><Target size={17}/> ACTIVE GOALS</span><strong>{activeCount}</strong><small>{goals.length} goals created</small></article>
-      <article className="savings-stat-card"><span><ArrowDownToLine size={17}/> CONTRIBUTIONS</span><strong>{entries.filter((entry) => Number(entry.amount_minor) > 0).length}</strong><small>Successful contributions</small></article>
+      <article className="savings-stat-card"><span><PiggyBank size={17}/> {t("TOTAL SAVED")}</span><strong>{money(totalSaved, locale)}</strong><small>{t("Across all your savings goals")}</small></article>
+      <article className="savings-stat-card"><span><Target size={17}/> {t("ACTIVE GOALS")}</span><strong>{activeCount}</strong><small>{goals.length} goals created</small></article>
+      <article className="savings-stat-card"><span><ArrowDownToLine size={17}/> {t("CONTRIBUTIONS")}</span><strong>{entries.filter((entry) => Number(entry.amount_minor) > 0).length}</strong><small>{t("Successful contributions")}</small></article>
     </section>
     <section className="workspace-panel savings-create-panel">
-      <div className="workspace-panel-heading"><div><span className="workspace-kicker">START SOMETHING</span><h2>Create a savings goal</h2></div><Plus size={18}/></div>
+      <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("START SOMETHING")}</span><h2>{t("Create a savings goal")}</h2></div><Plus size={18}/></div>
       <form action={createSavingsGoal} className="savings-create-form">
-        <label>Goal name<input name="name" minLength={2} maxLength={60} placeholder="e.g. New laptop" required/></label>
-        <label>Target amount (USD)<input name="target_amount" type="number" min="1" max="999999999" step="0.01" placeholder="2,500.00" required/></label>
-        <label>Target date <span className="savings-optional">(optional)</span><input name="target_date" type="date" min={new Date().toISOString().slice(0,10)}/></label>
-        <button type="submit">Create goal <Plus size={15}/></button>
+        <label>{t("Goal name")}<input name="name" minLength={2} maxLength={60} placeholder={t("e.g. New laptop")} required/></label>
+        <label>{t("Target amount (USD)")}<input name="target_amount" type="number" min="1" max="999999999" step="0.01" placeholder={t("2,500.00")} required/></label>
+        <label>{t("Target date")} <span className="savings-optional">{t("(optional)")}</span><input name="target_date" type="date" min={new Date().toISOString().slice(0,10)}/></label>
+        <button type="submit">{t("Create goal")} <Plus size={15}/></button>
       </form>
     </section>
     <section className="savings-goals-section">
-      <div className="savings-section-heading"><div><span className="workspace-kicker">YOUR PLAN</span><h2>Your savings goals</h2></div><span className="workspace-count">{goals.length} goals</span></div>
-      {goals.length === 0 ? <div className="workspace-empty"><PiggyBank size={27}/><h2>No savings goals yet</h2><p>Create a goal above and start setting money aside from an active account.</p></div> :
+      <div className="savings-section-heading"><div><span className="workspace-kicker">{t("YOUR PLAN")}</span><h2>{t("Your savings goals")}</h2></div><span className="workspace-count">{goals.length} goals</span></div>
+      {goals.length === 0 ? <div className="workspace-empty"><PiggyBank size={27}/><h2>{t("No savings goals yet")}</h2><p>{t("Create a goal above and start setting money aside from an active account.")}</p></div> :
         <div className="savings-goals-grid">{goals.map((goal) => {
           const goalEntries = entriesByGoal.get(goal.id) ?? [];
           const balance = goalEntries.reduce((sum, entry) => sum + Number(entry.amount_minor), 0);
@@ -75,20 +75,20 @@ export default async function SavingsPage({ searchParams }: Props) {
             <div className="savings-progress-meta"><strong>{percent}%</strong><span>{goal.target_date ? "Target " + new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(goal.target_date + "T00:00:00")) : "No target date"}</span></div>
             {goal.status === "active" && activeAccounts.length > 0 && <div className="savings-money-actions"><form action={moveSavingsGoalFunds}>
               <input type="hidden" name="goal_id" value={goal.id}/><input type="hidden" name="direction" value="contribution"/><input type="hidden" name="idempotency_key" value={randomUUID()}/>
-              <label>Add money<input name="amount" type="number" min="0.01" max="999999999" step="0.01" placeholder="Amount" required/></label>
-              <label>From account<select name="account_id" required>{activeAccounts.map((account) => <option key={account.account_id} value={account.account_id}>{account.nickname || account.account_name} · ••••{account.account_number.slice(-4)}</option>)}</select></label>
-              <button type="submit"><ArrowDownToLine size={14}/> Contribute</button>
+              <label>{t("Add money")}<input name="amount" type="number" min="0.01" max="999999999" step="0.01" placeholder={t("Amount")} required/></label>
+              <label>{t("From account")}<select name="account_id" required>{activeAccounts.map((account) => <option key={account.account_id} value={account.account_id}>{account.nickname || account.account_name} · ••••{account.account_number.slice(-4)}</option>)}</select></label>
+              <button type="submit"><ArrowDownToLine size={14}/> {t("Contribute")}</button>
             </form></div>}
             {balance > 0 && activeAccounts.length > 0 && <div className="savings-money-actions savings-withdraw"><form action={moveSavingsGoalFunds}>
               <input type="hidden" name="goal_id" value={goal.id}/><input type="hidden" name="direction" value="withdrawal"/><input type="hidden" name="idempotency_key" value={randomUUID()}/>
-              <label>Withdraw amount<input name="amount" type="number" min="0.01" max={(balance / 100).toFixed(2)} step="0.01" placeholder="Amount" required/></label>
-              <label>To account<select name="account_id" required>{activeAccounts.map((account) => <option key={account.account_id} value={account.account_id}>{account.nickname || account.account_name} · ••••{account.account_number.slice(-4)}</option>)}</select></label>
-              <button type="submit"><ArrowUpFromLine size={14}/> Withdraw</button>
+              <label>{t("Withdraw amount")}<input name="amount" type="number" min="0.01" max={(balance / 100).toFixed(2)} step="0.01" placeholder={t("Amount")} required/></label>
+              <label>{t("To account")}<select name="account_id" required>{activeAccounts.map((account) => <option key={account.account_id} value={account.account_id}>{account.nickname || account.account_name} · ••••{account.account_number.slice(-4)}</option>)}</select></label>
+              <button type="submit"><ArrowUpFromLine size={14}/> {t("Withdraw")}</button>
             </form></div>}
-            {goalEntries.length > 0 && <div className="savings-recent-entries"><strong>Recent activity</strong>{goalEntries.slice(0,3).map((entry) => <div key={entry.id}><span>{Number(entry.amount_minor) > 0 ? "Contribution" : "Withdrawal"} · {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(entry.created_at))}</span><b className={Number(entry.amount_minor) > 0 ? "positive" : ""}>{Number(entry.amount_minor) > 0 ? "+" : "−"}{money(Math.abs(Number(entry.amount_minor)), locale)}</b></div>)}</div>}
+            {goalEntries.length > 0 && <div className="savings-recent-entries"><strong>{t("Recent activity")}</strong>{goalEntries.slice(0,3).map((entry) => <div key={entry.id}><span>{Number(entry.amount_minor) > 0 ? "Contribution" : "Withdrawal"} · {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(entry.created_at))}</span><b className={Number(entry.amount_minor) > 0 ? "positive" : ""}>{Number(entry.amount_minor) > 0 ? "+" : "−"}{money(Math.abs(Number(entry.amount_minor)), locale)}</b></div>)}</div>}
           </article>;
         })}</div>}
     </section>
-    <p className="workspace-disclaimer">Savings contributions and withdrawals are recorded as balanced entries in your Nexora ledger. Only posted transactions change account balances.</p>
+    <p className="workspace-disclaimer">{t("Savings contributions and withdrawals are recorded as balanced entries in your Nexora ledger. Only posted transactions change account balances.")}</p>
   </main>;
 }
