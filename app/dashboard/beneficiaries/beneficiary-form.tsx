@@ -164,7 +164,7 @@ export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
       <label>{t("Sort code")}<input name="sort_code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required placeholder={t("6 digits, without spaces")} onBlur={event=>lookupUkSortCode(event.target.value)}/></label>
       {routingMessage&&<p className="form-hint" role="status">{routingLoading?t("Searching directory…"):t(routingMessage)}</p>}
       <label>{t("Account number")}<input name="account_number" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required placeholder={t("8-digit account number")}/></label>
-      <label>{t("UK IBAN (optional for broader bank lookup)")}<input autoCapitalize="characters" maxLength={22} placeholder="GB…" onBlur={event=>lookupIban(event.target.value,"GB")}/></label>
+      <label>{t("UK IBAN (optional for broader bank lookup)")}<input name="iban" autoCapitalize="characters" maxLength={22} placeholder="GB…" onBlur={event=>lookupIban(event.target.value,"GB")}/></label>
       <label className="directory-consent-row"><input type="checkbox" checked={externalLookupConsent} onChange={event=>setExternalLookupConsent(event.target.checked)}/> {t("I agree to send this IBAN to the external directory provider for bank identification.")}</label>
       <input type="hidden" name="bic" value={bic}/>
       {routingMessage&&<p className="form-hint" role="status">{routingLoading?t("Searching directory…"):t(routingMessage)}</p>}
