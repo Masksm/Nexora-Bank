@@ -764,6 +764,50 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], translations);
 }
+const transactionLabelTranslations: Record<SupportedLocale, Record<string,string>> = {
+  en: {},
+  es: {
+    "transactions":"Transacciones","transaction":"Transacción","transaction history":"Historial de transacciones",
+    "pharmacy bill":"Factura de farmacia","rent payment":"Pago del alquiler","electricity bill":"Factura de electricidad",
+    "grocery purchase":"Compra de alimentos","groceries":"Comestibles","internet bill":"Factura de internet",
+    "salary payment":"Pago de salario","monthly subscription":"Suscripción mensual","restaurant bill":"Factura de restaurante",
+    "medical expenses":"Gastos médicos","school fees":"Matrícula escolar","fuel purchase":"Compra de combustible",
+    "water bill":"Factura del agua","mobile top-up":"Recarga móvil","cash withdrawal":"Retirada de efectivo",
+    "transfer to savings":"Transferencia a ahorros","card payment":"Pago con tarjeta","online purchase":"Compra en línea",
+    "utility bill":"Factura de servicios","insurance premium":"Prima de seguro"
+  },
+  fr: {
+    "transactions":"Transactions","transaction":"Transaction","transaction history":"Historique des transactions",
+    "pharmacy bill":"Facture de pharmacie","rent payment":"Paiement du loyer","electricity bill":"Facture d’électricité",
+    "grocery purchase":"Achats alimentaires","groceries":"Courses","internet bill":"Facture Internet",
+    "salary payment":"Versement de salaire","monthly subscription":"Abonnement mensuel","restaurant bill":"Note de restaurant",
+    "medical expenses":"Frais médicaux","school fees":"Frais de scolarité","fuel purchase":"Achat de carburant",
+    "water bill":"Facture d’eau","mobile top-up":"Recharge mobile","cash withdrawal":"Retrait d’espèces",
+    "transfer to savings":"Virement vers l’épargne","card payment":"Paiement par carte","online purchase":"Achat en ligne",
+    "utility bill":"Facture de services","insurance premium":"Prime d’assurance"
+  },
+  pt: {
+    "transactions":"Transações","transaction":"Transação","transaction history":"Histórico de transações",
+    "pharmacy bill":"Conta da farmácia","rent payment":"Pagamento do aluguel","electricity bill":"Conta de eletricidade",
+    "grocery purchase":"Compra de alimentos","groceries":"Mantimentos","internet bill":"Conta de internet",
+    "salary payment":"Pagamento de salário","monthly subscription":"Assinatura mensal","restaurant bill":"Conta do restaurante",
+    "medical expenses":"Despesas médicas","school fees":"Mensalidades escolares","fuel purchase":"Compra de combustível",
+    "water bill":"Conta de água","mobile top-up":"Recarga de celular","cash withdrawal":"Saque em dinheiro",
+    "transfer to savings":"Transferência para poupança","card payment":"Pagamento com cartão","online purchase":"Compra online",
+    "utility bill":"Conta de serviços","insurance premium":"Prêmio de seguro"
+  },
+  de: {
+    "transactions":"Transaktionen","transaction":"Transaktion","transaction history":"Transaktionsverlauf",
+    "pharmacy bill":"Apothekenrechnung","rent payment":"Mietzahlung","electricity bill":"Stromrechnung",
+    "grocery purchase":"Lebensmitteleinkauf","groceries":"Lebensmittel","internet bill":"Internetrechnung",
+    "salary payment":"Gehaltszahlung","monthly subscription":"Monatsabonnement","restaurant bill":"Restaurantrechnung",
+    "medical expenses":"Medizinische Ausgaben","school fees":"Schulgebühren","fuel purchase":"Kraftstoffkauf",
+    "water bill":"Wasserrechnung","mobile top-up":"Handyaufladung","cash withdrawal":"Bargeldabhebung",
+    "transfer to savings":"Überweisung auf Sparkonto","card payment":"Kartenzahlung","online purchase":"Onlinekauf",
+    "utility bill":"Nebenkostenabrechnung","insurance premium":"Versicherungsprämie"
+  }
+};
+
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
@@ -771,6 +815,8 @@ export function pageText(locale: SupportedLocale, value: string): string {
     ?? extra[locale]?.[value]
     ?? dictionaries[locale]?.[value];
   if (exact !== undefined) return exact;
+  const transactionLabel = transactionLabelTranslations[locale]?.[value.trim().toLocaleLowerCase("en")];
+  if (transactionLabel) return transactionLabel;
   const composites: Array<[string,string]> = [
     ["File signature check passed. ", "File signature check passed."],
     ["File signature did not match the declared document type. Staff review is required. ", "File signature did not match the declared document type. Staff review is required."]
