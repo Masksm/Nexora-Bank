@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { acknowledgePaymentProcedure } from "./actions";
 import { CustomerReceiptViewer, type CustomerReceipt } from "./customer-receipt-viewer";
+import type { SupportedLocale } from "@/lib/locale";
 
 type Procedure = {
   id:string; cryptocurrency:string; network:string; wallet_address:string;
@@ -14,7 +15,7 @@ type Procedure = {
   verification_status?:string; transaction_hash?:string|null;
   verification_confirmations?:number|null; verification_result?:{detail?:string}|null;
 };
-export function PaymentProcedureCard({procedure,conversationId,receipts=[]}:{procedure:Procedure;conversationId:string;receipts?:CustomerReceipt[]}) {
+export function PaymentProcedureCard({procedure,conversationId,receipts=[],locale}:{procedure:Procedure;conversationId:string;receipts?:CustomerReceipt[];locale:SupportedLocale}) {
   const [copied,setCopied]=useState(false);
   const [uploading,setUploading]=useState(false);
   const [uploadError,setUploadError]=useState("");
@@ -85,7 +86,7 @@ export function PaymentProcedureCard({procedure,conversationId,receipts=[]}:{pro
     {procedure.status==="awaiting_payment"&&supported&&<section className="support-chain-verification"><strong>Verify your blockchain transaction</strong><p>Paste the transaction hash from your wallet. Nexora checks the public blockchain directly. A screenshot is not required for this check.</p><form onSubmit={verifyTransaction}><input aria-label="Blockchain transaction hash" value={txHash} onChange={event=>setTxHash(event.target.value)} placeholder="64-character transaction hash" minLength={64} maxLength={64} pattern="[a-fA-F0-9]{64}" required/><button type="submit" disabled={verifying||procedure.verification_status==="verified"}>{procedure.verification_status==="verified"?"Payment verified":verifying?"Checking blockchain…":"Verify transaction"}</button></form>{verificationMessage&&<p role="status">{verificationMessage}</p>}{verificationError&&<p role="alert">{verificationError}</p>}{procedure.verification_status&&procedure.verification_status!=="not_submitted"&&<small>Latest result: {procedure.verification_status.replaceAll("_"," ")}{procedure.verification_confirmations!==null&&procedure.verification_confirmations!==undefined?" · "+procedure.verification_confirmations+" confirmations":""}{procedure.verification_result?.detail?" · "+procedure.verification_result.detail:""}</small>}</section>}
     {procedure.status==="awaiting_payment"&&<form action={acknowledgePaymentProcedure}><input type="hidden" name="procedure_id" value={procedure.id}/><input type="hidden" name="conversation_id" value={conversationId}/><button type="submit" disabled={Boolean(procedure.customer_acknowledged_at)}>{procedure.customer_acknowledged_at?"Details acknowledged":"I have read and understood these details"}</button></form>}
     {procedure.status==="awaiting_payment"&&<div className="support-receipt-upload"><label>Upload payment receipt or transaction screenshot<input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={uploadReceipt} disabled={uploading}/></label><small>JPG, PNG, WebP or PDF · Maximum 10 MB. A receipt is supporting evidence; blockchain verification checks the actual public transaction.</small>{uploading&&<span>Uploading receipt…</span>}{uploadSuccess&&<span role="status">{uploadSuccess}</span>}{uploadError&&<span role="alert">{uploadError}</span>}</div>}
-    <CustomerReceiptViewer receipts={receipts}/>
+    <CustomerReceiptViewer receipts={receipts} locale={locale}/>
     {procedure.status==="cancelled"&&procedure.cancellation_reason&&<small>Cancellation reason: {procedure.cancellation_reason}</small>}
     <small>Issued {new Date(procedure.created_at).toLocaleString()}</small>
   </article>;
