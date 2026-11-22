@@ -27,6 +27,24 @@ export const bankDirectory: BankDirectoryEntry[] = [
     "Allied Irish Banks (AIB)","Bank of Ireland","Permanent TSB","Ulster Bank","EBS","An Post Money","Revolut","N26"
   ].map(name=>({country:"IE",name})),
   ...[
+    "Erste Bank","Raiffeisen Bank International","Bank Austria","BAWAG","easybank"
+  ].map(name=>({country:"AT",name})),
+  ...[
+    "BNP Paribas Fortis","KBC Bank","Belfius","ING Belgium","Argenta"
+  ].map(name=>({country:"BE",name})),
+  ...[
+    "UBS","Zürcher Kantonalbank","PostFinance","Raiffeisen Switzerland","Banque Cantonale Vaudoise"
+  ].map(name=>({country:"CH",name})),
+  ...[
+    "Caixa Geral de Depósitos","Millennium BCP","Novo Banco","Santander Portugal","BPI","ActivoBank"
+  ].map(name=>({country:"PT",name})),
+  ...[
+    "Intesa Sanpaolo","UniCredit","Banco BPM","BPER Banca","FinecoBank","Poste Italiane"
+  ].map(name=>({country:"IT",name})),
+  ...[
+    "Swedbank","SEB","Handelsbanken","Nordea","Danske Bank","Länsförsäkringar Bank"
+  ].map(name=>({country:"SE",name})),
+  ...[
     "Nexora Bank"
   ].map(name=>({country:"NX",name})),
 ];
