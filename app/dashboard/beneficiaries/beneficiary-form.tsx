@@ -69,13 +69,13 @@ export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
     const routing=value.replace(/\\D/g,"");
     if(country!=="US" || routing.length!==9) return;
     setRoutingLoading(true);
-    setRoutingMessage("Looking up bank directory…");
+    setRoutingMessage(t("Looking up bank directory…"));
     try{
       const response=await fetch(`/api/bank-directory/us?routing=${routing}`);
       const result=await response.json();
       if(!response.ok) throw new Error(result.error||"Bank lookup unavailable.");
       setBankName(result.bankName);
-      setRoutingMessage(`Directory match: ${result.bankName}${result.city&&result.state?` · ${result.city}, ${result.state}`:""}. This identifies the bank, not the account holder.`);
+      setRoutingMessage(`${t("Directory match")}: ${result.bankName}${result.city&&result.state?` · ${result.city}, ${result.state}`:""}. ${t("This identifies the bank, not the account holder.")}`);
     }catch(error){
       setRoutingMessage(error instanceof Error?error.message:"Bank lookup unavailable. Enter the bank name manually.");
     }finally{setRoutingLoading(false);}
@@ -85,13 +85,13 @@ export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
     const sortCode=value.replace(/\D/g,"");
     if(country!=="GB" || sortCode.length!==6) return;
     setRoutingLoading(true);
-    setRoutingMessage("Searching the UK live branch directory…");
+    setRoutingMessage(t("Searching directory…"));
     try{
       const response=await fetch(`/api/bank-directory/uk?sortCode=${sortCode}`);
       const result=await response.json();
       if(!response.ok) throw new Error(result.message||result.error||"No match in the available UK live directory.");
       setBankName(result.bankName);
-      setRoutingMessage(`Directory match: ${result.bankName}${result.branchName?` · ${result.branchName}`:""} · ${result.source}. The free live endpoint currently covers HSBC UK only.`);
+      setRoutingMessage(`${t("Directory match")}: ${result.bankName}${result.branchName?` · ${result.branchName}`:""} · ${result.source}. ${t("The free live endpoint currently covers HSBC UK only.")}`);
     }catch(error){
       setRoutingMessage(error instanceof Error?error.message:"UK bank lookup unavailable. Enter the bank name manually.");
     }finally{setRoutingLoading(false);}
@@ -110,11 +110,11 @@ export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
         if(!response.ok || !result.found) throw new Error(result.error||"No matching German bank code was found.");
         setBankName(result.bankName);
         if(result.bic) setBic(result.bic);
-        setRoutingMessage(`Bundesbank directory match: ${result.bankName}${result.city?` · ${result.city}`:""} · BIC ${result.bic||"not listed"}.`);
+        setRoutingMessage(`${t("Bundesbank directory match")}: ${result.bankName}${result.city?` · ${result.city}`:""} · BIC ${result.bic||t("not listed")}.`);
         return;
       }
       if(!externalLookupConsent){
-        setRoutingMessage("Select the external directory consent option before using the European lookup.");
+        setRoutingMessage(t("Select the external directory consent option before using the European lookup."));
         return;
       }
       const response=await fetch("/api/bank-directory/iban",{
@@ -126,7 +126,7 @@ export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
       if(!response.ok) throw new Error(result.error||"Bank lookup unavailable.");
       setBankName(result.bankName);
       if(result.bic) setBic(result.bic);
-      setRoutingMessage(`Directory match: ${result.bankName}${result.city?` · ${result.city}`:""} · ${result.source}. This identifies the bank, not the account holder.`);
+      setRoutingMessage(`${t("Directory match")}: ${result.bankName}${result.city?` · ${result.city}`:""} · ${result.source}. ${t("This identifies the bank, not the account holder.")}`);
     }catch(error){
       setRoutingMessage(error instanceof Error?error.message:"Bank lookup unavailable. Enter the bank name manually.");
     }finally{setRoutingLoading(false);}
