@@ -215,15 +215,18 @@ export async function revokeUserSession(formData: FormData) {
 export async function recordIdentityVerificationResult(formData: FormData) {
   const supabase = await requireAdmin();
   const attemptId = String(formData.get("attempt_id") || "");
+  const integrityStatus = String(formData.get("document_integrity_status") || "needs_review");
   const documentStatus = String(formData.get("document_authenticity_status") || "");
   const livenessStatus = String(formData.get("liveness_status") || "");
   const summary = String(formData.get("result_summary") || "").trim().slice(0, 500);
-  if (!attemptId || !["provider_passed", "provider_failed", "manual_review"].includes(documentStatus)
+  if (!attemptId || !["not_checked", "valid_format", "invalid_format", "needs_review"].includes(integrityStatus)
+      || !["provider_passed", "provider_failed", "manual_review"].includes(documentStatus)
       || !["passed", "failed", "manual_review", "unavailable"].includes(livenessStatus)) {
     redirect("/admin/kyc?kind=error&message=Choose%20valid%20document%20and%20liveness%20results.");
   }
   const { error } = await supabase.rpc("admin_record_identity_verification_result", {
     p_attempt_id: attemptId,
+    p_document_integrity_status: integrityStatus,
     p_document_authenticity_status: documentStatus,
     p_liveness_status: livenessStatus,
     p_result_summary: summary || null,
