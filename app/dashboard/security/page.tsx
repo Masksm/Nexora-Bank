@@ -10,7 +10,7 @@ import { saveTransactionPin } from "./actions";
 import { MfaManager } from "./mfa-manager";
 
 export const dynamic="force-dynamic";
-type Props={searchParams:Promise<{error?:string;success?:string}>};
+type Props={searchParams:Promise<{error?:string;success?:string;pin_saved?:string}>};
 
 export default async function SecurityPage({searchParams}:Props){
   const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
