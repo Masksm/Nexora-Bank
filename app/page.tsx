@@ -35,7 +35,7 @@ export default async function Home() {
   return (
     <main>
       <nav className="nav shell">
-        <Link className="brand" href="/" aria-label="Nexora Bank home">
+        <Link className="brand" href="/" aria-label={t("Nexora Bank home")}>
           <span className="brand-mark">N</span>
           <span>NEXORA<span className="brand-light"> BANK</span></span>
         </Link>
@@ -51,8 +51,7 @@ export default async function Home() {
           <div className="eyebrow"><span className="pulse" /> {t("A clearer way to bank")}</div>
           <h1>{t("Your money.")}<br /><em>{t("In better")}</em> {t("hands.")}</h1>
           <p className="hero-text">
-            A considered banking experience that puts clarity, control and
-            confidence at the centre of every interaction.
+            {t("A considered banking experience that puts clarity, control and confidence at the centre of every interaction.")}
           </p>
           <div className="hero-actions">
             <Link className="button-primary" href="/register">{t("Open an account")} <ArrowRight size={17} /></Link>
@@ -106,7 +105,7 @@ export default async function Home() {
 
       <footer className="footer shell">
         <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
-        <span>© {new Date().getFullYear()} Nexora Bank. A digital banking experience.</span>
+        <span>© {new Date().getFullYear()} Nexora Bank. {t("A digital banking experience.")}</span>
         <Link className="footer-note" href="/policy">{t("Policies")}</Link>
       </footer>
     </main>
