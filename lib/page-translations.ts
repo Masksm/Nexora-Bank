@@ -589,6 +589,7 @@ for (const locale of ["es","fr","pt","de"] as const) {
     de:"Die Aktion konnte nicht abgeschlossen werden. Prüfen Sie die Angaben und versuchen Sie es erneut."
   } as const;
   dynamicErrorTranslations[locale].push([/(failed|could not|unable to|unexpected error|operation error)/i, generic[locale]]);
+  dynamicErrorTranslations[locale].push([/(not allowed|not configured|unsupported|invalid .*|cannot |can't |must be )/i, generic[locale]]);
 }
 
 for (const locale of ["es","fr","pt","de"] as const) {
