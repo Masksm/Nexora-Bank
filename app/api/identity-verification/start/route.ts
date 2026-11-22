@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
   let provider: "nexora_sandbox" | "persona_sandbox" = "nexora_sandbox";
   let providerReference: string | null = null;
   let launchUrl: string | null = null;
-  let resultSummary = "Your document has been submitted to the identity review workflow.";
+  let resultSummary = "Your document has been submitted for review. You will receive an update when the review is complete.";
 
   const personaKey = process.env.PERSONA_API_KEY || "";
   const personaTemplate = process.env.PERSONA_INQUIRY_TEMPLATE_ID || "";
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
           data: {
             attributes: {
               "inquiry-template-id": personaTemplate,
-              "reference-id": user.id,
+              "reference-id": randomUUID(),
             },
           },
         }),
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "The identity provider could not be reached. Please try again." }, { status: 503 });
     }
   } else {
-    resultSummary = "Your document is queued for staff review. Automated provider checks are not connected yet.";
+    resultSummary = "Your document has been submitted for review. You will receive an update when the review is complete.";
   }
 
   const { data: attempt, error: startError } = await supabase.rpc("start_identity_verification", {
