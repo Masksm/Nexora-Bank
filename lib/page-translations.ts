@@ -634,6 +634,16 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], values);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const values = {
+    es: {"active":"activa","frozen":"congelada","blocked":"bloqueada","closed":"cerrada","checking":"corriente","savings":"ahorro","ACCOUNT":"CUENTA","saved of":"ahorrado de","No target date":"Sin fecha objetivo","Freeze card":"Congelar tarjeta","Activate card":"Activar tarjeta","Review required":"Revisión necesaria","completed":"completada","paused":"en pausa"},
+    fr: {"active":"active","frozen":"gelé","blocked":"bloqué","closed":"clôturé","checking":"courant","savings":"épargne","ACCOUNT":"COMPTE","saved of":"épargné sur","No target date":"Aucune date cible","Freeze card":"Bloquer la carte","Activate card":"Activer la carte","Review required":"Examen requis","completed":"terminé","paused":"en pause"},
+    pt: {"active":"ativa","frozen":"congelada","blocked":"bloqueada","closed":"encerrada","checking":"à ordem","savings":"poupança","ACCOUNT":"CONTA","saved of":"poupado de","No target date":"Sem data prevista","Freeze card":"Congelar cartão","Activate card":"Ativar cartão","Review required":"Revisão necessária","completed":"concluída","paused":"em pausa"},
+    de: {"active":"aktiv","frozen":"eingefroren","blocked":"gesperrt","closed":"geschlossen","checking":"Girokonto","savings":"Sparkonto","ACCOUNT":"KONTO","saved of":"gespart von","No target date":"Kein Zieldatum","Freeze card":"Karte sperren","Activate card":"Karte aktivieren","Review required":"Prüfung erforderlich","completed":"abgeschlossen","paused":"pausiert"}
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], values);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
