@@ -46,8 +46,8 @@ export default async function AccountsPage({ searchParams }: Props) {
         <section className="account-list">
           {(accounts ?? []).map((account) => (
             <article className="account-detail-card" key={account.account_id}>
-              <div className="account-detail-top"><span className="account-detail-icon"><Wallet size={20}/></span><span className={account.status === "active" ? "account-status" : "account-status inactive"}>{account.status}</span></div>
-              <div className="account-detail-name"><span>{account.account_type} ACCOUNT</span><h2>{account.nickname || account.account_name}</h2></div>
+              <div className="account-detail-top"><span className="account-detail-icon"><Wallet size={20}/></span><span className={account.status === "active" ? "account-status" : "account-status inactive"}>{t(account.status)}</span></div>
+              <div className="account-detail-name"><span>{t(account.account_type.toLowerCase())} {t("ACCOUNT")}</span><h2>{account.nickname || account.account_name}</h2></div>
               <strong className="account-detail-balance">{money(Number(account.balance_minor), account.currency, locale)}</strong>
               <div className="account-number-line"><div><span>{t("ACCOUNT NUMBER")}</span><strong>{account.account_number}</strong></div><CopyButton value={account.account_number}/></div>
               <form action={updateAccountNickname} className="account-nickname-form"><input type="hidden" name="account_id" value={account.account_id}/><label>{t("Account nickname")}<input name="nickname" defaultValue={account.nickname || ""} maxLength={40} minLength={2} placeholder={account.account_name}/></label><button type="submit">{t("Save name")}</button></form>
