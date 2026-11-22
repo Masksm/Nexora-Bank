@@ -220,8 +220,8 @@ export async function recordIdentityVerificationResult(formData: FormData) {
   const livenessStatus = String(formData.get("liveness_status") || "");
   const summary = String(formData.get("result_summary") || "").trim().slice(0, 500);
   if (!attemptId || !["not_checked", "valid_format", "invalid_format", "needs_review"].includes(integrityStatus)
-      || !["provider_passed", "provider_failed", "manual_review"].includes(documentStatus)
-      || !["passed", "failed", "manual_review", "unavailable"].includes(livenessStatus)) {
+      || !["not_checked", "provider_passed", "provider_failed", "manual_review"].includes(documentStatus)
+      || !["not_started", "passed", "failed", "manual_review", "unavailable"].includes(livenessStatus)) {
     redirect("/admin/kyc?kind=error&message=Choose%20valid%20document%20and%20liveness%20results.");
   }
   const { error } = await supabase.rpc("admin_record_identity_verification_result", {
