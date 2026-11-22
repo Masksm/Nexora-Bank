@@ -8,7 +8,7 @@ import {createClient} from "@/lib/supabase/server";
 import {openCurrencyAccount} from "./actions";
 import {ConversionForm} from "./conversion-form";
 export const dynamic="force-dynamic";
-const currencies=["USD","EUR","GBP","NGN","CAD","AUD","CHF","JPY","SGD","ZAR"];
+const currencies=["USD","EUR","GBP","NGN","CAD","AUD","CHF","SGD","ZAR"];
 function money(amount:number,currency:string,locale:SupportedLocale){return new Intl.NumberFormat(locale,{style:"currency",currency}).format(amount/100);}
 export default async function CurrenciesPage({searchParams}:{searchParams:Promise<{error?:string;opened?:string;converted?:string}>}){
  const locale=((await cookies()).get("nexora_locale")?.value||"en") as SupportedLocale;const t=(v:string)=>pageText(locale,v);
