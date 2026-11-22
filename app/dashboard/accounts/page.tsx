@@ -40,7 +40,7 @@ export default async function AccountsPage({ searchParams }: Props) {
         <div className="workspace-total"><span>{t("COMBINED USD BALANCE")}</span><strong>{money(total, "USD", locale)}</strong></div>
       </section>
       {params.error && <div className="workspace-alert">{params.error}</div>}
-      {params.success && <div className="transfer-success">Account nickname updated.</div>}
+      {params.success && <div className="transfer-success">{t("Account nickname updated.")}</div>}
       {error ? <div className="workspace-alert">{t("We couldn’t load your accounts. Please refresh and try again.")}</div> :
         (accounts ?? []).length === 0 ? <div className="workspace-empty"><Wallet size={25}/><h2>{t("No account yet")}</h2><p>{t("Your checking account will appear here after registration is completed.")}</p></div> :
         <section className="account-list">
@@ -50,12 +50,12 @@ export default async function AccountsPage({ searchParams }: Props) {
               <div className="account-detail-name"><span>{account.account_type} ACCOUNT</span><h2>{account.nickname || account.account_name}</h2></div>
               <strong className="account-detail-balance">{money(Number(account.balance_minor), account.currency, locale)}</strong>
               <div className="account-number-line"><div><span>{t("ACCOUNT NUMBER")}</span><strong>{account.account_number}</strong></div><CopyButton value={account.account_number}/></div>
-              <form action={updateAccountNickname} className="account-nickname-form"><input type="hidden" name="account_id" value={account.account_id}/><label>Account nickname<input name="nickname" defaultValue={account.nickname || ""} maxLength={40} minLength={2} placeholder={account.account_name}/></label><button type="submit">Save name</button></form>
+              <form action={updateAccountNickname} className="account-nickname-form"><input type="hidden" name="account_id" value={account.account_id}/><label>{t("Account nickname")}<input name="nickname" defaultValue={account.nickname || ""} maxLength={40} minLength={2} placeholder={account.account_name}/></label><button type="submit">{t("Save name")}</button></form>
               <div className="account-detail-foot"><span>{account.currency} · {account.account_type}</span><Link href="/dashboard/transfers">{t("Make a transfer")} <ArrowUpRight size={14}/></Link></div>
             </article>
           ))}
         </section>}
-      <p className="workspace-disclaimer">Balances are calculated from posted internal ledger entries. Nexora Bank does not hold or transfer real-world funds.</p>
+      <p className="workspace-disclaimer">{t("Balances are calculated from posted internal ledger entries. Nexora Bank does not hold or transfer real-world funds.")}</p>
     </main>
   );
 }
