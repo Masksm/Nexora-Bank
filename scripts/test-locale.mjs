@@ -12,7 +12,7 @@ test("automatic language uses country before browser language", () => {
 });
 
 test("automatic language falls back to browser language when country is unsupported", () => {
-  assert.equal(resolveLocale("auto", "fr-CA,fr;q=0.9,en;q=0.8", "NG"), "fr");
+  assert.equal(resolveLocale("auto", "fr-CA,fr;q=0.9,en;q=0.8", "ZZ"), "fr");
 });
 
 test("automatic language falls back to English when no supported signal exists", () => {
