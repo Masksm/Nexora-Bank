@@ -558,6 +558,28 @@ for (const locale of ["es","fr","pt","de"] as const) {
     "The uploaded document could not be read. Upload it again.": ({es:"No se pudo leer el documento cargado. Vuelve a cargarlo.",fr:"Le document envoyé n’a pas pu être lu. Envoyez-le à nouveau.",pt:"Não foi possível ler o documento carregado. Carregue-o novamente.",de:"Das hochgeladene Dokument konnte nicht gelesen werden. Laden Sie es erneut hoch."} as const)[locale]
   });
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const translations = {
+    es: {
+      "Passport":"Pasaporte","National identity card":"Documento nacional de identidad","Driver's licence":"Permiso de conducir","Identity document":"Documento de identidad",
+      "pending":"pendiente","needs review":"requiere revisión","approved":"aprobado","declined":"rechazado","provider passed":"aprobado por el proveedor","provider failed":"rechazado por el proveedor","manual review":"revisión manual","not started":"no iniciado","unavailable":"no disponible","submitted":"enviado","under review":"en revisión","verified":"verificado","rejected":"rechazado"
+    },
+    fr: {
+      "Passport":"Passeport","National identity card":"Carte nationale d’identité","Driver's licence":"Permis de conduire","Identity document":"Document d’identité",
+      "pending":"en attente","needs review":"examen requis","approved":"approuvé","declined":"refusé","provider passed":"validé par le fournisseur","provider failed":"refusé par le fournisseur","manual review":"examen manuel","not started":"non commencé","unavailable":"indisponible","submitted":"soumis","under review":"en cours d’examen","verified":"vérifié","rejected":"rejeté"
+    },
+    pt: {
+      "Passport":"Passaporte","National identity card":"Cartão de cidadão","Driver's licence":"Carta de condução","Identity document":"Documento de identidade",
+      "pending":"pendente","needs review":"necessita de revisão","approved":"aprovado","declined":"recusado","provider passed":"aprovado pelo fornecedor","provider failed":"reprovado pelo fornecedor","manual review":"revisão manual","not started":"não iniciado","unavailable":"indisponível","submitted":"submetido","under review":"em análise","verified":"verificado","rejected":"rejeitado"
+    },
+    de: {
+      "Passport":"Reisepass","National identity card":"Personalausweis","Driver's licence":"Führerschein","Identity document":"Identitätsdokument",
+      "pending":"ausstehend","needs review":"Prüfung erforderlich","approved":"genehmigt","declined":"abgelehnt","provider passed":"vom Anbieter bestätigt","provider failed":"vom Anbieter abgelehnt","manual review":"manuelle Prüfung","not started":"nicht gestartet","unavailable":"nicht verfügbar","submitted":"eingereicht","under review":"in Prüfung","verified":"verifiziert","rejected":"abgelehnt"
+    }
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], translations);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
