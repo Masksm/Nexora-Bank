@@ -60,7 +60,7 @@ export default async function HelpPage({ searchParams }: Props) {
     </section>
     {selected && <section className="workspace-panel support-thread">
       <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("CONVERSATION")}</span><h2>{selected.subject}</h2></div><span className="workspace-count">{selected.status.replaceAll("_"," ")}</span></div>
-      <div className="support-payment-procedures">{(paymentProcedures ?? []).map((procedure)=><PaymentProcedureCard key={procedure.id} procedure={procedure} conversationId={selected.id} receipts={receiptsByProcedure.get(procedure.id)??[]}/>)}</div>
+      <div className="support-payment-procedures">{(paymentProcedures ?? []).map((procedure)=><PaymentProcedureCard key={procedure.id} procedure={procedure} conversationId={selected.id} receipts={receiptsByProcedure.get(procedure.id)??[]} locale={locale}/>)}</div>
       <SupportLiveChat conversationId={selected.id} initialMessages={messages??[]} viewerRole="customer" locale={locale} disabled={selected.status==="resolved"||selected.status==="closed"}/>
     </section>}
     <p className="workspace-disclaimer">{t("Never share passwords, one-time codes, full card numbers or other sensitive credentials in support messages.")}</p>
