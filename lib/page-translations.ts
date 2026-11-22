@@ -673,6 +673,16 @@ for (const locale of ["es","fr","pt","de"] as const) {
     } as const)[locale]
   });
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const translations = {
+    es: {"FILE INTEGRITY":"INTEGRIDAD DEL ARCHIVO","File integrity result":"Resultado de integridad del archivo","Valid format":"Formato válido","Invalid format":"Formato no válido","Not checked":"No comprobado","not checked":"no comprobado","valid format":"formato válido","invalid format":"formato no válido","needs review":"requiere revisión"},
+    fr: {"FILE INTEGRITY":"INTÉGRITÉ DU FICHIER","File integrity result":"Résultat d’intégrité du fichier","Valid format":"Format valide","Invalid format":"Format invalide","Not checked":"Non vérifié","not checked":"non vérifié","valid format":"format valide","invalid format":"format invalide","needs review":"examen requis"},
+    pt: {"FILE INTEGRITY":"INTEGRIDADE DO FICHEIRO","File integrity result":"Resultado da integridade do ficheiro","Valid format":"Formato válido","Invalid format":"Formato inválido","Not checked":"Não verificado","not checked":"não verificado","valid format":"formato válido","invalid format":"formato inválido","needs review":"necessita de revisão"},
+    de: {"FILE INTEGRITY":"DATEIINTEGRITÄT","File integrity result":"Ergebnis der Dateiintegrität","Valid format":"Gültiges Format","Invalid format":"Ungültiges Format","Not checked":"Nicht geprüft","not checked":"nicht geprüft","valid format":"gültiges Format","invalid format":"ungültiges Format","needs review":"Prüfung erforderlich"}
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], translations);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
