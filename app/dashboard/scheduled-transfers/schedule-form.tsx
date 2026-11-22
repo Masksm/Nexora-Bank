@@ -5,25 +5,26 @@ import { createScheduledTransfer } from "./actions";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
 
-type Account = { account_id: string; account_number: string; nickname: string | null; account_name: string; balance_minor: number };
+type Account = { account_id: string; account_number: string; nickname: string | null; account_name: string; balance_minor: number; currency: string };
 
 export default function ScheduleTransferForm({ accounts, locale }: { accounts: Account[]; locale: SupportedLocale }) {
   const t=(value:string)=>pageText(locale,value);
+  const [accountId,setAccountId]=useState(accounts[0]?.account_id??"");
   const [localDate, setLocalDate] = useState("");
   const [utcDate, setUtcDate] = useState("");
   return (
     <form action={createScheduledTransfer} className="transfer-form">
       <label>Pay from
-        <select name="account_id" required>
+        <select name="account_id" value={accountId} onChange={event=>setAccountId(event.target.value)} required>
           {accounts.map((account) => <option key={account.account_id} value={account.account_id}>
-            {(account.nickname || account.account_name)} · {account.account_number} · ${(Number(account.balance_minor) / 100).toFixed(2)}
+            {(account.nickname || account.account_name)} · {account.account_number} · {new Intl.NumberFormat(locale,{style:"currency",currency:account.currency}).format(Number(account.balance_minor)/100)}
           </option>)}
         </select>
       </label>
       <label>Recipient account number
         <input name="recipient" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder={t("10-digit Nexora account number")} required />
       </label>
-      <label>Amount (USD)
+      <label>Amount ({accounts.find(account=>account.account_id===accountId)?.currency??"USD"})
         <input name="amount" type="number" min="0.01" step="0.01" placeholder={t("250.00")} required />
       </label>
       <label>Schedule date and time
@@ -43,6 +44,7 @@ export default function ScheduleTransferForm({ accounts, locale }: { accounts: A
       <label>Description (optional)
         <input name="description" maxLength={160} placeholder={t("What is this transfer for?")} />
       </label>
+      <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required/></label>
       <button type="submit" disabled={!utcDate}>{t("Save scheduled transfer")}</button>
       <p>{t("When due, the transfer is submitted to security review. It will not affect either balance until an administrator approves it.")}</p>
     </form>
