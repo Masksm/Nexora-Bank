@@ -296,8 +296,6 @@ export async function issueSupportPaymentProcedure(formData: FormData) {
   if (!addressChecksumValid) {
     redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("The address checksum or network format is invalid. Recheck the receiving address in the selected wallet."));
   }
-    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("Choose a supported asset/network, enter an address in the accepted format, and provide a valid amount and purpose."));
-  }
   const { error } = await supabase.rpc("create_support_payment_procedure", { p_conversation_id: conversationId, p_cryptocurrency: selected.cryptocurrency, p_network: selected.network, p_wallet_address: walletAddress, p_expected_amount: amountRaw, p_amount_currency: selected.cryptocurrency, p_purpose: purpose });
   if (error) redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent(error.message));
   revalidatePath("/admin/support");
