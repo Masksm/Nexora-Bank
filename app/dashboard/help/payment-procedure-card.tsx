@@ -37,19 +37,14 @@ export function PaymentProcedureCard({procedure,conversationId}:{procedure:Proce
       const path=user.id+"/"+procedure.id+"/"+crypto.randomUUID()+"-"+safeName;
       const {error:uploadError}=await supabase.storage.from("payment-receipts").upload(path,file,{contentType:file.type,upsert:false});
       if(uploadError)throw uploadError;
-      const {data:receipt,error:insertError}=await supabase.from("support_payment_receipts").insert({
+      const {error:insertError}=await supabase.from("support_payment_receipts").insert({
         procedure_id:procedure.id,conversation_id:conversationId,customer_user_id:user.id,
         storage_path:path,original_filename:file.name.slice(0,255),mime_type:file.type,file_size_bytes:file.size
-      }).select("id").single();
+      });
       if(insertError){
         await supabase.storage.from("payment-receipts").remove([path]);
         throw insertError;
       }
-      const {error:messageError}=await supabase.from("support_messages").insert({
-        conversation_id:conversationId,sender_user_id:user.id,sender_role:"customer",
-        body:"Payment receipt uploaded for review. Receipt reference: "+receipt.id
-      });
-      if(messageError)throw messageError;
       setUploadSuccess("Receipt received and added to the payment audit record.");
       router.refresh();
     }catch(error){
