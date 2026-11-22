@@ -169,6 +169,7 @@ export default async function AdminKycPage({ searchParams }: Props) {
                             </label>
                             <label>{t("Document authenticity result")}
                               <select name="document_authenticity_status" defaultValue={attempt.document_authenticity_status==="provider_passed"||attempt.document_authenticity_status==="provider_failed"?attempt.document_authenticity_status:"manual_review"}>
+                                <option value="not_checked">{t("Not checked")}</option>
                                 <option value="provider_passed">{t("Passed")}</option>
                                 <option value="provider_failed">{t("Failed")}</option>
                                 <option value="manual_review">{t("Needs manual review")}</option>
@@ -176,6 +177,7 @@ export default async function AdminKycPage({ searchParams }: Props) {
                             </label>
                             <label>{t("Liveness result")}
                               <select name="liveness_status" defaultValue={["passed","failed","manual_review","unavailable"].includes(attempt.liveness_status)?attempt.liveness_status:"manual_review"}>
+                                <option value="not_started">{t("Not started")}</option>
                                 <option value="passed">{t("Passed")}</option>
                                 <option value="failed">{t("Failed")}</option>
                                 <option value="manual_review">{t("Needs manual review")}</option>
