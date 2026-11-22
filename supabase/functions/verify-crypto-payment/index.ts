@@ -28,16 +28,20 @@ async function verifyTron(address: string, txHash: string, expected: string) {
   const response = await fetch(url, { headers: { accept: "application/json" } });
   if (!response.ok) throw new Error(`TRON explorer returned HTTP ${response.status}.`);
   const payload = await response.json();
-  const tx = (payload.data ?? []).find((item: any) =>
+  const transfers = (payload.data ?? []).filter((item: any) =>
     String(item.transaction_id ?? "").toLowerCase() === txHash.toLowerCase()
   );
-  if (!tx) return { state: "not_found", confirmations: 0, detail: "Transaction was not found in the confirmed TRC-20 history for this receiving address." };
-  const tokenAddress = String(tx.token_info?.address ?? "");
-  const destination = String(tx.to ?? "");
-  const amount = decimalUnits(String(tx.value ?? ""), 6);
+  if (!transfers.length) return { state: "not_found", confirmations: 0, detail: "Transaction was not found in the confirmed TRC-20 history for this receiving address." };
   const expectedUnits = decimalUnits(expected, 6);
-  if (tokenAddress !== contract || destination !== address || amount === null || expectedUnits === null || amount !== expectedUnits) {
-    return { state: "mismatch", confirmations: 1, detail: "The transaction exists, but its token contract, receiving address or exact amount does not match this payment instruction." };
+  const allMatch = transfers.every((item: any) =>
+    String(item.token_info?.address ?? "") === contract && String(item.to ?? "") === address
+  );
+  const receivedUnits = transfers.reduce((sum: bigint, item: any) => {
+    const units = decimalUnits(String(item.value ?? ""), 6);
+    return sum + (units ?? 0n);
+  }, 0n);
+  if (!allMatch || expectedUnits === null || receivedUnits !== expectedUnits) {
+    return { state: "mismatch", confirmations: 1, detail: "The transaction exists, but its token contract, receiving address or total amount does not match this payment instruction." };
   }
   return { state: "verified", confirmations: 1, detail: "Confirmed USDT TRC-20 transfer matched the payment instruction. TRON solidified transaction history was used." };
 }
