@@ -5,12 +5,12 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const ibanLengths:Record<string,number>={
-  AT:20,BE:16,BG:22,CH:21,CY:28,CZ:24,DE:22,DK:18,EE:20,ES:24,FI:18,
+  GB:22,AT:20,BE:16,BG:22,CH:21,CY:28,CZ:24,DE:22,DK:18,EE:20,ES:24,FI:18,
   FR:27,GB:22,GR:27,HR:21,HU:28,IE:22,IS:26,IT:27,LI:21,LT:20,LU:20,
   LV:21,MC:27,MD:24,ME:22,MK:19,MT:31,NL:18,NO:15,PL:28,PT:25,RO:24,
   RS:22,SE:24,SI:19,SK:24,SM:27,TR:26,UA:29,VA:22
 };
-const ibanCountries = new Set(Object.keys(ibanLengths));
+const ibanCountries = new Set(Object.keys(ibanLengths).filter((code)=>code!=="GB"));
 const supportedCountries = new Set(["NX","US","GB",...ibanCountries]);
 
 function validIban(value:string){
@@ -57,6 +57,9 @@ export async function addBeneficiary(formData:FormData){
   if(country==="GB" && (!/^\d{6}$/.test(sortCode) || !/^\d{8}$/.test(account))){
     redirect("/dashboard/beneficiaries?error=Enter%20a%206-digit%20UK%20sort%20code%20and%208-digit%20account%20number.");
   }
+  if(country==="GB" && iban && (iban.length!==22 || !validIban(iban) || iban.slice(8,14)!==sortCode || iban.slice(14,22)!==account)){
+    redirect("/dashboard/beneficiaries?error=The%20UK%20IBAN%20does%20not%20match%20the%20sort%20code%20and%20account%20number.");
+  }
   if(ibanCountries.has(country) && (iban.length!==ibanLengths[country] || !validIban(iban) || iban.slice(0,2)!==country)){
     redirect("/dashboard/beneficiaries?error=Enter%20a%20valid%20IBAN.");
   }
@@ -73,7 +76,7 @@ export async function addBeneficiary(formData:FormData){
     account_number:ibanCountries.has(country) ? null : account,
     routing_number:country==="US"?routing:null,
     sort_code:country==="GB"?sortCode:null,
-    iban:ibanCountries.has(country)?iban:null,
+    iban:country==="GB"&&iban?iban:ibanCountries.has(country)?iban:null,
     bic:bic||null,
     verification_status:"unverified",
     verification_method:null,
