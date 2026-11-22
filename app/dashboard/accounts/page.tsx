@@ -27,7 +27,7 @@ export default async function AccountsPage({ searchParams }: Props) {
     .select("account_id,account_number,account_name,nickname,account_type,currency,status,balance_minor")
     .eq("user_id", user.id);
 
-  const total = (accounts ?? []).reduce((sum, account) => sum + Number(account.balance_minor ?? 0), 0);
+  const total = (accounts ?? []).filter(account => account.currency === "USD").reduce((sum, account) => sum + Number(account.balance_minor ?? 0), 0);
 
   return (
     <main className="workspace-shell">
@@ -37,7 +37,7 @@ export default async function AccountsPage({ searchParams }: Props) {
       </header>
       <section className="workspace-intro">
         <div><span className="workspace-kicker">{t("YOUR MONEY, ORGANIZED")}</span><h1>{t("Accounts")}</h1><p>{t("View your account details and available balances.")}</p></div>
-        <div className="workspace-total"><span>{t("COMBINED USD BALANCE")}</span><strong>{money(total, "USD", locale)}</strong></div>
+        <div className="workspace-total"><span>{t("USD BALANCE TOTAL")}</span><strong>{money(total, "USD", locale)}</strong></div>
       </section>
       {params.error && <div className="workspace-alert">{params.error}</div>}
       {params.success && <div className="transfer-success">{t("Account nickname updated.")}</div>}
