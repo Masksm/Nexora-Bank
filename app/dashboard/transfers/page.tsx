@@ -30,7 +30,7 @@ export default async function TransfersPage({ searchParams }: Props) {
 
   return <main className="workspace-shell">
     <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">NEXORA BANK · {t("PAYMENTS")}</span></header>
-    <section className="workspace-intro"><div><span className="workspace-kicker">{t("MOVE MONEY")}</span><h1>{t("Transfers")}</h1><p>{t("Send an internal transfer to another active Nexora account.")}</p></div><Link href="/dashboard/scheduled-transfers" className="workspace-download">Schedule a transfer</Link></section>
+    <section className="workspace-intro"><div><span className="workspace-kicker">{t("MOVE MONEY")}</span><h1>{t("Transfers")}</h1><p>{t("Send an internal transfer to another active Nexora account.")}</p></div><Link href="/dashboard/scheduled-transfers" className="workspace-download">{t("Schedule a transfer")}</Link></section>
     {params.error && <div className="workspace-alert">{params.error}</div>}
     {params.success && <div className="transfer-success"><ShieldCheck size={19}/> {t("Transfer posted successfully. Your ledger has been updated.")}</div>}
     {params.review && <div className="transfer-review"><ShieldCheck size={19}/><div><strong>{t("Transfer held for security review")}</strong><p>{t("This device is not yet trusted. The transfer has not changed either account balance. Customer care will review it before it can be posted.")}</p><Link href="/dashboard/help">{t("Contact customer care")} <ArrowUpRight size={14}/></Link></div></div>}
@@ -40,7 +40,7 @@ export default async function TransfersPage({ searchParams }: Props) {
         <form action={submitTransfer} className="transfer-form">
           <label>{t("Pay from")}<select name="account_id" required>{activeAccounts.map((account)=><option key={account.account_id} value={account.account_id}>{account.account_name} · {account.account_number} · {money(Number(account.balance_minor), locale)}</option>)}</select></label>
           <label>{t("Recipient account number")}<input name="recipient" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder={t("10-digit Nexora account number")} required/></label>
-          <label>{t("Amount (USD)")}<input name="amount" type="number" min="0.01" step="0.01" placeholder="250.00" required/></label>
+          <label>{t("Amount (USD)")}<input name="amount" type="number" min="0.01" step="0.01" placeholder={t("250.00")} required/></label>
           <label>{t("Description (optional)")}<input name="description" maxLength={160} placeholder={t("What is this transfer for?")}/></label>
           <button type="submit">{t("Review and send transfer")} <ArrowUpRight size={15}/></button>
           <p>{t("Transfers from new or unrecognized devices are held for manual security review before processing.")}</p>
