@@ -28,7 +28,7 @@ export function MfaManager(){
   setChallengeId(challenge.id);
   const {error}=await supabase.auth.mfa.verify({factorId,challengeId:challenge.id,code:code.trim()});
   setBusy(false);
-  if(error){setMessage(error.message);return;}
+  if(error){setMessage(error.message);void supabase.rpc("record_operations_event",{p_severity:"warning",p_category:"authentication",p_service:"MFA enrollment",p_operation:"verification_failed",p_error_code:"MFA_VERIFY_FAILED",p_request_path:"/dashboard/security"});return;}
   setQr("");setSecret("");setFactorId("");setChallengeId("");setCode("");setMessage("Authenticator MFA is now enabled for this account.");await refresh();
  }
  async function remove(id:string){
