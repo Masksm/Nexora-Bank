@@ -23,6 +23,7 @@ export default function PlaidNameCheck({ beneficiaryId, locale }: {
 }) {
   const t = (value: string) => pageText(locale, value);
   const [scriptReady, setScriptReady] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [matched, setMatched] = useState<boolean | null>(null);
@@ -76,7 +77,11 @@ export default function PlaidNameCheck({ beneficiaryId, locale }: {
   return (
     <div className="beneficiary-name-check">
       <Script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js" strategy="afterInteractive" onReady={() => setScriptReady(true)} />
-      <button type="button" onClick={startCheck} disabled={busy || !scriptReady}>
+      <label className="directory-consent-row">
+        <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+        {t("I agree to connect a US bank Sandbox account for an account-holder name check.")}
+      </label>
+      <button type="button" onClick={startCheck} disabled={busy || !scriptReady || !consent}>
         {busy ? t("Checking…") : t("Check account-holder name")}
       </button>
       {message && <small className={matched === true ? "name-check-match" : matched === false ? "name-check-no-match" : ""} role="status">{message}</small>}
