@@ -79,7 +79,7 @@ export default function PlaidNameCheck({ beneficiaryId, locale }: {
       <Script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js" strategy="afterInteractive" onReady={() => setScriptReady(true)} />
       <label className="directory-consent-row">
         <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
-        {t("I agree to connect a US bank Sandbox account for an account-holder name check.")}
+        {t("I agree to connect a US bank account for an account-holder name check.")}
       </label>
       <button type="button" onClick={startCheck} disabled={busy || !scriptReady || !consent}>
         {busy ? t("Checking…") : t("Check account-holder name")}
