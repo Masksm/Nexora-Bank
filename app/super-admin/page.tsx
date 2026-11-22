@@ -58,6 +58,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <a href="#assignments"><Users size={16}/> {t("Customer access")}</a>
           <a href="#promote"><UserCog size={16}/> {t("Role management")}</a>
           <a href="#oversight"><Eye size={16}/> {t("Support oversight")}</a>
+          <Link href="/super-admin/operations"><Activity size={16}/> Operations monitoring</Link>
           <Link href="/super-admin/audit"><ShieldCheck size={16}/> Global audit log</Link>
           <a href="#payment-audit"><ShieldCheck size={16}/> Crypto payment audit</a>          <a href="#accounts"><Trash2 size={16}/> {t("Account management")}</a>
           <Link href="/admin"><LockKeyhole size={16}/> {t("Legacy admin operations")}</Link>
