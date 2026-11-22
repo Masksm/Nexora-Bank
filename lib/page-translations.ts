@@ -580,6 +580,16 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], translations);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const generic = {
+    es:"No se pudo completar la acción. Revisa los datos e inténtalo de nuevo.",
+    fr:"L’action n’a pas pu être effectuée. Vérifiez les informations et réessayez.",
+    pt:"Não foi possível concluir a ação. Reveja os dados e tente novamente.",
+    de:"Die Aktion konnte nicht abgeschlossen werden. Prüfen Sie die Angaben und versuchen Sie es erneut."
+  } as const;
+  dynamicErrorTranslations[locale].push([/(failed|could not|unable to|unexpected error|operation error)/i, generic[locale]]);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
