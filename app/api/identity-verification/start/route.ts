@@ -96,7 +96,16 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({
-    attempt,
+    attempt: {
+      id: attempt.id,
+      identity_document_id: documentId,
+      provider,
+      provider_reference: providerReference,
+      provider_launch_url: launchUrl,
+      status: attempt.status,
+      result_summary: resultSummary,
+      created_at: new Date().toISOString(),
+    },
     provider,
     launchUrl,
     message: resultSummary,
