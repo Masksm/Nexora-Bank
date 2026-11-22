@@ -248,6 +248,56 @@ for (const locale of ["es","fr","pt","de"] as const) {
   Object.assign(settingsAndHistoryTranslations[locale], beneficiaryFormTranslations[locale]);
 }
 
+
+Object.assign(settingsAndHistoryTranslations.es, {
+ "Bank connection is still loading. Try again.":"La conexión bancaria aún se está cargando. Inténtalo de nuevo.",
+ "Unable to start bank connection.":"No se pudo iniciar la conexión bancaria.",
+ "Checking the account-holder name…":"Comprobando el nombre del titular de la cuenta…",
+ "The name check could not be completed.":"No se pudo completar la comprobación del nombre.",
+ "The linked Sandbox account number does not match the saved beneficiary account.":"El número de cuenta de prueba vinculado no coincide con la cuenta del beneficiario guardada.",
+ "The account-holder name matched in the Sandbox identity response.":"El nombre del titular coincide con la respuesta de identidad de prueba.",
+ "The saved recipient name did not exactly match the Sandbox account-holder name.":"El nombre del beneficiario guardado no coincide exactamente con el nombre del titular de prueba.",
+ "Plaid Sandbox credentials are not configured.":"Las credenciales de Plaid Sandbox no están configuradas.",
+ "Check account-holder name":"Comprobar el nombre del titular","Checking…":"Comprobando…","Name matched":"Nombre coincidente","Name verified":"Nombre verificado","Name not independently verified":"Nombre no verificado de forma independiente",
+ "Bundesbank directory match":"Coincidencia en el directorio del Bundesbank","not listed":"no indicado","No matching German bank code was found.":"No se encontró el código bancario alemán.","Bank lookup unavailable.":"La búsqueda bancaria no está disponible.","UK bank lookup unavailable. Enter the bank name manually.":"La búsqueda bancaria del Reino Unido no está disponible. Introduce el nombre del banco manualmente.","Bank lookup unavailable. Enter the bank name manually.":"La búsqueda bancaria no está disponible. Introduce el nombre del banco manualmente.","Bank lookup unavailable.":"La búsqueda bancaria no está disponible."
+});
+Object.assign(settingsAndHistoryTranslations.fr, {
+ "Bank connection is still loading. Try again.":"La connexion bancaire est en cours de chargement. Réessayez.",
+ "Unable to start bank connection.":"Impossible de démarrer la connexion bancaire.",
+ "Checking the account-holder name…":"Vérification du nom du titulaire du compte…",
+ "The name check could not be completed.":"La vérification du nom n’a pas pu être terminée.",
+ "The linked Sandbox account number does not match the saved beneficiary account.":"Le numéro de compte Sandbox connecté ne correspond pas au compte bénéficiaire enregistré.",
+ "The account-holder name matched in the Sandbox identity response.":"Le nom du titulaire correspond à la réponse d’identité Sandbox.",
+ "The saved recipient name did not exactly match the Sandbox account-holder name.":"Le nom du bénéficiaire enregistré ne correspond pas exactement au nom du titulaire Sandbox.",
+ "Plaid Sandbox credentials are not configured.":"Les identifiants Plaid Sandbox ne sont pas configurés.",
+ "Check account-holder name":"Vérifier le nom du titulaire","Checking…":"Vérification…","Name matched":"Nom correspondant","Name verified":"Nom vérifié","Name not independently verified":"Nom non vérifié de manière indépendante",
+ "Bundesbank directory match":"Correspondance dans l’annuaire de la Bundesbank","not listed":"non répertorié","No matching German bank code was found.":"Aucun code bancaire allemand correspondant n’a été trouvé.","Bank lookup unavailable.":"Recherche bancaire indisponible.","UK bank lookup unavailable. Enter the bank name manually.":"La recherche bancaire britannique est indisponible. Saisissez le nom de la banque.","Bank lookup unavailable. Enter the bank name manually.":"La recherche bancaire est indisponible. Saisissez le nom de la banque."
+});
+Object.assign(settingsAndHistoryTranslations.pt, {
+ "Bank connection is still loading. Try again.":"A ligação bancária ainda está a carregar. Tente novamente.",
+ "Unable to start bank connection.":"Não foi possível iniciar a ligação bancária.",
+ "Checking the account-holder name…":"A verificar o nome do titular da conta…",
+ "The name check could not be completed.":"Não foi possível concluir a verificação do nome.",
+ "The linked Sandbox account number does not match the saved beneficiary account.":"O número da conta Sandbox ligada não corresponde à conta do beneficiário guardada.",
+ "The account-holder name matched in the Sandbox identity response.":"O nome do titular correspondeu à resposta de identidade Sandbox.",
+ "The saved recipient name did not exactly match the Sandbox account-holder name.":"O nome do beneficiário guardado não corresponde exatamente ao nome do titular Sandbox.",
+ "Plaid Sandbox credentials are not configured.":"As credenciais do Plaid Sandbox não estão configuradas.",
+ "Check account-holder name":"Verificar nome do titular","Checking…":"A verificar…","Name matched":"Nome correspondente","Name verified":"Nome verificado","Name not independently verified":"Nome não verificado de forma independente",
+ "Bundesbank directory match":"Correspondência no diretório do Bundesbank","not listed":"não indicado","No matching German bank code was found.":"Não foi encontrado um código bancário alemão correspondente.","Bank lookup unavailable.":"Pesquisa bancária indisponível.","UK bank lookup unavailable. Enter the bank name manually.":"A pesquisa bancária do Reino Unido está indisponível. Introduza o nome do banco.","Bank lookup unavailable. Enter the bank name manually.":"A pesquisa bancária está indisponível. Introduza o nome do banco."
+});
+Object.assign(settingsAndHistoryTranslations.de, {
+ "Bank connection is still loading. Try again.":"Die Bankverbindung wird noch geladen. Versuchen Sie es erneut.",
+ "Unable to start bank connection.":"Bankverbindung konnte nicht gestartet werden.",
+ "Checking the account-holder name…":"Kontoinhabername wird überprüft…",
+ "The name check could not be completed.":"Der Namensabgleich konnte nicht abgeschlossen werden.",
+ "The linked Sandbox account number does not match the saved beneficiary account.":"Die verknüpfte Sandbox-Kontonummer stimmt nicht mit dem gespeicherten Empfängerkonto überein.",
+ "The account-holder name matched in the Sandbox identity response.":"Der Kontoinhabername stimmt mit der Sandbox-Identitätsantwort überein.",
+ "The saved recipient name did not exactly match the Sandbox account-holder name.":"Der gespeicherte Empfängername stimmt nicht exakt mit dem Sandbox-Kontoinhabernamen überein.",
+ "Plaid Sandbox credentials are not configured.":"Plaid-Sandbox-Zugangsdaten sind nicht konfiguriert.",
+ "Check account-holder name":"Kontoinhabernamen prüfen","Checking…":"Wird geprüft…","Name matched":"Name stimmt überein","Name verified":"Name verifiziert","Name not independently verified":"Name nicht unabhängig verifiziert",
+ "Bundesbank directory match":"Treffer im Bundesbank-Verzeichnis","not listed":"nicht aufgeführt","No matching German bank code was found.":"Kein passender deutscher Bankcode gefunden.","Bank lookup unavailable.":"Banksuche nicht verfügbar.","UK bank lookup unavailable. Enter the bank name manually.":"Britische Banksuche nicht verfügbar. Geben Sie den Banknamen manuell ein.","Bank lookup unavailable. Enter the bank name manually.":"Banksuche nicht verfügbar. Geben Sie den Banknamen manuell ein."
+});
+
 export function pageText(locale: SupportedLocale, value: string): string {
   return dashboardLabels[locale]?.[value] ?? identityUiTranslations[locale]?.[value] ?? settingsAndHistoryTranslations[locale]?.[value] ?? extra[locale]?.[value] ?? dictionaries[locale]?.[value] ?? value;
 }
