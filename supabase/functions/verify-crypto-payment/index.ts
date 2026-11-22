@@ -125,9 +125,13 @@ Deno.serve(async (req: Request) => {
     let result;
     if (asset === "USDT") {
       if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(procedure.wallet_address)) return json(400, { error: "The stored TRON receiving address has an unsupported format. Contact support." });
+      const addressCheck = await fetch("https://api.trongrid.io/wallet/validateaddress", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address: procedure.wallet_address, visible: true }) });
+      if (!addressCheck.ok || (await addressCheck.json()).result !== true) return json(400, { error: "The stored TRON address failed the network checksum validation." });
       result = await verifyTron(procedure.wallet_address, txHash, String(procedure.expected_amount));
     } else {
       if (!/^(bc1[ac-hj-np-z02-9]{11,87}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/.test(procedure.wallet_address)) return json(400, { error: "The stored Bitcoin receiving address has an unsupported format. Contact support." });
+      const addressCheckResponse = await fetch("https://mempool.space/api/v1/validate-address/" + encodeURIComponent(procedure.wallet_address));
+      if (!addressCheckResponse.ok || (await addressCheckResponse.json()).isvalid !== true) return json(400, { error: "The stored Bitcoin address failed mainnet checksum validation." });
       result = await verifyBitcoin(procedure.wallet_address, txHash, String(procedure.expected_amount));
     }
 
