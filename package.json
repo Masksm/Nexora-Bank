@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:locale": "node --experimental-strip-types scripts/test-locale.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
