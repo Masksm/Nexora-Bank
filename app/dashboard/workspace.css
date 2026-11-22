@@ -296,3 +296,5 @@ html[data-theme="dark"] .support-payment-warning{background:#332a1b;border-color
 html[data-theme="dark"] .support-receipt-upload{background:#15251a;border-color:#4b7054}
 html[data-theme="dark"] .support-receipt-upload label{color:#c1ddc6}
 html[data-theme="dark"] .support-receipt-upload small,html[data-theme="dark"] .support-receipt-upload span{color:#a9c1ad}
+
+.support-chain-verification{margin:16px 0;padding:15px;border:1px solid var(--line,#d9dee8);border-radius:14px;display:grid;gap:10px}.support-chain-verification>strong{font-size:14px}.support-chain-verification p{margin:0;font-size:13px;line-height:1.5}.support-chain-verification form{display:flex;gap:8px;flex-wrap:wrap}.support-chain-verification input{flex:1;min-width:220px;padding:11px;border:1px solid var(--line,#d9dee8);border-radius:9px;background:transparent;color:inherit;font:inherit}.support-chain-verification button{padding:10px 14px;border:0;border-radius:9px;cursor:pointer}.support-chain-verification small{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
