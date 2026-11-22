@@ -246,3 +246,8 @@
 .settings-popup-content .workspace-panel-heading{padding:0 0 15px}
 .settings-popup-content .settings-link-panel{margin:0 0 10px}
 @media(max-width:600px){.settings-popup-backdrop{align-items:end;padding:0}.settings-popup-dialog{width:100%;max-height:92dvh;border-radius:14px 14px 0 0}.settings-popup-header{padding:17px}.settings-popup-content{padding:16px}.settings-popup-trigger{min-height:72px;padding:13px}}
+
+.identity-document-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.identity-document-actions button,.identity-verification-state a{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid #d8e5dc;border-radius:7px;background:#f3f8f4;color:#416a50;font-size:10px;font-weight:700;text-decoration:none;cursor:pointer}
+.identity-document-actions button:disabled{opacity:.55;cursor:not-allowed}
+.identity-verification-state{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:10px;color:#718276}
