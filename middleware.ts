@@ -94,6 +94,17 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   };
 
+  if (claims?.sub && (isCustomerArea || isAdminArea || isSuperAdminArea) && !path.startsWith("/mfa")) {
+    const { data: assurance, error: assuranceError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (!assuranceError && assurance?.nextLevel === "aal2" && assurance.currentLevel !== "aal2") {
+      const target = request.nextUrl.clone();
+      target.pathname = "/mfa";
+      target.search = "";
+      target.searchParams.set("next", path);
+      return redirectWithSession(target);
+    }
+  }
+
   if ((isCustomerArea || isAdminArea || isSuperAdminArea) && !claims) {
     const target = request.nextUrl.clone();
     target.pathname = "/login";
