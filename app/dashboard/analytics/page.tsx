@@ -66,24 +66,24 @@ export default async function AnalyticsPage() {
   const trend = months.map((month)=>{const rows=posted.filter((e)=>{const d=new Date(e.created_at);return d>=month.start&&d<month.end;});return {...month,in:rows.reduce((s,e)=>s+Math.max(0,Number(e.amount_minor)),0),out:rows.reduce((s,e)=>s+Math.max(0,-Number(e.amount_minor)),0)};});
   const maxTrend = Math.max(1,...trend.flatMap((m)=>[m.in,m.out]));
   return <main className="workspace-shell">
-    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> Overview</Link><span className="workspace-overline">NEXORA BANK · INSIGHTS</span></header>
-    <section className="workspace-intro"><div><span className="workspace-kicker">YOUR MONEY, AT A GLANCE</span><h1>Spending analytics</h1><p>Understand how money moves across your accounts.</p></div><Link href="/dashboard/statements" className="workspace-download">View statements</Link></section>
-    {failed ? <div className="workspace-alert">We couldn’t load complete account activity. Refresh and try again.</div> : <>
+    <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">{t("NEXORA BANK · INSIGHTS")}</span></header>
+    <section className="workspace-intro"><div><span className="workspace-kicker">{t("YOUR MONEY, AT A GLANCE")}</span><h1>{t("Spending analytics")}</h1><p>{t("Understand how money moves across your accounts.")}</p></div><Link href="/dashboard/statements" className="workspace-download">{t("View statements")}</Link></section>
+    {failed ? <div className="workspace-alert">{t("We couldn’t load complete account activity. Refresh and try again.")}</div> : <>
       <section className="analytics-summary">
-        <article className="analytics-stat"><span>This month · Money in</span><strong>{money(income,locale)}</strong><small><ArrowDownLeft size={14}/> Posted credits</small></article>
-        <article className="analytics-stat"><span>This month · Money out</span><strong>{money(spending,locale)}</strong><small><ArrowUpRight size={14}/> Posted debits</small></article>
-        <article className="analytics-stat"><span>This month · Net movement</span><strong className={income-spending>=0?"positive":""}>{money(income-spending,locale)}</strong><small>Credits less debits</small></article>
+        <article className="analytics-stat"><span>{t("This month · Money in")}</span><strong>{money(income,locale)}</strong><small><ArrowDownLeft size={14}/> {t("Posted credits")}</small></article>
+        <article className="analytics-stat"><span>{t("This month · Money out")}</span><strong>{money(spending,locale)}</strong><small><ArrowUpRight size={14}/> {t("Posted debits")}</small></article>
+        <article className="analytics-stat"><span>{t("This month · Net movement")}</span><strong className={income-spending>=0?"positive":""}>{money(income-spending,locale)}</strong><small>{t("Credits less debits")}</small></article>
       </section>
       <section className="analytics-grid">
-        <article className="workspace-panel analytics-panel"><div className="workspace-panel-heading"><div><span className="workspace-kicker">SIX-MONTH VIEW</span><h2>Income and spending</h2></div></div>
+        <article className="workspace-panel analytics-panel"><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("SIX-MONTH VIEW")}</span><h2>{t("Income and spending")}</h2></div></div>
           <div className="trend-chart">{trend.map((m)=><div className="trend-column" key={m.key}><div className="trend-bars"><span className="trend-in" style={{height:Math.max(2,m.in/maxTrend*100)+"%"}}/><span className="trend-out" style={{height:Math.max(2,m.out/maxTrend*100)+"%"}}/></div><small>{m.label}</small></div>)}</div>
-          <div className="analytics-legend"><span><i className="legend-in"/> Money in</span><span><i className="legend-out"/> Money out</span></div>
+          <div className="analytics-legend"><span><i className="legend-in"/> {t("Money in")}</span><span><i className="legend-out"/> {t("Money out")}</span></div>
         </article>
-        <article className="workspace-panel analytics-panel"><div className="workspace-panel-heading"><div><span className="workspace-kicker">POSTED DEBITS</span><h2>Spending categories</h2></div></div>
-          {sortedCategories.length ? <div className="category-list">{sortedCategories.map(([name,value])=><div className="category-row" key={name}><div><strong>{name}</strong><b>{money(value,locale)}</b></div><span className="category-track"><i style={{width:(value/maxCategory*100)+"%"}}/></span></div>)}</div> : <div className="workspace-empty"><Activity size={24}/><p>Spending categories will appear after posted debits are recorded.</p></div>}
+        <article className="workspace-panel analytics-panel"><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("POSTED DEBITS")}</span><h2>{t("Spending categories")}</h2></div></div>
+          {sortedCategories.length ? <div className="category-list">{sortedCategories.map(([name,value])=><div className="category-row" key={name}><div><strong>{name}</strong><b>{money(value,locale)}</b></div><span className="category-track"><i style={{width:(value/maxCategory*100)+"%"}}/></span></div>)}</div> : <div className="workspace-empty"><Activity size={24}/><p>{t("Spending categories will appear after posted debits are recorded.")}</p></div>}
         </article>
       </section>
     </>}
-    <p className="workspace-disclaimer">Analytics are calculated from posted internal ledger entries. Pending and rejected transfers are excluded. Categories are estimated from transaction descriptions and types.</p>
+    <p className="workspace-disclaimer">{t("Analytics are calculated from posted internal ledger entries. Pending and rejected transfers are excluded. Categories are estimated from transaction descriptions and types.")}</p>
   </main>;
 }
