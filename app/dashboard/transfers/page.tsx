@@ -22,7 +22,6 @@ export default async function TransfersPage({ searchParams }: Props) {
     supabase.from("beneficiaries").select("id,beneficiary_name,bank_name,country_code,account_number,routing_number,sort_code,iban,bic,verification_status").eq("user_id",user.id).order("created_at",{ascending:false}),
     searchParams,
   ]);
-  const activeAccounts = (accounts ?? []).filter((account) => account.status === "active");
   const blocked = (accounts ?? []).some((account) => account.status === "blocked" || account.status === "frozen");
 
   return <main className="workspace-shell">
