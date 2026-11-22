@@ -70,7 +70,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <article><span><LockKeyhole size={17}/> {t("ACTIVE ASSIGNMENTS")}</span><strong>{assignmentCount}</strong><small>{t("Customer-to-admin access links")}</small></article>
         </section>
 
-        <SuperAdminDialog title={t("Staff administrators")} eyebrow="STAFF AUTHORITY" description="Review staff administrator accounts and manage their access." count={staffCount} id="staff" icon={<UserCog size={20}/>}>
+        <SuperAdminDialog locale={locale} title={t("Staff administrators")} eyebrow={t("STAFF AUTHORITY")} description={t("Review staff administrator accounts and manage their access.")} count={staffCount} id="staff" icon={<UserCog size={20}/>}>
           <div className="admin-panel-heading"><div><span>{t("STAFF AUTHORITY")}</span><h2>{t("Staff administrator accounts")}</h2></div><span>{staffCount} staff</span></div>
           {directoryError ? <p className="admin-empty">Unable to load the administrator directory: {directoryError.message}</p> : !admins.length ? <p className="admin-empty">{t("No staff administrators have been appointed yet.")}</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>{t("Staff administrator")}</th><th>{t("Assigned customers")}</th><th>{t("Access")}</th></tr></thead><tbody>
@@ -78,7 +78,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
             </tbody></table></div>}
         </SuperAdminDialog>
 
-        <SuperAdminDialog title={t("Customer access")} eyebrow="ACCESS ALLOCATION" description="Review the customer directory and control which staff member can access each customer." count={customers.length} id="assignments" icon={<Users size={20}/>}>
+        <SuperAdminDialog locale={locale} title={t("Customer access")} eyebrow={t("ACCESS ALLOCATION")} description={t("Review the customer directory and control which staff member can access each customer.")} count={customers.length} id="assignments" icon={<Users size={20}/>}>
           <div className="admin-panel-heading"><div><span>{t("ACCESS ALLOCATION")}</span><h2>{t("Assign customers to staff")}</h2></div><span>{customers.length} customers</span></div>
           <p className="admin-help">{t("Each customer can belong to only one staff administrator. Remove the current assignment before assigning that customer to another staff member.")}</p>
           {!admins.length ? <p className="admin-empty">{t("Promote at least one customer to staff administrator before assigning customer accounts.")}</p> :
@@ -95,13 +95,13 @@ export default async function SuperAdminPage({ searchParams }: Props) {
             </tbody></table></div>}
         </SuperAdminDialog>
 
-        <SuperAdminDialog title={t("Promote customers")} eyebrow="ROLE MANAGEMENT" description="Choose customer accounts to appoint as staff administrators." count={customers.length} id="promote" icon={<ShieldCheck size={20}/>}>
+        <SuperAdminDialog locale={locale} title={t("Promote customers")} eyebrow={t("ROLE MANAGEMENT")} description={t("Choose customer accounts to appoint as staff administrators.")} count={customers.length} id="promote" icon={<ShieldCheck size={20}/>}>
           <div className="admin-panel-heading"><div><span>{t("ROLE MANAGEMENT")}</span><h2>{t("Promote a customer to staff administrator")}</h2></div><UserCog size={18}/></div>
           <p className="admin-help">{t("Promoting an account does not grant access to any customer records. You must separately assign customers above.")}</p>
           <div className="super-promote-list">{customers.map((person) => <form action={superAdminSetRole} key={person.user_id}><div><strong>{person.display_name}</strong><small>{person.email}</small></div><input type="hidden" name="user_id" value={person.user_id}/><input type="hidden" name="make_admin" value="true"/><button type="submit">{t("Promote to staff admin")}</button></form>)}</div>
         </SuperAdminDialog>
 
-        <SuperAdminDialog defaultOpen={Boolean(params.ticket)} title={t("Support oversight")} eyebrow="GLOBAL CUSTOMER CARE" description="Read support conversations across Nexora without needing to open each staff workspace." count={tickets?.length ?? 0} id="oversight" icon={<MessageSquare size={20}/>}>
+        <SuperAdminDialog locale={locale} defaultOpen={Boolean(params.ticket)} title={t("Support oversight")} eyebrow={t("GLOBAL CUSTOMER CARE")} description={t("Read support conversations across Nexora without needing to open each staff workspace.")} count={tickets?.length ?? 0} id="oversight" icon={<MessageSquare size={20}/>}>
           <div className="admin-panel-heading"><div><span>{t("GLOBAL CUSTOMER CARE OVERSIGHT")}</span><h2>{t("All support conversations")}</h2></div><span>{openCount} open · {tickets?.length ?? 0} recent</span></div>
           {ticketError ? <p className="admin-empty">{t("Unable to load support conversations.")}</p> : !tickets?.length ? <p className="admin-empty">{t("No support conversations have been opened.")}</p> :
             <div className="super-support-layout"><div className="admin-ticket-list">{tickets.map((ticket) => <Link href={"/super-admin?ticket=" + ticket.id + "#oversight"} key={ticket.id} className={selected?.id === ticket.id ? "admin-ticket selected" : "admin-ticket"}><strong>{ticket.subject}</strong><span>{personMap.get(ticket.user_id)?.email ?? ticket.user_id} · {ticket.category} · {ticket.status}</span><small>{new Date(ticket.updated_at).toLocaleString(locale)}</small></Link>)}</div>
@@ -109,7 +109,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
             </div>}
         </SuperAdminDialog>
 
-        <SuperAdminDialog title={t("Account management")} eyebrow="ACCOUNT CONTROL" description="Permanently delete customer or staff accounts when they are eligible for closure." count={deletableUsers.length + " accounts"} id="accounts" icon={<Trash2 size={20}/>}>
+        <SuperAdminDialog locale={locale} title={t("Account management")} eyebrow={t("ACCOUNT CONTROL")} description={t("Permanently delete customer or staff accounts when they are eligible for closure.")} count={deletableUsers.length + " accounts"} id="accounts" icon={<Trash2 size={20}/>}>
           <div className="admin-panel-heading"><div><span>{t("ACCOUNT CONTROL")}</span><h2>{t("Delete customer or staff accounts")}</h2></div><span>{deletableUsers.length} accounts</span></div>
           <p className="admin-help">{t("Deletion is permanent. Accounts with non-zero balances, pending financial transactions or money remaining in savings goals are blocked. Scheduled transfers are cancelled. Zero-balance bank accounts are closed and ledger history is retained for audit. Super Admin accounts cannot be deleted here.")}</p>
           {!deletableUsers.length ? <p className="admin-empty">{t("There are no customer or staff accounts to manage.")}</p> :
