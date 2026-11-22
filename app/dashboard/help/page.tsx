@@ -5,7 +5,8 @@ import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
 import { ArrowLeft, MessageCircle, Send, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { createSupportRequest, replySupportRequest } from "./actions";\nimport { PaymentProcedureCard } from "./payment-procedure-card";
+import { createSupportRequest, replySupportRequest } from "./actions";
+import { PaymentProcedureCard } from "./payment-procedure-card";
 
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ error?: string; ticket?: string }> };
@@ -27,7 +28,8 @@ export default async function HelpPage({ searchParams }: Props) {
     supabase.from("bank_accounts").select("account_number").eq("user_id",user.id),
   ]);
   const selected = (tickets ?? []).find((ticket)=>ticket.id===params.ticket) ?? (params.ticket ? null : (tickets ?? [])[0]);
-  const { data: messages } = selected ? await supabase.from("support_messages").select("id,sender_role,body,created_at").eq("conversation_id",selected.id).order("created_at") : {data:[]};\n  const { data: paymentProcedures } = selected ? await supabase.from("support_payment_procedures").select("id,cryptocurrency,network,wallet_address,expected_amount,amount_currency,payment_reference,purpose,status,customer_acknowledged_at,created_at,cancellation_reason").eq("conversation_id",selected.id).order("created_at",{ascending:false}) : {data:[]};
+  const { data: messages } = selected ? await supabase.from("support_messages").select("id,sender_role,body,created_at").eq("conversation_id",selected.id).order("created_at") : {data:[]};
+  const { data: paymentProcedures } = selected ? await supabase.from("support_payment_procedures").select("id,cryptocurrency,network,wallet_address,expected_amount,amount_currency,payment_reference,purpose,status,customer_acknowledged_at,created_at,cancellation_reason").eq("conversation_id",selected.id).order("created_at",{ascending:false}) : {data:[]};
   return <main className="workspace-shell">
     <header className="workspace-header"><Link href="/dashboard" className="workspace-back"><ArrowLeft size={16}/> {t("Overview")}</Link><span className="workspace-overline">{t("NEXORA BANK · SUPPORT")}</span></header>
     <section className="workspace-intro"><div><span className="workspace-kicker">{t("WE’RE HERE TO HELP")}</span><h1>{t("Help centre")}</h1><p>{t("Send a request and continue the conversation with customer care.")}</p></div></section>
@@ -52,7 +54,8 @@ export default async function HelpPage({ searchParams }: Props) {
     </section>
     {selected && <section className="workspace-panel support-thread">
       <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("CONVERSATION")}</span><h2>{selected.subject}</h2></div><span className="workspace-count">{selected.status.replaceAll("_"," ")}</span></div>
-      <div className="support-payment-procedures">{(paymentProcedures ?? []).map((procedure)=><PaymentProcedureCard key={procedure.id} procedure={procedure} conversationId={selected.id}/>)}</div>\n      <div className="support-messages">{(messages ?? []).map((message)=><article key={message.id} className={message.sender_role==="customer"?"support-message mine":"support-message"}><span>{message.sender_role==="admin"?"Nexora customer care":"You"} · {new Date(message.created_at).toLocaleString()}</span><p>{message.body}</p></article>)}</div>
+      <div className="support-payment-procedures">{(paymentProcedures ?? []).map((procedure)=><PaymentProcedureCard key={procedure.id} procedure={procedure} conversationId={selected.id}/>)}</div>
+      <div className="support-messages">{(messages ?? []).map((message)=><article key={message.id} className={message.sender_role==="customer"?"support-message mine":"support-message"}><span>{message.sender_role==="admin"?"Nexora customer care":"You"} · {new Date(message.created_at).toLocaleString()}</span><p>{message.body}</p></article>)}</div>
       {selected.status!=="resolved" && selected.status!=="closed" && <form action={replySupportRequest} className="support-reply"><input type="hidden" name="conversation_id" value={selected.id}/><textarea name="body" rows={2} maxLength={4000} placeholder={t("Write a reply...")} required/><button type="submit" aria-label={t("Send reply")}><Send size={16}/></button></form>}
     </section>}
     <p className="workspace-disclaimer">{t("Never share passwords, one-time codes, full card numbers or other sensitive credentials in support messages.")}</p>
