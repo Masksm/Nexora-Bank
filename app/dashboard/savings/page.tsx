@@ -30,7 +30,7 @@ export default async function SavingsPage({ searchParams }: Props) {
   const goals = goalResult.data ?? [];
   const entries = entryResult.data ?? [];
   const accounts = accountResult.data ?? [];
-  const activeAccounts = accounts.filter((account) => account.status === "active");
+  const activeAccounts = accounts.filter((account) => account.status === "active" && account.currency === "USD");
   const entriesByGoal = new Map<string, typeof entries>();
   for (const entry of entries) {
     const current = entriesByGoal.get(entry.goal_id) ?? [];
@@ -77,12 +77,14 @@ export default async function SavingsPage({ searchParams }: Props) {
               <input type="hidden" name="goal_id" value={goal.id}/><input type="hidden" name="direction" value="contribution"/><input type="hidden" name="idempotency_key" value={randomUUID()}/>
               <label>{t("Add money")}<input name="amount" type="number" min="0.01" max="999999999" step="0.01" placeholder={t("Amount")} required/></label>
               <label>{t("From account")}<select name="account_id" required>{activeAccounts.map((account) => <option key={account.account_id} value={account.account_id}>{account.nickname || account.account_name} · ••••{account.account_number.slice(-4)}</option>)}</select></label>
+              <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required/></label>
               <button type="submit"><ArrowDownToLine size={14}/> {t("Contribute")}</button>
             </form></div>}
             {balance > 0 && activeAccounts.length > 0 && <div className="savings-money-actions savings-withdraw"><form action={moveSavingsGoalFunds}>
               <input type="hidden" name="goal_id" value={goal.id}/><input type="hidden" name="direction" value="withdrawal"/><input type="hidden" name="idempotency_key" value={randomUUID()}/>
               <label>{t("Withdraw amount")}<input name="amount" type="number" min="0.01" max={(balance / 100).toFixed(2)} step="0.01" placeholder={t("Amount")} required/></label>
               <label>{t("To account")}<select name="account_id" required>{activeAccounts.map((account) => <option key={account.account_id} value={account.account_id}>{account.nickname || account.account_name} · ••••{account.account_number.slice(-4)}</option>)}</select></label>
+              <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required/></label>
               <button type="submit"><ArrowUpFromLine size={14}/> {t("Withdraw")}</button>
             </form></div>}
             {goalEntries.length > 0 && <div className="savings-recent-entries"><strong>{t("Recent activity")}</strong>{goalEntries.slice(0,3).map((entry) => <div key={entry.id}><span>{Number(entry.amount_minor) > 0 ? "Contribution" : "Withdrawal"} · {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(entry.created_at))}</span><b className={Number(entry.amount_minor) > 0 ? "positive" : ""}>{Number(entry.amount_minor) > 0 ? "+" : "−"}{money(Math.abs(Number(entry.amount_minor)), locale)}</b></div>)}</div>}
