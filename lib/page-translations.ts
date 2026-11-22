@@ -623,6 +623,16 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], translations);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const values = {
+    es: { "processing":"en proceso","completed":"completada","failed":"fallida","paused":"pausada" },
+    fr: { "processing":"en cours","completed":"terminée","failed":"échouée","paused":"suspendue" },
+    pt: { "processing":"em processamento","completed":"concluída","failed":"falhou","paused":"em pausa" },
+    de: { "processing":"in Bearbeitung","completed":"abgeschlossen","failed":"fehlgeschlagen","paused":"pausiert" }
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], values);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
