@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { acknowledgePaymentProcedure } from "./actions";
@@ -21,7 +21,7 @@ export function PaymentProcedureCard({procedure,conversationId}:{procedure:Proce
     try{await navigator.clipboard.writeText(procedure.wallet_address);setCopied(true);window.setTimeout(()=>setCopied(false),1800);}
     catch{setCopied(false);}
   }
-  async function uploadReceipt(event:React.ChangeEvent<HTMLInputElement>){
+  async function uploadReceipt(event:ChangeEvent<HTMLInputElement>){
     const file=event.target.files?.[0];
     if(!file)return;
     setUploadError("");setUploadSuccess("");
