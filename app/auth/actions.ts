@@ -29,7 +29,10 @@ export async function signIn(formData: FormData) {
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect("/login?error=Unable%20to%20sign%20in.%20Check%20your%20details.");
+  if (error) {
+    await supabase.rpc("record_failed_signin");
+    redirect("/login?error=Unable%20to%20sign%20in.%20Check%20your%20details.");
+  }
 
   try {
     const cookieStore = await cookies();
