@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 
 type PlaidAccount = { account_id?: string; owners?: Array<{ names?: string[] }> };
-type PlaidAuthAccount = { account_id?: string; numbers?: { ach?: Array<{ account?: string }> } };
+type PlaidAuthAccount = { account_id?: string; numbers?: { ach?: Array<{ account?: string; routing?: string }> } };
 
 function normalizeName(value: string) {
   return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { data: beneficiary, error } = await supabase.from("beneficiaries")
-    .select("beneficiary_name,account_number,country_code")
+    .select("beneficiary_name,account_number,routing_number,country_code")
     .eq("id", beneficiaryId).eq("user_id", user.id).maybeSingle();
   if (error || !beneficiary) return NextResponse.json({ error: "Beneficiary not found." }, { status: 404 });
   if (beneficiary.country_code !== "US" || !beneficiary.account_number) {
@@ -60,12 +60,14 @@ export async function POST(request: NextRequest) {
 
     const [identity, auth] = await Promise.all([
       plaidPost("identity/get", { access_token: exchange.access_token }) as Promise<{ accounts?: PlaidAccount[] }>,
-      plaidPost("auth/get", { access_token: exchange.access_token }) as Promise<{ numbers?: { ach?: Array<{ account?: string; account_id?: string }> }; accounts?: PlaidAuthAccount[] }>,
+      plaidPost("auth/get", { access_token: exchange.access_token }) as Promise<{ numbers?: { ach?: Array<{ account?: string; routing?: string; account_id?: string }> }; accounts?: PlaidAuthAccount[] }>,
     ]);
 
     const expectedAccount = String(beneficiary.account_number).replace(/\D/g, "");
+    const expectedRouting = String(beneficiary.routing_number || "").replace(/\D/g, "");
     const accountId = (auth.numbers?.ach || []).find((item) =>
       String(item.account || "").replace(/\D/g, "") === expectedAccount
+      && String(item.routing || "").replace(/\D/g, "") === expectedRouting
     )?.account_id;
     if (!accountId) {
       return NextResponse.json({
