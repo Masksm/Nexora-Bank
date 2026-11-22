@@ -12,9 +12,9 @@ as $$
 declare v_attempt public.identity_verification_attempts%rowtype;
 begin
   if not (private.is_staff_admin() or private.is_super_admin()) then raise exception 'Administrator access required'; end if;
-  if p_document_integrity_status not in ('not_checked','valid_format','invalid_format','needs_review') then raise exception 'Invalid file integrity result'; end if;
-  if p_document_authenticity_status not in ('not_checked','provider_passed','provider_failed','manual_review') then raise exception 'Invalid document verification result'; end if;
-  if p_liveness_status not in ('not_started','passed','failed','manual_review','unavailable') then raise exception 'Invalid liveness result'; end if;
+  if p_document_integrity_status is null or p_document_integrity_status not in ('not_checked','valid_format','invalid_format','needs_review') then raise exception 'Invalid file integrity result'; end if;
+  if p_document_authenticity_status is null or p_document_authenticity_status not in ('not_checked','provider_passed','provider_failed','manual_review') then raise exception 'Invalid document verification result'; end if;
+  if p_liveness_status is null or p_liveness_status not in ('not_started','passed','failed','manual_review','unavailable') then raise exception 'Invalid liveness result'; end if;
 
   select * into v_attempt from public.identity_verification_attempts where id=p_attempt_id for update;
   if not found then raise exception 'Verification attempt not found'; end if;
