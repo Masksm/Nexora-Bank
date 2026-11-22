@@ -165,3 +165,6 @@ html[data-theme="dark"] .audit-event pre{background:#101a14;color:#dbe6dd}
 .admin-receipt-preview-content{min-height:180px;overflow:auto;padding:16px;background:#f4f7f4}.admin-receipt-preview-content img,.admin-receipt-preview-content iframe{display:block;width:100%;height:min(65vh,650px);object-fit:contain;border:1px solid #dfe8e1;border-radius:12px;background:#fff}
 .admin-receipt-preview-modal>footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid #e7eee8}.admin-receipt-preview-modal>footer a{display:inline-flex;align-items:center;gap:6px;color:#176b4d}.admin-receipt-preview-modal>footer button{border:0;border-radius:9px;background:#176b4d;color:#fff;padding:10px 14px;cursor:pointer}
 .admin-support-select-prompt{padding:36px;text-align:center;color:#557064}.admin-support-select-prompt svg{color:#2d8b60}.admin-support-select-prompt h2{color:#193e31}
+
+/* Super Admin operations monitor */
+.admin-search select{min-width:130px;height:35px;padding:0 9px;border:1px solid #e3eae4;border-radius:4px;background:#fff;color:#52675a;font-size:10px}.admin-table td small{display:block;margin-top:4px;color:#96a49a}.admin-stats article strong{font-size:clamp(13px,1.5vw,21px)}.admin-disclaimer{line-height:1.7}
