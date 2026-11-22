@@ -154,3 +154,14 @@ html[data-theme="dark"] .audit-event pre{background:#101a14;color:#dbe6dd}
 .admin-conversation-modal>footer{padding:13px 22px;border-top:1px solid #e8eee9;color:#718177;font-size:11px}
 .admin-support-layout{display:block}.admin-support-messages{max-height:440px;overflow-y:auto}.admin-support-reply{display:none}
 @media(max-width:640px){.admin-conversation-modal{border-radius:17px}.admin-conversation-modal>header{padding:18px}.admin-conversation-modal>header h2{font-size:19px}.admin-conversation-backdrop{padding:10px}}
+
+
+.admin-receipt-preview-trigger{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid #d6e4da;border-radius:10px;background:#f5faf6;color:#176b4d;font-weight:700;cursor:pointer}
+.admin-receipt-preview-backdrop{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:18px;background:rgba(5,20,14,.68);backdrop-filter:blur(6px)}
+.admin-receipt-preview-modal{width:min(860px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;border-radius:20px;background:#fff;color:#193e31;box-shadow:0 30px 100px #0005}
+.admin-receipt-preview-modal>header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:19px 22px;border-bottom:1px solid #e7eee8}
+.admin-receipt-preview-modal>header span{font-size:10px;letter-spacing:.16em;font-weight:800;color:#27815a}.admin-receipt-preview-modal>header h2{margin:5px 0 0;font-size:18px;overflow-wrap:anywhere}
+.admin-receipt-preview-modal>header button{width:36px;height:36px;border:0;border-radius:50%;background:#eef4ef;color:#254d3b;display:grid;place-items:center;cursor:pointer}
+.admin-receipt-preview-content{min-height:180px;overflow:auto;padding:16px;background:#f4f7f4}.admin-receipt-preview-content img,.admin-receipt-preview-content iframe{display:block;width:100%;height:min(65vh,650px);object-fit:contain;border:1px solid #dfe8e1;border-radius:12px;background:#fff}
+.admin-receipt-preview-modal>footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid #e7eee8}.admin-receipt-preview-modal>footer a{display:inline-flex;align-items:center;gap:6px;color:#176b4d}.admin-receipt-preview-modal>footer button{border:0;border-radius:9px;background:#176b4d;color:#fff;padding:10px 14px;cursor:pointer}
+.admin-support-select-prompt{padding:36px;text-align:center;color:#557064}.admin-support-select-prompt svg{color:#2d8b60}.admin-support-select-prompt h2{color:#193e31}
