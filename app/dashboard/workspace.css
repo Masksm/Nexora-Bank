@@ -262,3 +262,28 @@ html[data-theme="dark"] .beneficiary-name-check button{background:#203128;border
 html[data-theme="dark"] .beneficiary-name-check small{color:#a6b6ac}
 html[data-theme="dark"] .beneficiary-name-check .name-check-match{color:#9bd4a8}
 html[data-theme="dark"] .beneficiary-name-check .name-check-no-match{color:#e5a28e}
+
+
+.support-payment-procedures{display:grid;gap:12px;margin:14px 0}
+.support-payment-card{display:grid;gap:12px;padding:17px;background:#f7faf7;border:1px solid #dce8df;border-radius:10px}
+.support-payment-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.support-payment-heading span{color:#68806e;font-size:8px;font-weight:800;letter-spacing:1.2px}
+.support-payment-heading strong{padding:5px 8px;border-radius:20px;background:#eaf2eb;color:#416d4d;font-size:8px;text-transform:capitalize}
+.support-payment-card>p{margin:0;color:#6e7e72;font-size:10px;line-height:1.55}
+.support-payment-card dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.support-payment-card dl>div{display:grid;gap:4px;min-width:0}
+.support-payment-card dt,.support-payment-address>span{color:#8b9a8e;font-size:8px;font-weight:800;letter-spacing:.5px}
+.support-payment-card dd{margin:0;color:#344e3b;font-size:10px;font-weight:700;overflow-wrap:anywhere}
+.support-payment-address{display:grid;gap:7px;padding:12px;background:#fff;border:1px solid #e1e9e2;border-radius:7px}
+.support-payment-address code{color:#354d3c;font-size:10px;line-height:1.6;overflow-wrap:anywhere;user-select:all}
+.support-payment-address button,.support-payment-card form button{justify-self:start;padding:8px 11px;border:0;border-radius:6px;background:#174d40;color:#fff;font-size:9px;font-weight:800;cursor:pointer}
+.support-payment-address button:disabled,.support-payment-card form button:disabled{opacity:.55;cursor:not-allowed}
+.support-payment-warning{padding:10px 11px;border-left:3px solid #c69b5d;background:#fbf5e9;color:#876b43;font-size:9px;line-height:1.55}
+.support-payment-card>small{color:#91a096;font-size:8px}
+html[data-theme="dark"] .support-payment-card{background:#15231a;border-color:#30483a}
+html[data-theme="dark"] .support-payment-heading span,html[data-theme="dark"] .support-payment-card>p,html[data-theme="dark"] .support-payment-card dt,html[data-theme="dark"] .support-payment-address>span{color:#a9b9ad}
+html[data-theme="dark"] .support-payment-heading strong{background:#263d2d;color:#b9dfc2}
+html[data-theme="dark"] .support-payment-card dd,html[data-theme="dark"] .support-payment-address code{color:#e0ebe3}
+html[data-theme="dark"] .support-payment-address{background:#101a14;border-color:#344b3a}
+html[data-theme="dark"] .support-payment-warning{background:#332a1b;border-color:#b18b50;color:#e0c58e}
+@media(max-width:560px){.support-payment-card{padding:13px}.support-payment-card dl{grid-template-columns:1fr}}
