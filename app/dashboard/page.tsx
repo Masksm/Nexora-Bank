@@ -98,7 +98,7 @@ export default async function DashboardPage() {
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
   const monthEntries = (entries ?? []).filter(entry =>
-    postedIds.has(entry.transaction_id) && new Date(entry.created_at) >= monthStart);
+    postedIds.has(entry.transaction_id) && entry.currency === "USD" && new Date(entry.created_at) >= monthStart);
   const moneyIn = monthEntries.reduce((sum, entry) => sum + Math.max(0, Number(entry.amount_minor)), 0);
   const moneyOut = monthEntries.reduce((sum, entry) => sum + Math.max(0, -Number(entry.amount_minor)), 0);
   const activityError = Boolean(entriesError || transactionsError);
