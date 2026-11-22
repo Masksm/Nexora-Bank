@@ -6,7 +6,7 @@ import { pageText } from "@/lib/page-translations";
 import { ArrowLeft, FileCheck2, FileText, LogOut, ShieldCheck, UserRound, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
-import { reviewIdentityDocument } from "../actions";
+import { reviewIdentityDocument, recordIdentityVerificationResult } from "../actions";
 
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ kind?: string; message?: string }> };
@@ -154,7 +154,28 @@ export default async function AdminKycPage({ searchParams }: Props) {
                           <div><span>{t("PROVIDER STATUS")}</span><strong>{attempt.status.replaceAll("_", " ")}</strong></div>
                           <div><span>{t("DOCUMENT CHECK")}</span><strong>{attempt.document_authenticity_status.replaceAll("_", " ")}</strong></div>
                           <div><span>{t("LIVENESS CHECK")}</span><strong>{attempt.liveness_status.replaceAll("_", " ")}</strong></div>
-                          <p>{attempt.result_summary || "No additional provider result."}</p>
+                          <p>{attempt.result_summary || t("No additional provider result.")}</p>
+                          {attempt.provider_reference && <p className="kyc-provider-reference">{t("Provider reference")}: {attempt.provider_reference}</p>}
+                          {canReview && ["pending","needs_review"].includes(attempt.status) && <form action={recordIdentityVerificationResult} className="kyc-provider-result-form">
+                            <input type="hidden" name="attempt_id" value={attempt.id}/>
+                            <label>{t("Document authenticity result")}
+                              <select name="document_authenticity_status" defaultValue={attempt.document_authenticity_status==="provider_passed"||attempt.document_authenticity_status==="provider_failed"?attempt.document_authenticity_status:"manual_review"}>
+                                <option value="provider_passed">{t("Passed")}</option>
+                                <option value="provider_failed">{t("Failed")}</option>
+                                <option value="manual_review">{t("Needs manual review")}</option>
+                              </select>
+                            </label>
+                            <label>{t("Liveness result")}
+                              <select name="liveness_status" defaultValue={["passed","failed","manual_review","unavailable"].includes(attempt.liveness_status)?attempt.liveness_status:"manual_review"}>
+                                <option value="passed">{t("Passed")}</option>
+                                <option value="failed">{t("Failed")}</option>
+                                <option value="manual_review">{t("Needs manual review")}</option>
+                                <option value="unavailable">{t("Unavailable")}</option>
+                              </select>
+                            </label>
+                            <label>{t("Provider review notes")}<textarea name="result_summary" maxLength={500} defaultValue={attempt.result_summary||""} rows={2}/></label>
+                            <button type="submit">{t("Save provider results")}</button>
+                          </form>}
                         </div>
                       ) : <p className="kyc-automated-result-empty">{t("No automated verification attempt has been started.")}</p>;
                     })()}
