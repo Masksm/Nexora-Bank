@@ -590,6 +590,17 @@ for (const locale of ["es","fr","pt","de"] as const) {
   } as const;
   dynamicErrorTranslations[locale].push([/(failed|could not|unable to|unexpected error|operation error)/i, generic[locale]]);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "I agree to connect a US bank Sandbox account for an account-holder name check.": ({
+      es:"Acepto conectar una cuenta bancaria de prueba de EE. UU. para comprobar el nombre del titular.",
+      fr:"J’accepte de connecter un compte bancaire Sandbox américain pour vérifier le nom du titulaire.",
+      pt:"Concordo em ligar uma conta bancária Sandbox dos EUA para verificar o nome do titular.",
+      de:"Ich stimme zu, ein US-Bank-Sandbox-Konto für die Prüfung des Kontoinhabernamens zu verbinden."
+    } as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
