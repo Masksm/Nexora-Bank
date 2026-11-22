@@ -111,6 +111,7 @@ export default async function DashboardPage() {
         <nav className="dashboard-nav" aria-label="Main navigation">
           <Link className="active" href="/dashboard"><LayoutDashboard size={17}/> {t("nav.overview")}</Link>
           <Link href="/dashboard/accounts"><Wallet size={17}/> {t("nav.accounts")}</Link>
+          <Link href="/dashboard/currencies"><Globe size={17}/> Multi-currency</Link>
           <Link href="/dashboard/beneficiaries"><Contact size={17}/> {t("nav.beneficiaries")}</Link>
           <Link href="/dashboard/transfers"><ArrowUpRight size={17}/> {t("nav.transfers")}</Link>
           <Link href="/dashboard/cards"><CreditCard size={17}/> {t("nav.cards")}</Link>
