@@ -131,7 +131,7 @@ export default async function AdminKycPage({ searchParams }: Props) {
                 return (
                   <article className="kyc-review-card" key={doc.id}>
                     <div className="kyc-review-top">
-                      <div><span className="kyc-doc-type">{documentLabel(doc.document_type)}</span><h3>{fullName}</h3><small>{t("Customer ID")} <code>{doc.user_id.slice(0, 12)}…</code> · Uploaded {new Date(doc.uploaded_at).toLocaleString(locale)}</small></div>
+                      <div><span className="kyc-doc-type">{t(documentLabel(doc.document_type))}</span><h3>{fullName}</h3><small>{t("Customer ID")} <code>{doc.user_id.slice(0, 12)}…</code> · Uploaded {new Date(doc.uploaded_at).toLocaleString(locale)}</small></div>
                       <span className={"admin-status " + (doc.review_status === "verified" ? "active" : doc.review_status === "rejected" ? "blocked" : "pending")}>{doc.review_status.replace("_", " ")}</span>
                     </div>
                     <div className="kyc-customer-details">
@@ -151,9 +151,9 @@ export default async function AdminKycPage({ searchParams }: Props) {
                       return attempt ? (
                         <div className="kyc-automated-result">
                           <div><span>{t("VERIFICATION PROVIDER")}</span><strong>{attempt.provider === "persona_sandbox" ? "Persona" : "Nexora verification workflow"}</strong></div>
-                          <div><span>{t("PROVIDER STATUS")}</span><strong>{attempt.status.replaceAll("_", " ")}</strong></div>
-                          <div><span>{t("DOCUMENT CHECK")}</span><strong>{attempt.document_authenticity_status.replaceAll("_", " ")}</strong></div>
-                          <div><span>{t("LIVENESS CHECK")}</span><strong>{attempt.liveness_status.replaceAll("_", " ")}</strong></div>
+                          <div><span>{t("PROVIDER STATUS")}</span><strong>{t(attempt.status.replaceAll("_", " "))}</strong></div>
+                          <div><span>{t("DOCUMENT CHECK")}</span><strong>{t(attempt.document_authenticity_status.replaceAll("_", " "))}</strong></div>
+                          <div><span>{t("LIVENESS CHECK")}</span><strong>{t(attempt.liveness_status.replaceAll("_", " "))}</strong></div>
                           <p>{attempt.result_summary || t("No additional provider result.")}</p>
                           {attempt.provider_reference && <p className="kyc-provider-reference">{t("Provider reference")}: {attempt.provider_reference}</p>}
                           {canReview && ["pending","needs_review"].includes(attempt.status) && <form action={recordIdentityVerificationResult} className="kyc-provider-result-form">
