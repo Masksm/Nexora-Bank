@@ -38,7 +38,7 @@ export default async function ScheduledTransfersPage({ searchParams }: Props) {
     {scheduleResult.error && <div className="workspace-alert">{t("Scheduled transfers could not be loaded. Refresh the page.")}</div>}
     <section className="workspace-panel transfer-panel">
       <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("NEW SCHEDULE")}</span><h2>{t("Create a scheduled transfer")}</h2></div></div>
-      {accounts.length ? <ScheduleTransferForm accounts={accounts}/> : <div className="workspace-alert">{t("No active account is available for scheduling.")}</div>}
+      {accounts.length ? <ScheduleTransferForm accounts={accounts} locale={locale}/> : <div className="workspace-alert">{t("No active account is available for scheduling.")}</div>}
     </section>
     <section className="workspace-panel scheduled-list-panel">
       <div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("YOUR PAYMENT PLAN")}</span><h2>{t("Scheduled activity")}</h2></div><span className="workspace-count">{schedules.length} schedules</span></div>
