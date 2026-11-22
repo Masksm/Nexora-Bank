@@ -62,6 +62,22 @@ export default function BeneficiaryForm(){
   const isIban=countries.some(item=>item.code===country && item.format==="IBAN");
   const suggestions=useMemo(()=>searchBanks(country,bankName),[country,bankName]);
 
+  async function lookupUsRouting(value:string){
+    const routing=value.replace(/\\D/g,"");
+    if(country!=="US" || routing.length!==9) return;
+    setRoutingLoading(true);
+    setRoutingMessage("Looking up bank directory…");
+    try{
+      const response=await fetch(`/api/bank-directory/us?routing=${routing}`);
+      const result=await response.json();
+      if(!response.ok) throw new Error(result.error||"Bank lookup unavailable.");
+      setBankName(result.bankName);
+      setRoutingMessage(`Directory match: ${result.bankName}${result.city&&result.state?` · ${result.city}, ${result.state}`:""}. This identifies the bank, not the account holder.`);
+    }catch(error){
+      setRoutingMessage(error instanceof Error?error.message:"Bank lookup unavailable. Enter the bank name manually.");
+    }finally{setRoutingLoading(false);}
+  }
+
   async function lookupUkSortCode(value:string){
     const sortCode=value.replace(/\D/g,"");
     if(country!=="GB" || sortCode.length!==6) return;
