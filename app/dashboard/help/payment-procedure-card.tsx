@@ -44,12 +44,13 @@ export function PaymentProcedureCard({procedure,conversationId,receipts=[],local
       const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100);
       const path=user.id+"/"+procedure.id+"/"+crypto.randomUUID()+"-"+safeName;
       const {error:uploadError}=await supabase.storage.from("payment-receipts").upload(path,file,{contentType:file.type,upsert:false});
-      if(uploadError)throw uploadError;
+      if(uploadError){void supabase.rpc("record_operations_event",{p_severity:"error",p_category:"storage",p_service:"Payment receipts",p_operation:"receipt_upload_failed",p_error_code:uploadError.name||"STORAGE_UPLOAD_FAILED",p_request_path:"/dashboard/help"});throw uploadError;}
       const {error:insertError}=await supabase.from("support_payment_receipts").insert({
         procedure_id:procedure.id,conversation_id:conversationId,customer_user_id:user.id,
         storage_path:path,original_filename:file.name.slice(0,255),mime_type:file.type,file_size_bytes:file.size
       });
       if(insertError){
+        void supabase.rpc("record_operations_event",{p_severity:"error",p_category:"database",p_service:"Payment receipts",p_operation:"receipt_metadata_insert_failed",p_error_code:insertError.code||"RECEIPT_METADATA_FAILED",p_request_path:"/dashboard/help"});
         await supabase.storage.from("payment-receipts").remove([path]);
         throw insertError;
       }
@@ -68,7 +69,7 @@ export function PaymentProcedureCard({procedure,conversationId,receipts=[],local
     try{
       const supabase=createClient();
       const {data,error}=await supabase.functions.invoke("verify-crypto-payment",{body:{procedure_id:procedure.id,transaction_hash:hash}});
-      if(error)throw new Error(error.message||"Blockchain verification could not be completed.");
+      if(error){void supabase.rpc("record_operations_event",{p_severity:"error",p_category:"api",p_service:"Blockchain verification",p_operation:"verification_invoke_failed",p_error_code:"EDGE_FUNCTION_INVOKE_FAILED",p_request_path:"/dashboard/help"});throw new Error(error.message||"Blockchain verification could not be completed.");}
       if(data?.error)throw new Error(data.error);
       setVerificationMessage(data?.message??"Blockchain check completed.");
       router.refresh();
