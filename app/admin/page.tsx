@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<{ kind?: string; message?: string; q?: string }>;
 
-function money(minor: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(minor / 100);
+function money(minor: number, currency = "USD") {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(minor / 100);
 }
 
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
@@ -32,7 +32,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   const rows = accounts ?? [];
   const search = (params.q || "").trim().toLowerCase();
   const displayedRows = search ? rows.filter((row) => row.account_number.toLowerCase().includes(search) || row.account_name.toLowerCase().includes(search) || row.user_id.toLowerCase().includes(search)) : rows;
-  const currencyTotals = new Map<string, number>();\n  for (const row of rows) currencyTotals.set(row.currency, (currencyTotals.get(row.currency) || 0) + Number(row.balance_minor || 0));\n  const totalDisplay = [...currencyTotals.entries()].map(([currency, amount]) => money(amount, currency)).join(" · ") || "—";
+  const currencyTotals = new Map<string, number>();
+  for (const row of rows) currencyTotals.set(row.currency, (currencyTotals.get(row.currency) || 0) + Number(row.balance_minor || 0));
+  const totalDisplay = [...currencyTotals.entries()].map(([currency, amount]) => money(amount, currency)).join(" · ") || "—";
   const activeCount = rows.filter((row) => row.status === "active").length;
 
   return (
@@ -67,7 +69,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
             <div className="admin-panel-heading"><div><span>{t("MANUAL LEDGER ENTRY")}</span><h2>{t("Credit or debit account")}</h2></div><ArrowUpFromLine size={18}/></div>
             <p className="admin-help">{t("Post one ordinary adjustment. It immediately changes the customer’s ledger balance and appears as a transaction.")}</p>
             <form action={adjustBalance} className="admin-form">
-              <label>{t("Customer account")}<select name="account_id" required defaultValue=""><option value="" disabled>{t("Select an account")}</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} · {money(Number(row.balance_minor))}</option>)}</select></label>
+              <label>{t("Customer account")}<select name="account_id" required defaultValue=""><option value="" disabled>{t("Select an account")}</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} · {money(Number(row.balance_minor), row.currency)}</option>)}</select></label>
               <div className="admin-form-grid"><label>{t("Operation")}<select name="direction" defaultValue="credit"><option value="credit">{t("Credit / money in")}</option><option value="debit">{t("Debit / money out")}</option></select></label><label>{t("Amount (USD)")}<input name="amount" type="number" min="0.01" step="0.01" placeholder={t("2500.00")} required/></label></div>
               <label>{t("Source or reason")}<input name="reason" minLength={8} maxLength={240} placeholder={t("e.g. Account funding adjustment")} required/></label>
               <button type="submit" disabled={!rows.length}>{t("Post ledger adjustment")}</button>
