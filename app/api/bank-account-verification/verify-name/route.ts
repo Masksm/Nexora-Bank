@@ -8,6 +8,17 @@ const supportedCountries = new Set([
   "MT","NL","PT","SK","SI","ES","GB",
 ]);
 
+function validIban(value: string) {
+  if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/.test(value)) return false;
+  const rearranged = value.slice(4) + value.slice(0, 4);
+  let remainder = 0;
+  for (const character of rearranged) {
+    const digits = character >= "A" && character <= "Z" ? String(character.charCodeAt(0) - 55) : character;
+    for (const digit of digits) remainder = (remainder * 10 + Number(digit)) % 97;
+  }
+  return remainder === 1;
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -34,6 +45,9 @@ export async function POST(request: NextRequest) {
   if (error || !beneficiary) return NextResponse.json({ error: "Beneficiary not found." }, { status: 404 });
   if (!beneficiary.iban || !supportedCountries.has(beneficiary.country_code)) {
     return NextResponse.json({ error: "Sandbox name verification supports IBANs from the UK and 20 SEPA countries only." }, { status: 400 });
+  }
+  if (beneficiary.iban.slice(0, 2) !== beneficiary.country_code || !validIban(beneficiary.iban)) {
+    return NextResponse.json({ error: "Enter a valid IBAN before checking the account-holder name." }, { status: 400 });
   }
 
   try {
