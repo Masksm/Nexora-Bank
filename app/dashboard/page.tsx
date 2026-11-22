@@ -6,7 +6,7 @@ import { isLanguagePreference, type SupportedLocale } from "@/lib/locale";
 import { redirect } from "next/navigation";
 import {
   ArrowDownLeft, ArrowUpRight, Bell, Contact, CreditCard, FileText, Activity, CalendarClock,
-  HelpCircle, LayoutDashboard, LogOut, Plus, Settings, ShieldCheck, Wallet, PiggyBank,
+  HelpCircle, LayoutDashboard, LogOut, Plus, Settings, ShieldCheck, Wallet, PiggyBank, Globe,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
