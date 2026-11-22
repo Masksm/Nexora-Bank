@@ -30,10 +30,11 @@ export default async function SettingsPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: documents }, { data: verification }, params] = await Promise.all([
+  const [{ data: profile }, { data: documents }, { data: verification }, { data: attempts }, params] = await Promise.all([
     supabase.from("profiles").select("first_name,last_name,display_name,phone,date_of_birth,country_code,address_line1,address_line2,city,region,postal_code,preferred_timezone,preferred_language").eq("user_id", user.id).maybeSingle(),
     supabase.from("identity_documents").select("id,document_type,file_name,review_status,rejection_reason,uploaded_at").eq("user_id", user.id).order("uploaded_at", { ascending: false }),
     supabase.from("customer_verifications").select("status,rejection_reason,submitted_at,reviewed_at").eq("user_id", user.id).maybeSingle(),
+    supabase.from("identity_verification_attempts").select("id,identity_document_id,provider,provider_reference,provider_launch_url,status,result_summary,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
     searchParams,
   ]);
   const displayName = profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
@@ -99,7 +100,7 @@ export default async function SettingsPage({ searchParams }: Props) {
           {kycStatus==="verified" && <p className="kyc-customer-verified">{t("Your identity documents have passed Nexora's internal review.")}</p>}
           {kycStatus==="submitted" && <p className="kyc-customer-pending">{t("Your documents have been received and are waiting for review.")}</p>}
           {kycStatus==="under_review" && <p className="kyc-customer-pending">{t("Your documents are currently being reviewed.")}</p>}</section>
-          <section className="workspace-panel settings-panel"><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("IDENTITY RECORDS")}</span><h2>{t("Documents")}</h2></div><span className="workspace-count">{documents?.length ?? 0} {t("uploaded")}</span></div><IdentityDocuments userId={user.id} locale={locale} initialDocuments={(documents??[]) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";rejection_reason:string|null;uploaded_at:string}>}/></section>
+          <section className="workspace-panel settings-panel"><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("IDENTITY RECORDS")}</span><h2>{t("Documents")}</h2></div><span className="workspace-count">{documents?.length ?? 0} {t("uploaded")}</span></div><IdentityDocuments userId={user.id} locale={locale} initialDocuments={(documents??[]) as Array<{id:string;document_type:"passport"|"national_id"|"drivers_license";file_name:string;review_status:"submitted"|"under_review"|"verified"|"rejected";rejection_reason:string|null;uploaded_at:string}>} initialAttempts={(attempts??[]) as Array<{id:string;identity_document_id:string;provider:string;provider_reference:string|null;provider_launch_url:string|null;status:string;result_summary:string|null;created_at:string}>}/></section>
         </SettingsPopupSection>
 
         <SettingsPopupSection title={t("Preferences")} description={t("Choose your display language and regional format.")} icon={<Languages size={18}/>}>
