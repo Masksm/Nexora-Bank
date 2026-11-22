@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Sign in to continue." }, { status: 401 });
 
   if (!process.env.PLAID_CLIENT_ID || !process.env.PLAID_SECRET || (process.env.PLAID_ENV || "sandbox") !== "sandbox") {
-    return NextResponse.json({ error: "Plaid Sandbox is not configured." }, { status: 503 });
+    return NextResponse.json({ error: "Account-name verification is not configured yet." }, { status: 503 });
   }
 
   let body: { publicToken?: string; beneficiaryId?: string };
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         matched: false,
         result: "account_not_matched",
-        message: "The linked Sandbox account number does not match the saved beneficiary account.",
+        message: "The linked account number does not match the saved beneficiary account.",
       });
     }
 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       result: matchedName ? "exact_name_match" : names.length ? "name_mismatch" : "owner_name_unavailable",
       matchedName,
       bankNames: names.slice(0, 3),
-      message: matchedName ? "The account-holder name matched in the Sandbox identity response." : "The saved recipient name did not exactly match the Sandbox account-holder name.",
+      message: matchedName ? "The account-holder name matched the name returned by the provider." : "The saved recipient name did not exactly match the account-holder name returned by the provider.",
     });
   } catch (error) {
     return NextResponse.json({
