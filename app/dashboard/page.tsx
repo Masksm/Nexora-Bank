@@ -106,9 +106,9 @@ export default async function DashboardPage() {
   return (
     <main className="dashboard-shell">
       <aside className="dashboard-sidebar">
-        <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
+        <Link className="brand" href="/"><span className="brand-mark">N</span><span>{t("NEXORA")}<span className="brand-light"> {t("BANK")}</span></span></Link>
         <div className="sidebar-label">{t("nav.yourBank")}</div>
-        <nav className="dashboard-nav" aria-label="Main navigation">
+        <nav className="dashboard-nav" aria-label={t("Main navigation")}>
           <Link className="active" href="/dashboard"><LayoutDashboard size={17}/> {t("nav.overview")}</Link>
           <Link href="/dashboard/accounts"><Wallet size={17}/> {t("nav.accounts")}</Link>
           <Link href="/dashboard/beneficiaries"><Contact size={17}/> {t("nav.beneficiaries")}</Link>
