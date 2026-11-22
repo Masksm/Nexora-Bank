@@ -150,7 +150,7 @@ export default async function AdminKycPage({ searchParams }: Props) {
                       const attempt = attemptMap.get(doc.id);
                       return attempt ? (
                         <div className="kyc-automated-result">
-                          <div><span>{t("VERIFICATION PROVIDER")}</span><strong>{attempt.provider === "persona_sandbox" ? "Persona" : "Nexora verification workflow"}</strong></div>
+                          <div><span>{t("VERIFICATION PROVIDER")}</span><strong>{attempt.provider === "persona_sandbox" ? "Persona" : t("Nexora verification workflow")}</strong></div>
                           <div><span>{t("PROVIDER STATUS")}</span><strong>{t(attempt.status.replaceAll("_", " "))}</strong></div>
                           <div><span>{t("FILE INTEGRITY")}</span><strong>{t(attempt.document_integrity_status.replaceAll("_", " "))}</strong></div>
                           <div><span>{t("DOCUMENT CHECK")}</span><strong>{t(attempt.document_authenticity_status.replaceAll("_", " "))}</strong></div>
