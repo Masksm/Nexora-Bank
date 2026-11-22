@@ -23,12 +23,13 @@ export default async function ScheduledTransfersPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const [accountResult, scheduleResult, params] = await Promise.all([
-    supabase.from("account_balances").select("account_id,account_number,account_name,nickname,balance_minor,status").eq("user_id", user.id),
+    supabase.from("account_balances").select("account_id,account_number,account_name,nickname,balance_minor,status,currency").eq("user_id", user.id),
     supabase.from("scheduled_transfers").select("id,from_account_id,recipient_account_number,amount_minor,description,frequency,scheduled_for,status,last_error,last_transaction_id").eq("user_id", user.id).order("scheduled_for", { ascending: true }),
     searchParams,
   ]);
   const accounts = (accountResult.data ?? []).filter((a) => a.status === "active");
   const accountNames = new Map((accountResult.data ?? []).map((a) => [a.account_id, a.nickname || a.account_name]));
+  const accountCurrencies = new Map((accountResult.data ?? []).map((a) => [a.account_id, a.currency]));
   const schedules = scheduleResult.data ?? [];
   return <main className="workspace-shell">
     <header className="workspace-header"><Link href="/dashboard/transfers" className="workspace-back"><ArrowLeft size={16}/> {t("Transfers")}</Link><span className="workspace-overline">{t("NEXORA BANK · PAYMENTS")}</span></header>
@@ -45,7 +46,7 @@ export default async function ScheduledTransfersPage({ searchParams }: Props) {
       {schedules.length === 0 ? <div className="workspace-empty"><CalendarClock size={25}/><h2>{t("No scheduled transfers")}</h2><p>{t("Future payments you create will appear here.")}</p></div> :
         <div className="scheduled-list">{schedules.map((item) => <article className="scheduled-row" key={item.id}>
           <div className="scheduled-row-main"><strong>{item.description || "Scheduled transfer"}</strong><span>{accountNames.get(item.from_account_id) || "Account"} · To ••••{item.recipient_account_number.slice(-4)}</span><small>{new Date(item.scheduled_for).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })} · {t(item.frequency.replaceAll("_"," "))}</small></div>
-          <div className="scheduled-row-side"><strong>{money(Number(item.amount_minor))}</strong><span className={"scheduled-status " + item.status}>{t(item.status.replaceAll("_", " "))}</span>
+          <div className="scheduled-row-side"><strong>{money(Number(item.amount_minor),accountCurrencies.get(item.from_account_id)||"USD")}</strong><span className={"scheduled-status " + item.status}>{t(item.status.replaceAll("_", " "))}</span>
             {item.status === "scheduled" && <form action={cancelScheduledTransfer}><input type="hidden" name="schedule_id" value={item.id}/><button type="submit" aria-label={t("Cancel scheduled transfer")}><XCircle size={15}/> {t("Cancel")}</button></form>}
             {item.last_error && <small className="scheduled-error">{item.last_error}</small>}
             {item.last_transaction_id && <Link href={"/dashboard/transactions/" + item.last_transaction_id}>{t("View transaction")}</Link>}
