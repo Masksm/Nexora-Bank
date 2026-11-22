@@ -26,7 +26,9 @@ export default async function SuperAdminPage({ searchParams }: Props) {
   const [{ data: directory, error: directoryError }, { data: assignments }, { data: tickets, error: ticketError }, { data: paymentProcedures, error: paymentError }, { data: paymentAudit, error: paymentAuditError }] = await Promise.all([
     supabase.rpc("super_admin_directory"),
     supabase.from("admin_customer_assignments").select("id,admin_user_id,customer_user_id,created_at").order("created_at", { ascending: false }),
-    supabase.from("support_conversations").select("id,user_id,subject,category,status,created_at,updated_at").order("updated_at", { ascending: false }).limit(100),\n    supabase.from("support_payment_procedures").select("id,conversation_id,customer_user_id,created_by,cryptocurrency,network,wallet_address,expected_amount,amount_currency,payment_reference,purpose,status,customer_acknowledged_at,cancelled_at,cancellation_reason,created_at,updated_at").order("created_at",{ascending:false}).limit(100),\n    supabase.from("support_payment_procedure_audit").select("id,procedure_id,actor_user_id,actor_role,action,details,created_at").order("created_at",{ascending:false}).limit(250),
+    supabase.from("support_conversations").select("id,user_id,subject,category,status,created_at,updated_at").order("updated_at", { ascending: false }).limit(100),
+    supabase.from("support_payment_procedures").select("id,conversation_id,customer_user_id,created_by,cryptocurrency,network,wallet_address,expected_amount,amount_currency,payment_reference,purpose,status,customer_acknowledged_at,cancelled_at,cancellation_reason,created_at,updated_at").order("created_at",{ascending:false}).limit(100),
+    supabase.from("support_payment_procedure_audit").select("id,procedure_id,actor_user_id,actor_role,action,details,created_at").order("created_at",{ascending:false}).limit(250),
   ]);
   const people = (directory ?? []) as DirectoryUser[];
   const links = (assignments ?? []) as Assignment[];
@@ -54,7 +56,8 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <a href="#staff"><UserCog size={16}/> {t("Staff administrators")}</a>
           <a href="#assignments"><Users size={16}/> {t("Customer access")}</a>
           <a href="#promote"><UserCog size={16}/> {t("Role management")}</a>
-          <a href="#oversight"><Eye size={16}/> {t("Support oversight")}</a>\n          <a href="#payment-audit"><ShieldCheck size={16}/> Crypto payment audit</a>          <a href="#accounts"><Trash2 size={16}/> {t("Account management")}</a>
+          <a href="#oversight"><Eye size={16}/> {t("Support oversight")}</a>
+          <a href="#payment-audit"><ShieldCheck size={16}/> Crypto payment audit</a>          <a href="#accounts"><Trash2 size={16}/> {t("Account management")}</a>
           <Link href="/admin"><LockKeyhole size={16}/> {t("Legacy admin operations")}</Link>
         </nav>
         <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>{t("Super Admin session")}</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> {t("Sign out")}</button></form></div>
