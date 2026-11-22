@@ -662,6 +662,17 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], translations);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "Contributions and withdrawals update your savings balance after they are processed.": ({
+      es:"Las aportaciones y retiradas actualizan tu saldo de ahorro una vez procesadas.",
+      fr:"Les versements et retraits mettent à jour votre solde d’épargne après traitement.",
+      pt:"As contribuições e os levantamentos atualizam o saldo da poupança após o processamento.",
+      de:"Einzahlungen und Auszahlungen aktualisieren Ihren Sparsaldo nach der Verarbeitung."
+    } as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
