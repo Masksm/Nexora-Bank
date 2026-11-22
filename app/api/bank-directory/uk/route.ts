@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       return NextResponse.json({ error: "The UK bank directory is temporarily unavailable." }, { status: 503 });
     }
-    const payload = await response.json() as { data?: { Branch?: Branch[] } };
-    const branches = payload.data?.Branch || [];
+    const payload = await response.json() as { data?: Branch[] };
+    const branches = Array.isArray(payload.data) ? payload.data : [];
     const matches = branches.filter((branch) => (branch.BranchIdentification || "").replace(/\D/g, "") === sortCode);
     if (!matches.length) {
       return NextResponse.json({
