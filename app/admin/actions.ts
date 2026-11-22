@@ -296,3 +296,22 @@ export async function issueSupportPaymentProcedure(formData: FormData) {
   revalidatePath("/admin/support");
   redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=success&message=" + encodeURIComponent("Automated payment procedure issued and recorded."));
 }
+
+
+export async function reviewSupportPaymentReceipt(formData: FormData) {
+  const supabase = await requireAdmin();
+  const receiptId = String(formData.get("receipt_id") || "");
+  const conversationId = String(formData.get("conversation_id") || "");
+  const decision = String(formData.get("decision") || "");
+  const note = String(formData.get("note") || "").trim();
+  if (!receiptId || !conversationId || !["reviewed", "rejected"].includes(decision) || note.length < 3 || note.length > 500) {
+    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("Choose a receipt decision and provide a note."));
+  }
+  const { error } = await supabase.rpc("review_support_payment_receipt", {
+    p_receipt_id: receiptId, p_decision: decision, p_note: note,
+  });
+  if (error) redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent(error.message));
+  revalidatePath("/admin/support");
+  revalidatePath("/super-admin/audit");
+  redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=success&message=" + encodeURIComponent("Receipt review saved. Payment has not been marked as confirmed."));
+}
