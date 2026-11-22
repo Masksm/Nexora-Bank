@@ -550,6 +550,14 @@ for (const locale of ["es","fr","pt","de"] as const) {
     } as const)[locale]
   });
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  Object.assign(settingsAndHistoryTranslations[locale], {
+    "File signature check passed.": ({es:"La comprobación de la firma del archivo se completó correctamente.",fr:"La vérification de la signature du fichier a réussi.",pt:"A verificação da assinatura do ficheiro foi concluída com sucesso.",de:"Die Dateisignaturprüfung war erfolgreich."} as const)[locale],
+    "File signature did not match the declared document type. Staff review is required.": ({es:"La firma del archivo no coincide con el tipo de documento declarado. Se requiere revisión del personal.",fr:"La signature du fichier ne correspond pas au type de document déclaré. Un examen par le personnel est requis.",pt:"A assinatura do ficheiro não corresponde ao tipo de documento declarado. É necessária uma revisão da equipa.",de:"Die Dateisignatur stimmt nicht mit dem angegebenen Dokumenttyp überein. Eine Mitarbeiterprüfung ist erforderlich."} as const)[locale],
+    "The uploaded document could not be read. Upload it again.": ({es:"No se pudo leer el documento cargado. Vuelve a cargarlo.",fr:"Le document envoyé n’a pas pu être lu. Envoyez-le à nouveau.",pt:"Não foi possível ler o documento carregado. Carregue-o novamente.",de:"Das hochgeladene Dokument konnte nicht gelesen werden. Laden Sie es erneut hoch."} as const)[locale]
+  });
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
@@ -557,6 +565,18 @@ export function pageText(locale: SupportedLocale, value: string): string {
     ?? extra[locale]?.[value]
     ?? dictionaries[locale]?.[value];
   if (exact !== undefined) return exact;
+  const composites: Array<[string,string]> = [
+    ["File signature check passed. ", "File signature check passed."],
+    ["File signature did not match the declared document type. Staff review is required. ", "File signature did not match the declared document type. Staff review is required."]
+  ];
+  for (const [prefix, key] of composites) {
+    if (value.startsWith(prefix)) {
+      const prefixTranslation = settingsAndHistoryTranslations[locale]?.[key] ?? key;
+      const remainder = value.slice(prefix.length);
+      const remainderTranslation = settingsAndHistoryTranslations[locale]?.[remainder] ?? dictionaries[locale]?.[remainder] ?? remainder;
+      return prefixTranslation + " " + remainderTranslation;
+    }
+  }
   for (const [pattern, translation] of dynamicErrorTranslations[locale] || []) {
     if (pattern.test(value)) return translation;
   }
