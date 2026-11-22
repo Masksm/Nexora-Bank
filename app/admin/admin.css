@@ -130,3 +130,5 @@ html[data-theme="dark"] .audit-account-icon,html[data-theme="dark"] .audit-event
 html[data-theme="dark"] .audit-date-filter select,html[data-theme="dark"] .admin-receipt-item input,html[data-theme="dark"] .admin-receipt-item select{background:#101a14;border-color:#405646;color:#e1ebe3}
 html[data-theme="dark"] .audit-event pre{background:#101a14;color:#dbe6dd}
 @media(max-width:650px){.audit-account{align-items:flex-start}.audit-account-meta{display:none}.audit-date-filter{display:grid;grid-template-columns:1fr 1fr}.audit-date-filter label:first-of-type{grid-column:1/-1}.audit-date-filter button,.audit-date-filter>a{justify-content:center}.audit-event-top{display:grid}.audit-event-top time{text-align:left}}
+
+.admin-payment-address-help{display:block;padding:10px 12px;border-radius:9px;background:rgba(59,130,246,.08);font-size:12px;line-height:1.55;color:inherit}.admin-receipt-item code{overflow-wrap:anywhere;word-break:break-all}
