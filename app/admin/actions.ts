@@ -266,3 +266,33 @@ export async function reviewIdentityDocument(formData: FormData) {
     "Document moved into review."
   ));
 }
+
+
+export async function issueSupportPaymentProcedure(formData: FormData) {
+  const supabase = await requireAdmin();
+  const conversationId = String(formData.get("conversation_id") || "");
+  const cryptocurrency = String(formData.get("cryptocurrency") || "").trim().toUpperCase();
+  const network = String(formData.get("network") || "").trim();
+  const walletAddress = String(formData.get("wallet_address") || "").trim();
+  const amountRaw = String(formData.get("expected_amount") || "").trim();
+  const purpose = String(formData.get("purpose") || "").trim();
+  const amount = Number(amountRaw);
+  if (!conversationId || !cryptocurrency || !network || !walletAddress || !purpose
+      || !/^(?:0|[1-9]\d*)(?:\.\d{1,18})?$/.test(amountRaw)
+      || !Number.isFinite(amount) || amount <= 0 || walletAddress.length > 256
+      || purpose.length < 3 || purpose.length > 500) {
+    redirect("/admin/support?kind=error&message=" + encodeURIComponent("Complete every payment field and enter a positive amount."));
+  }
+  const { error } = await supabase.rpc("create_support_payment_procedure", {
+    p_conversation_id: conversationId,
+    p_cryptocurrency: cryptocurrency,
+    p_network: network,
+    p_wallet_address: walletAddress,
+    p_expected_amount: amountRaw,
+    p_amount_currency: cryptocurrency,
+    p_purpose: purpose,
+  });
+  if (error) redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent(error.message));
+  revalidatePath("/admin/support");
+  redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=success&message=" + encodeURIComponent("Automated payment procedure issued and recorded."));
+}
