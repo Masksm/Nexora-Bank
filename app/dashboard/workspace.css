@@ -251,3 +251,14 @@
 .identity-document-actions button,.identity-verification-state a{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid #d8e5dc;border-radius:7px;background:#f3f8f4;color:#416a50;font-size:10px;font-weight:700;text-decoration:none;cursor:pointer}
 .identity-document-actions button:disabled{opacity:.55;cursor:not-allowed}
 .identity-verification-state{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:10px;color:#718276}
+
+.beneficiary-name-check{display:flex;align-items:flex-start;gap:6px;flex-direction:column;margin-top:8px}
+.beneficiary-name-check button{border:1px solid #d6e4da;border-radius:7px;background:#f4f8f4;color:#416a50;padding:7px 10px;font-size:9px;font-weight:700;cursor:pointer}
+.beneficiary-name-check button:disabled{opacity:.55;cursor:not-allowed}
+.beneficiary-name-check small{font-size:9px;line-height:1.45;color:#78877e}
+.beneficiary-name-check .name-check-match{color:#39744a;font-weight:700}
+.beneficiary-name-check .name-check-no-match{color:#a45b48;font-weight:700}
+html[data-theme="dark"] .beneficiary-name-check button{background:#203128;border-color:#3a5143;color:#b8ddc3}
+html[data-theme="dark"] .beneficiary-name-check small{color:#a6b6ac}
+html[data-theme="dark"] .beneficiary-name-check .name-check-match{color:#9bd4a8}
+html[data-theme="dark"] .beneficiary-name-check .name-check-no-match{color:#e5a28e}
