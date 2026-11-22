@@ -644,6 +644,24 @@ for (const locale of ["es","fr","pt","de"] as const) {
   }[locale];
   Object.assign(settingsAndHistoryTranslations[locale], values);
 }
+
+for (const locale of ["es","fr","pt","de"] as const) {
+  const translations = {
+    es: {
+      "Transfer held for review":"Transferencia retenida para revisión","This transfer was submitted from a new or unrecognized device. It will not affect your balance until customer care approves it.":"Esta transferencia se envió desde un dispositivo nuevo o no reconocido. No afectará a tu saldo hasta que atención al cliente la apruebe.","Customer care replied":"Atención al cliente ha respondido","There is a new reply in your Nexora support conversation.":"Hay una nueva respuesta en tu conversación de soporte de Nexora.","security":"seguridad","support":"soporte"
+    },
+    fr: {
+      "Transfer held for review":"Virement retenu pour examen","This transfer was submitted from a new or unrecognized device. It will not affect your balance until customer care approves it.":"Ce virement a été envoyé depuis un nouvel appareil ou un appareil non reconnu. Il ne modifiera pas votre solde avant son approbation par le service client.","Customer care replied":"Le service client a répondu","There is a new reply in your Nexora support conversation.":"Une nouvelle réponse est disponible dans votre conversation avec l’assistance Nexora.","security":"sécurité","support":"assistance"
+    },
+    pt: {
+      "Transfer held for review":"Transferência retida para análise","This transfer was submitted from a new or unrecognized device. It will not affect your balance until customer care approves it.":"Esta transferência foi enviada a partir de um dispositivo novo ou não reconhecido. Não afetará o seu saldo até ser aprovada pelo apoio ao cliente.","Customer care replied":"O apoio ao cliente respondeu","There is a new reply in your Nexora support conversation.":"Existe uma nova resposta na sua conversa de apoio Nexora.","security":"segurança","support":"apoio"
+    },
+    de: {
+      "Transfer held for review":"Überweisung zur Prüfung zurückgehalten","This transfer was submitted from a new or unrecognized device. It will not affect your balance until customer care approves it.":"Diese Überweisung wurde von einem neuen oder unbekannten Gerät gesendet. Sie wirkt sich erst auf Ihren Kontostand aus, wenn der Kundenservice sie genehmigt.","Customer care replied":"Der Kundenservice hat geantwortet","There is a new reply in your Nexora support conversation.":"Es gibt eine neue Antwort in Ihrem Nexora-Supportgespräch.","security":"Sicherheit","support":"Support"
+    }
+  }[locale];
+  Object.assign(settingsAndHistoryTranslations[locale], translations);
+}
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
