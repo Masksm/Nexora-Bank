@@ -41,6 +41,8 @@ export async function middleware(request: NextRequest) {
     const { error: auditRequestError } = await supabase.rpc("record_activity_request", {
       p_path: path,
       p_method: request.method,
+      p_user_agent: request.headers.get("user-agent")?.slice(0, 500) || null,
+      p_ip_address: request.headers.get("x-real-ip") || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
     });
     if (auditRequestError) {
       console.error("Nexora request audit failed:", auditRequestError.code || "UNKNOWN");
