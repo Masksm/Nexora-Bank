@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 import { Activity, Eye, LogOut, ShieldCheck, Users, UserCog, MessageSquare, LockKeyhole, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
@@ -39,7 +41,8 @@ export default async function SuperAdminPage({ searchParams }: Props) {
   const staffCount = admins.length;
   const assignmentCount = links.length;
   const openCount = (tickets ?? []).filter((ticket) => !["resolved", "closed"].includes(ticket.status)).length;
-  const locale = (await cookies()).get("nexora_locale")?.value || "en";
+  const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
+  const t = (value: string) => pageText(locale, value);
 
   return (
     <main className="admin-shell">
