@@ -58,7 +58,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           <form className="admin-search" action="/admin" method="get"><input name="q" defaultValue={params.q || ""} placeholder={t("Search account number, name or customer ID")}/><button type="submit">{t("Search")}</button></form>
           {error ? <p className="admin-empty">{t("Could not load customer accounts. Check the administrator database policies.")}</p> : rows.length === 0 ? <p className="admin-empty">{t("No customer accounts have been created yet.")}</p> :
             <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>{t("Account")}</th><th>{t("Account number")}</th><th>{t("Balance")}</th><th>{t("Status")}</th><th>{t("Customer ID")}</th></tr></thead><tbody>
-              {displayedRows.map((row) => <tr key={row.account_id}><td><strong>{row.account_name}</strong><small>{row.account_type} · {row.currency}</small></td><td>{row.account_number}</td><td>{money(Number(row.balance_minor))}</td><td><span className={"admin-status " + row.status}>{row.status}</span></td><td><code>{row.user_id.slice(0, 8)}…</code></td></tr>)}
+              {displayedRows.map((row) => <tr key={row.account_id}><td><strong>{row.account_name}</strong><small>{row.account_type} · {row.currency}</small></td><td>{row.account_number}</td><td>{money(Number(row.balance_minor))}</td><td><span className={"admin-status " + row.status}>{t(row.status)}</span></td><td><code>{row.user_id.slice(0, 8)}…</code></td></tr>)}
             </tbody></table></div>}
         </section>
 
@@ -102,7 +102,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
             <div className="admin-panel-heading"><div><span>{t("ACCOUNT CONTROLS")}</span><h2>{t("Freeze or block account")}</h2></div><ShieldCheck size={18}/></div>
             <p className="admin-help">{t("Frozen and blocked accounts cannot send or receive transfers through the current transfer engine.")}</p>
             <form action={setAccountStatus} className="admin-form">
-              <label>{t("Customer account")}<select name="account_id" required defaultValue=""><option value="" disabled>{t("Select an account")}</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} ({row.status})</option>)}</select></label>
+              <label>{t("Customer account")}<select name="account_id" required defaultValue=""><option value="" disabled>{t("Select an account")}</option>{rows.map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name} ({t(row.status)})</option>)}</select></label>
               <div className="admin-form-grid"><label>{t("New status")}<select name="status"><option value="active">{t("Active / unblock")}</option><option value="frozen">{t("Frozen")}</option><option value="blocked">{t("Blocked")}</option></select></label><label>{t("Reason")}<input name="reason" minLength={8} maxLength={240} placeholder={t("Reason for status change")} required/></label></div>
               <button type="submit" className="secondary" disabled={!rows.length}>{t("Update account status")}</button>
             </form>
