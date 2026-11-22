@@ -42,6 +42,7 @@ export default function IdentityDocuments({ userId, initialDocuments, initialAtt
   const router = useRouter();
   const [documents, setDocuments] = useState(initialDocuments);
   const [attempts, setAttempts] = useState(initialAttempts);
+  useEffect(() => { setDocuments(initialDocuments); setAttempts(initialAttempts); }, [initialDocuments, initialAttempts]);
   const [documentType, setDocumentType] = useState<IdentityDocument["document_type"]>("passport");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -187,6 +188,7 @@ export default function IdentityDocuments({ userId, initialDocuments, initialAtt
                 return latest?.status === "pending" ? (
                   <div className="identity-verification-state">
                     <span>{t("Verification in progress")}</span>
+                    {latest.result_summary && <small>{t(latest.result_summary)}</small>}
                     {latest.provider_launch_url && <a href={latest.provider_launch_url} target="_blank" rel="noreferrer">{t("Continue verification")}</a>}
                   </div>
                 ) : (
