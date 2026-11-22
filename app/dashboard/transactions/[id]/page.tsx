@@ -44,17 +44,17 @@ export default async function TransactionReceiptPage({ params }: Props) {
   const total = Number(metadata?.amount_minor ?? Math.max(...entries.map((entry) => Math.abs(Number(entry.amount_minor)))));
   const incoming = entries.some(entry => Number(entry.amount_minor) > 0);
   const review = metadata?.review_required === true;
-  const statusLabel = review ? "Under review" : transaction.status.replaceAll("_", " ");
+  const statusLabel = t(review ? "Under review" : transaction.status.replaceAll("_", " "));
 
   return <main className="workspace-shell receipt-shell">
     <header className="workspace-header no-print"><Link href="/dashboard/transactions" className="workspace-back"><ArrowLeft size={16}/> {t("Transactions")}</Link><span className="workspace-overline">{t("NEXORA BANK · TRANSACTION RECORD")}</span></header>
     <section className="workspace-intro no-print"><div><span className="workspace-kicker">{t("TRANSACTION DETAILS")}</span><h1>{t("Transaction record")}</h1><p>{t("Review the details recorded for this account activity.")}</p></div><PrintButton label="Download receipt"/></section>
     <article className="workspace-panel receipt-card">
       <div className="receipt-status"><span className={review ? "receipt-status-icon pending" : "receipt-status-icon"}>{review ? <Clock3 size={22}/> : <CheckCircle2 size={22}/>}</span><strong>{statusLabel}</strong><small>{transaction.posted_at ? "Posted " + new Date(transaction.posted_at).toLocaleString(locale) : "Recorded " + new Date(transaction.created_at).toLocaleString(locale)}</small></div>
-      <div className="receipt-amount"><span>{transaction.description || transaction.transaction_type.replaceAll("_", " ")}</span><strong>{incoming ? "+" : ""}{money(total, entries[0].currency, locale)}</strong></div>
+      <div className="receipt-amount"><span>{transaction.description ? t(transaction.description) : t(transaction.transaction_type.replaceAll("_", " "))}</span><strong>{incoming ? "+" : ""}{money(total, entries[0].currency, locale)}</strong></div>
       <div className="receipt-details">
         <div><span>{t("REFERENCE NUMBER")}</span><strong>{transaction.reference}</strong><CopyButton value={transaction.reference} locale={locale}/></div>
-        <div><span>{t("TRANSACTION TYPE")}</span><strong>{transaction.transaction_type.replaceAll("_", " ")}</strong></div>
+        <div><span>{t("TRANSACTION TYPE")}</span><strong>{t(transaction.transaction_type.replaceAll("_", " "))}</strong></div>
         <div><span>{t("DATE & TIME")}</span><strong>{new Date(transaction.created_at).toLocaleString(locale)}</strong></div>
         <div><span>{t("STATUS")}</span><strong className="receipt-capitalize">{statusLabel}</strong></div>
         {metadata?.source_account && <div><span>{t("FROM ACCOUNT")}</span><strong>•••• {metadata.source_account.slice(-4)}</strong></div>}
