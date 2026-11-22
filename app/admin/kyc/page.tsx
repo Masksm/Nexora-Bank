@@ -152,12 +152,21 @@ export default async function AdminKycPage({ searchParams }: Props) {
                         <div className="kyc-automated-result">
                           <div><span>{t("VERIFICATION PROVIDER")}</span><strong>{attempt.provider === "persona_sandbox" ? "Persona" : "Nexora verification workflow"}</strong></div>
                           <div><span>{t("PROVIDER STATUS")}</span><strong>{t(attempt.status.replaceAll("_", " "))}</strong></div>
+                          <div><span>{t("FILE INTEGRITY")}</span><strong>{t(attempt.document_integrity_status.replaceAll("_", " "))}</strong></div>
                           <div><span>{t("DOCUMENT CHECK")}</span><strong>{t(attempt.document_authenticity_status.replaceAll("_", " "))}</strong></div>
                           <div><span>{t("LIVENESS CHECK")}</span><strong>{t(attempt.liveness_status.replaceAll("_", " "))}</strong></div>
                           <p>{attempt.result_summary || t("No additional provider result.")}</p>
                           {attempt.provider_reference && <p className="kyc-provider-reference">{t("Provider reference")}: {attempt.provider_reference}</p>}
                           {canReview && ["pending","needs_review"].includes(attempt.status) && <form action={recordIdentityVerificationResult} className="kyc-provider-result-form">
                             <input type="hidden" name="attempt_id" value={attempt.id}/>
+                            <label>{t("File integrity result")}
+                              <select name="document_integrity_status" defaultValue={attempt.document_integrity_status}>
+                                <option value="valid_format">{t("Valid format")}</option>
+                                <option value="invalid_format">{t("Invalid format")}</option>
+                                <option value="needs_review">{t("Needs manual review")}</option>
+                                <option value="not_checked">{t("Not checked")}</option>
+                              </select>
+                            </label>
                             <label>{t("Document authenticity result")}
                               <select name="document_authenticity_status" defaultValue={attempt.document_authenticity_status==="provider_passed"||attempt.document_authenticity_status==="provider_failed"?attempt.document_authenticity_status:"manual_review"}>
                                 <option value="provider_passed">{t("Passed")}</option>
