@@ -84,6 +84,6 @@ export default async function AnalyticsPage() {
         </article>
       </section>
     </>}
-    <p className="workspace-disclaimer">{t("Analytics are calculated from posted internal ledger entries. Pending and rejected transfers are excluded. Categories are estimated from transaction descriptions and types.")}</p>
+    
   </main>;
 }
