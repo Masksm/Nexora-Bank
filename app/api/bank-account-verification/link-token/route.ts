@@ -12,7 +12,7 @@ export async function POST() {
   const secret = process.env.PLAID_SECRET || "";
   const environment = process.env.PLAID_ENV || "sandbox";
   if (!clientId || !secret || environment !== "sandbox") {
-    return NextResponse.json({ error: "Plaid Sandbox credentials are not configured." }, { status: 503 });
+    return NextResponse.json({ error: "Account-name verification is not configured yet." }, { status: 503 });
   }
 
   try {
