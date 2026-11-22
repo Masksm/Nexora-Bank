@@ -64,7 +64,7 @@ export default async function TransactionReceiptPage({ params }: Props) {
 
       </div>
       <div className="receipt-ledger"><div className="receipt-ledger-heading"><FileText size={15}/> {t("ACCOUNT ENTRIES")}</div>{entries.map((entry,index)=>{const account=accountById.get(entry.account_id);const amount=Number(entry.amount_minor);return <div className="receipt-ledger-row" key={index}><div><strong>{account?.account_name ?? "Account"}</strong><span>Account ending {account?.account_number?.slice(-4) ?? "••••"}</span></div><strong className={amount>0?"positive":""}>{amount>0?"+":"−"}{money(amount,entry.currency,locale)}</strong></div>})}</div>
-      <p className="receipt-footnote">{t("This receipt records activity in Nexora internal ledger. A pending or under-review transaction has not changed the account balance.")}</p>
+      
     </article>
   </main>;
 }
