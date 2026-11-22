@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { addBeneficiary } from "./actions";
 import { searchBanks } from "@/lib/bank-directory";
+import type { SupportedLocale } from "@/lib/locale";
+import { pageText } from "@/lib/page-translations";
 
 const countries = [
   { code:"US", name:"United States", format:"US routing number (ABA) + account number" },
@@ -50,7 +52,8 @@ const countries = [
   { code:"NX", name:"Nexora Bank", format:"10-digit Nexora account number" },
 ];
 
-export default function BeneficiaryForm(){
+export default function BeneficiaryForm({locale}:{locale:SupportedLocale}){
+  const t=(value:string)=>pageText(locale,value);
   const [country,setCountry]=useState("US");
   const [bankName,setBankName]=useState("");
   const [bic,setBic]=useState("");
@@ -140,36 +143,36 @@ export default function BeneficiaryForm(){
   return <form action={addBeneficiary} className="transfer-form">
     <label>Destination country
       <select name="country_code" value={country} onChange={event=>changeCountry(event.target.value)} required>
-        {countries.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}
+        {countries.map(item=><option key={item.code} value={item.code}>{t(item.name)}</option>)}
       </select>
     </label>
-    <p className="form-hint">{selected.format}</p>
-    <label>Recipient account-holder name<input name="name" minLength={2} maxLength={100} required placeholder="Full name on the bank account"/></label>
+    <p className="form-hint">{t(selected.format)}</p>
+    <label>{t("Recipient account-holder name")}<input name="name" minLength={2} maxLength={100} required placeholder={t("Full name on the bank account")}/></label>
     <label className="bank-autocomplete-label">Bank name
-      <input name="bank_name" value={bankName} onChange={event=>setBankName(event.target.value)} onFocus={()=>setBankFocused(true)} onBlur={()=>setTimeout(()=>setBankFocused(false),120)} minLength={2} maxLength={120} required autoComplete="off" placeholder="Search banks or enter a bank name"/>
-      {bankFocused && suggestions.length>0 && <div className="bank-autocomplete-list" role="listbox" aria-label="Matching banks">
+      <input name="bank_name" value={bankName} onChange={event=>setBankName(event.target.value)} onFocus={()=>setBankFocused(true)} onBlur={()=>setTimeout(()=>setBankFocused(false),120)} minLength={2} maxLength={120} required autoComplete="off" placeholder={t("Search banks or enter a bank name")}/>
+      {bankFocused && suggestions.length>0 && <div className="bank-autocomplete-list" role="listbox" aria-label={t("Matching banks")}>
         {suggestions.map(bank=><button type="button" role="option" aria-selected={bankName===bank.name} key={bank.country+bank.name} onMouseDown={event=>event.preventDefault()} onClick={()=>{setBankName(bank.name);setBankFocused(false);}}>{bank.name}</button>)}
       </div>}
-      <span className="form-hint">Bank suggestions are reference data. They do not confirm account ownership.</span>
+      <span className="form-hint">{t("Bank suggestions are reference data. They do not confirm account ownership.")}</span>
     </label>
     {country==="US" && <>
-      <label>Routing number<input name="routing_number" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required placeholder="9-digit ABA routing number" onBlur={event=>lookupUsRouting(event.target.value)}/></label>
-      {routingMessage&&<p className="form-hint" role="status">{routingLoading?"Looking up bank directory…":routingMessage}</p>}
-      <label>Account number<input name="account_number" inputMode="numeric" pattern="[0-9]{4,17}" maxLength={17} required placeholder="Bank account number"/></label>
+      <label>{t("Routing number")}<input name="routing_number" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required placeholder={t("9-digit ABA routing number")} onBlur={event=>lookupUsRouting(event.target.value)}/></label>
+      {routingMessage&&<p className="form-hint" role="status">{routingLoading?t("Looking up bank directory…"):t(routingMessage)}</p>}
+      <label>{t("Account number")}<input name="account_number" inputMode="numeric" pattern="[0-9]{4,17}" maxLength={17} required placeholder={t("Bank account number")}/></label>
     </>}
     {country==="GB" && <>
-      <label>Sort code<input name="sort_code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required placeholder="6 digits, without spaces" onBlur={event=>lookupUkSortCode(event.target.value)}/></label>
-      {routingMessage&&<p className="form-hint" role="status">{routingLoading?"Searching directory…":routingMessage}</p>}
-      <label>Account number<input name="account_number" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required placeholder="8-digit account number"/></label>
+      <label>{t("Sort code")}<input name="sort_code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required placeholder={t("6 digits, without spaces")} onBlur={event=>lookupUkSortCode(event.target.value)}/></label>
+      {routingMessage&&<p className="form-hint" role="status">{routingLoading?t("Searching directory…"):t(routingMessage)}</p>}
+      <label>{t("Account number")}<input name="account_number" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required placeholder={t("8-digit account number")}/></label>
     </>}
     {isIban && <>
-      <label>IBAN<input name="iban" autoCapitalize="characters" minLength={15} maxLength={34} required placeholder="Enter IBAN" onBlur={event=>lookupIban(event.target.value)}/></label>
-      {country!=="DE" && <label className="directory-consent-row"><input type="checkbox" checked={externalLookupConsent} onChange={event=>setExternalLookupConsent(event.target.checked)}/> I agree to send this IBAN to the external directory provider for bank identification.</label>}
-      {routingMessage&&<p className="form-hint" role="status">{routingLoading?"Looking up bank directory…":routingMessage}</p>}
-      <label>BIC / SWIFT (optional)<input name="bic" value={bic} onChange={event=>setBic(event.target.value.toUpperCase())} autoCapitalize="characters" maxLength={11} placeholder="Bank identifier code"/></label>
+      <label>{t("IBAN")}<input name="iban" autoCapitalize="characters" minLength={15} maxLength={34} required placeholder={t("Enter IBAN")} onBlur={event=>lookupIban(event.target.value)}/></label>
+      {country!=="DE" && <label className="directory-consent-row"><input type="checkbox" checked={externalLookupConsent} onChange={event=>setExternalLookupConsent(event.target.checked)}/> {t("I agree to send this IBAN to the external directory provider for bank identification.")}</label>}
+      {routingMessage&&<p className="form-hint" role="status">{routingLoading?t("Looking up bank directory…"):t(routingMessage)}</p>}
+      <label>{t("BIC / SWIFT (optional)")}<input name="bic" value={bic} onChange={event=>setBic(event.target.value.toUpperCase())} autoCapitalize="characters" maxLength={11} placeholder={t("Bank identifier code")}/></label>
     </>}
-    {country==="NX" && <label>Nexora account number<input name="account_number" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} required placeholder="10-digit account number"/></label>}
-    <label>Nickname (optional)<input name="nickname" maxLength={60} placeholder="e.g. Rent"/></label>
-    <button type="submit">Save beneficiary</button>
+    {country==="NX" && <label>{t("Nexora account number")}<input name="account_number" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} required placeholder={t("10-digit account number")}/></label>}
+    <label>{t("Nickname (optional)")}<input name="nickname" maxLength={60} placeholder={t("e.g. Rent")}/></label>
+    <button type="submit">{t("Save beneficiary")}</button>
   </form>;
 }
