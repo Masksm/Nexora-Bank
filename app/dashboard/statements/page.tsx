@@ -26,7 +26,7 @@ export default async function StatementsPage({searchParams}:Props){
   const supabase=await createClient();
   const {data:{user}}=await supabase.auth.getUser();
   if(!user)redirect("/login");
-  const {data:accounts,error:accountError}=await supabase.from("bank_accounts").select("id,account_number,account_name,nickname").eq("user_id",user.id);
+  const {data:accounts,error:accountError}=await supabase.from("bank_accounts").select("id,account_number,account_name,nickname,currency").eq("user_id",user.id).eq("currency","USD");
   const ids=(accounts??[]).map(a=>a.id);
   const entries:Array<{transaction_id:string;account_id:string;amount_minor:number;currency:string;created_at:string}>=[];
   let failed=Boolean(accountError||invalidRange);
@@ -59,7 +59,7 @@ export default async function StatementsPage({searchParams}:Props){
     <section className="statement-document">
       <div className="statement-brand"><div><strong>{t("NEXORA BANK")}</strong><span>{t("ACCOUNT STATEMENT")}</span></div><FileText size={28}/></div>
       <div className="statement-meta"><div><span>{t("ACCOUNT HOLDER")}</span><strong>{user.email}</strong></div><div><span>{t("STATEMENT PERIOD")}</span><strong>{from||"All available"} to {to||"Present"}</strong></div><div><span>{t("GENERATED")}</span><strong>{new Date().toLocaleDateString(locale,{dateStyle:"long"})}</strong></div></div>
-      <div className="statement-totals"><div><span>{t("Total credits")}</span><strong>{money(credits,locale)}</strong></div><div><span>{t("Total debits")}</span><strong>{money(debits,locale)}</strong></div><div><span>{t("Net movement")}</span><strong>{money(credits-debits,locale)}</strong></div></div>
+      <p className="workspace-disclaimer">This statement currently includes USD accounts only. Other currency balances are held separately and are not combined into this USD statement.</p><div className="statement-totals"><div><span>{t("Total credits")}</span><strong>{money(credits,locale)}</strong></div><div><span>{t("Total debits")}</span><strong>{money(debits,locale)}</strong></div><div><span>{t("Net movement")}</span><strong>{money(credits-debits,locale)}</strong></div></div>
       {invalidRange?<div className="workspace-alert">{t("Enter valid dates and ensure the start date is on or before the end date.")}</div>:failed?<div className="workspace-alert">{t("We could not load a complete statement. Refresh and try again.")}</div>:rows.length===0?<div className="workspace-empty"><p>{t("No posted transactions were found for this period.")}</p></div>:
       <div className="statement-table-wrap"><table className="statement-table"><thead><tr><th>{t("Date")}</th><th>{t("Account")}</th><th>{t("Description")}</th><th>{t("Reference")}</th><th>{t("Status")}</th><th className="numeric">{t("Amount")}</th></tr></thead><tbody>{rows.map((row,index)=><tr key={row.transaction_id+"-"+row.account_id+"-"+index}><td>{new Date(row.created_at).toLocaleDateString(locale)}</td><td>{accountNames.get(row.account_id)||"Account"}</td><td>{row.transaction.description||row.transaction.transaction_type.replaceAll("_"," ")}</td><td>{row.transaction.reference}</td><td>{t("Posted")}</td><td className="numeric">{money(Number(row.amount_minor),locale)}</td></tr>)}</tbody></table></div>}
       
