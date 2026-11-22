@@ -90,37 +90,37 @@ export default async function AdminKycPage({ searchParams }: Props) {
   return (
     <main className="admin-shell">
       <aside className="admin-sidebar">
-        <Link className="admin-brand" href="/admin"><span>N</span>NEXORA <i>ADMIN</i></Link>
+        <Link className="admin-brand" href="/admin"><span>N</span>{t("NEXORA")} <i>{t("ADMIN")}</i></Link>
         <div className="admin-side-label">{t("CONTROL CENTRE")}</div>
         <nav>
           <Link href="/admin">{t("Overview")}</Link>
-          <Link className="selected" href="/admin/kyc"><FileCheck2 size={16}/> KYC review</Link>
+          <Link className="selected" href="/admin/kyc"><FileCheck2 size={16}/> {t("KYC review")}</Link>
           <Link href="/admin/reviews">{t("Security reviews")}</Link>
           <Link href="/admin/support">{t("Support inbox")}</Link>
           <Link href="/admin/audit">{t("Audit log")}</Link>
         </nav>
-        <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>{t("Administrator session")}</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> Sign out</button></form></div>
+        <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>{t("Administrator session")}</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> {t("Sign out")}</button></form></div>
       </aside>
 
       <section className="admin-main">
-        <header className="admin-topbar"><div><span>ADMINISTRATION / CUSTOMER DUE DILIGENCE</span><h1>KYC and identity review</h1></div><Link href="/admin"><ArrowLeft size={15}/> Overview</Link></header>
+        <header className="admin-topbar"><div><span>{t("ADMINISTRATION / CUSTOMER DUE DILIGENCE")}</span><h1>{t("KYC and identity review")}</h1></div><Link href="/admin"><ArrowLeft size={15}/> {t("Overview")}</Link></header>
         {params.message && <div className={params.kind === "error" ? "admin-alert error" : "admin-alert success"} role="status">{params.message}</div>}
 
         <section className="admin-stats kyc-stats">
-          <article><span><FileText size={17}/> AWAITING REVIEW</span><strong>{pendingCount}</strong><small>Submitted or under review</small></article>
-          <article><span><ShieldCheck size={17}/> VERIFIED DOCUMENTS</span><strong>{verifiedCount}</strong><small>Documents approved by an administrator</small></article>
-          <article><span><UserRound size={17}/> REJECTED DOCUMENTS</span><strong>{rejectedCount}</strong><small>Replacement may be submitted by the customer</small></article>
+          <article><span><FileText size={17}/> {t("AWAITING REVIEW")}</span><strong>{pendingCount}</strong><small>{t("Submitted or under review")}</small></article>
+          <article><span><ShieldCheck size={17}/> {t("VERIFIED DOCUMENTS")}</span><strong>{verifiedCount}</strong><small>{t("Documents approved by an administrator")}</small></article>
+          <article><span><UserRound size={17}/> {t("REJECTED DOCUMENTS")}</span><strong>{rejectedCount}</strong><small>{t("Replacement may be submitted by the customer")}</small></article>
         </section>
 
         <section className="admin-panel kyc-profile-panel">
-          <div className="admin-panel-heading"><div><span>CUSTOMER ONBOARDING</span><h2>Profile completion overview</h2></div><span>{profileRows.length} customers · latest 200</span></div>
-          {!profileRows.length ? <p className="admin-empty">No customer profiles were found.</p> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Customer</th><th>Contact</th><th>Profile completion</th><th>KYC status</th></tr></thead><tbody>{profileRows.map((profile) => { const status = verificationMap.get(profile.user_id)?.status || "not_started"; const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.display_name || "Name not provided"; return <tr key={profile.user_id}><td><strong>{name}</strong><small><code>{profile.user_id.slice(0, 12)}…</code></small></td><td>{profile.phone || "Not provided"}<small>{profile.country_code?.trim() || "Country not set"}</small></td><td><div className="kyc-table-progress"><span>{completion(profile)}%</span><i><b style={{ width: completion(profile) + "%" }}/></i></div></td><td><span className={"admin-status " + (status === "verified" ? "active" : status === "rejected" ? "blocked" : "pending")}>{status.replace("_", " ")}</span></td></tr>; })}</tbody></table></div>}
+          <div className="admin-panel-heading"><div><span>{t("CUSTOMER ONBOARDING")}</span><h2>{t("Profile completion overview")}</h2></div><span>{profileRows.length} customers · latest 200</span></div>
+          {!profileRows.length ? <p className="admin-empty">{t("No customer profiles were found.")}</p> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>{t("Customer")}</th><th>{t("Contact")}</th><th>{t("Profile completion")}</th><th>{t("KYC status")}</th></tr></thead><tbody>{profileRows.map((profile) => { const status = verificationMap.get(profile.user_id)?.status || "not_started"; const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.display_name || "Name not provided"; return <tr key={profile.user_id}><td><strong>{name}</strong><small><code>{profile.user_id.slice(0, 12)}…</code></small></td><td>{profile.phone || "Not provided"}<small>{profile.country_code?.trim() || "Country not set"}</small></td><td><div className="kyc-table-progress"><span>{completion(profile)}%</span><i><b style={{ width: completion(profile) + "%" }}/></i></div></td><td><span className={"admin-status " + (status === "verified" ? "active" : status === "rejected" ? "blocked" : "pending")}>{status.replace("_", " ")}</span></td></tr>; })}</tbody></table></div>}
         </section>
 
         <section className="admin-panel kyc-panel">
-          <div className="admin-panel-heading"><div><span>IDENTITY DOCUMENT REGISTER</span><h2>Customer submissions</h2></div><span>{documents.length} records · latest 200</span></div>
-          {docsResult.error ? <p className="admin-empty">Unable to load identity documents. Check administrator review permissions.</p> :
-            documents.length === 0 ? <p className="admin-empty">No identity documents have been submitted yet.</p> :
+          <div className="admin-panel-heading"><div><span>{t("IDENTITY DOCUMENT REGISTER")}</span><h2>{t("Customer submissions")}</h2></div><span>{documents.length} records · latest 200</span></div>
+          {docsResult.error ? <p className="admin-empty">{t("Unable to load identity documents. Check administrator review permissions.")}</p> :
+            documents.length === 0 ? <p className="admin-empty">{t("No identity documents have been submitted yet.")}</p> :
             <div className="kyc-review-list">
               {documents.map((doc) => {
                 const profile = profileMap.get(doc.user_id);
@@ -131,38 +131,38 @@ export default async function AdminKycPage({ searchParams }: Props) {
                 return (
                   <article className="kyc-review-card" key={doc.id}>
                     <div className="kyc-review-top">
-                      <div><span className="kyc-doc-type">{documentLabel(doc.document_type)}</span><h3>{fullName}</h3><small>Customer ID <code>{doc.user_id.slice(0, 12)}…</code> · Uploaded {new Date(doc.uploaded_at).toLocaleString(locale)}</small></div>
+                      <div><span className="kyc-doc-type">{documentLabel(doc.document_type)}</span><h3>{fullName}</h3><small>{t("Customer ID")} <code>{doc.user_id.slice(0, 12)}…</code> · Uploaded {new Date(doc.uploaded_at).toLocaleString(locale)}</small></div>
                       <span className={"admin-status " + (doc.review_status === "verified" ? "active" : doc.review_status === "rejected" ? "blocked" : "pending")}>{doc.review_status.replace("_", " ")}</span>
                     </div>
                     <div className="kyc-customer-details">
-                      <div><span>PHONE</span><strong>{profile?.phone || "Not provided"}</strong></div>
-                      <div><span>DATE OF BIRTH</span><strong>{profile?.date_of_birth || "Not provided"}</strong></div>
-                      <div><span>COUNTRY</span><strong>{profile?.country_code?.trim() || "Not provided"}</strong></div>
-                      <div><span>ADDRESS</span><strong>{[profile?.address_line1, profile?.city, profile?.region].filter(Boolean).join(", ") || "Not provided"}</strong></div>
-                      <div><span>PROFILE COMPLETION</span><strong>{completion(profile)}%</strong></div>
-                      <div><span>CUSTOMER KYC STATUS</span><strong className="kyc-capitalize">{verification?.status || "not started"}</strong></div>
+                      <div><span>{t("PHONE")}</span><strong>{profile?.phone || "Not provided"}</strong></div>
+                      <div><span>{t("DATE OF BIRTH")}</span><strong>{profile?.date_of_birth || "Not provided"}</strong></div>
+                      <div><span>{t("COUNTRY")}</span><strong>{profile?.country_code?.trim() || "Not provided"}</strong></div>
+                      <div><span>{t("ADDRESS")}</span><strong>{[profile?.address_line1, profile?.city, profile?.region].filter(Boolean).join(", ") || "Not provided"}</strong></div>
+                      <div><span>{t("PROFILE COMPLETION")}</span><strong>{completion(profile)}%</strong></div>
+                      <div><span>{t("CUSTOMER KYC STATUS")}</span><strong className="kyc-capitalize">{verification?.status || "not started"}</strong></div>
                     </div>
                     <div className="kyc-file-row">
                       <div><FileText size={16}/><span><strong>{doc.file_name}</strong><small>{doc.content_type} · {(Number(doc.file_size_bytes) / 1024 / 1024).toFixed(2)} MB</small></span></div>
-                      {url ? <Link href={url} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open private document</Link> : <span className="kyc-file-unavailable">Preview unavailable</span>}
+                      {url ? <Link href={url} target="_blank" rel="noreferrer"><ExternalLink size={14}/> {t("Open private document")}</Link> : <span className="kyc-file-unavailable">{t("Preview unavailable")}</span>}
                     </div>
                     {(() => {
                       const attempt = attemptMap.get(doc.id);
                       return attempt ? (
                         <div className="kyc-automated-result">
-                          <div><span>VERIFICATION PROVIDER</span><strong>{attempt.provider === "persona_sandbox" ? "Persona" : "Nexora verification workflow"}</strong></div>
-                          <div><span>PROVIDER STATUS</span><strong>{attempt.status.replaceAll("_", " ")}</strong></div>
-                          <div><span>DOCUMENT CHECK</span><strong>{attempt.document_authenticity_status.replaceAll("_", " ")}</strong></div>
-                          <div><span>LIVENESS CHECK</span><strong>{attempt.liveness_status.replaceAll("_", " ")}</strong></div>
+                          <div><span>{t("VERIFICATION PROVIDER")}</span><strong>{attempt.provider === "persona_sandbox" ? "Persona" : "Nexora verification workflow"}</strong></div>
+                          <div><span>{t("PROVIDER STATUS")}</span><strong>{attempt.status.replaceAll("_", " ")}</strong></div>
+                          <div><span>{t("DOCUMENT CHECK")}</span><strong>{attempt.document_authenticity_status.replaceAll("_", " ")}</strong></div>
+                          <div><span>{t("LIVENESS CHECK")}</span><strong>{attempt.liveness_status.replaceAll("_", " ")}</strong></div>
                           <p>{attempt.result_summary || "No additional provider result."}</p>
                         </div>
-                      ) : <p className="kyc-automated-result-empty">No automated verification attempt has been started.</p>;
+                      ) : <p className="kyc-automated-result-empty">{t("No automated verification attempt has been started.")}</p>;
                     })()}
-                    {doc.review_status === "rejected" && doc.rejection_reason && <div className="kyc-rejection-note"><strong>Recorded rejection reason</strong><p>{doc.rejection_reason}</p></div>}
+                    {doc.review_status === "rejected" && doc.rejection_reason && <div className="kyc-rejection-note"><strong>{t("Recorded rejection reason")}</strong><p>{doc.rejection_reason}</p></div>}
                     {canReview && <div className="kyc-review-actions">
-                      {doc.review_status === "submitted" && <form action={reviewIdentityDocument}><input type="hidden" name="document_id" value={doc.id}/><button name="decision" value="under_review" type="submit" className="kyc-secondary-button">Mark under review</button></form>}
-                      <form action={reviewIdentityDocument}><input type="hidden" name="document_id" value={doc.id}/><button name="decision" value="verified" type="submit" className="kyc-approve-button">Verify document</button></form>
-                      <form action={reviewIdentityDocument} className="kyc-reject-form"><input type="hidden" name="document_id" value={doc.id}/><textarea name="rejection_reason" minLength={8} maxLength={500} placeholder="Explain what is wrong and what the customer should correct" required/><button name="decision" value="rejected" type="submit" className="kyc-reject-button">Reject with reason</button></form>
+                      {doc.review_status === "submitted" && <form action={reviewIdentityDocument}><input type="hidden" name="document_id" value={doc.id}/><button name="decision" value="under_review" type="submit" className="kyc-secondary-button">{t("Mark under review")}</button></form>}
+                      <form action={reviewIdentityDocument}><input type="hidden" name="document_id" value={doc.id}/><button name="decision" value="verified" type="submit" className="kyc-approve-button">{t("Verify document")}</button></form>
+                      <form action={reviewIdentityDocument} className="kyc-reject-form"><input type="hidden" name="document_id" value={doc.id}/><textarea name="rejection_reason" minLength={8} maxLength={500} placeholder={t("Explain what is wrong and what the customer should correct")} required/><button name="decision" value="rejected" type="submit" className="kyc-reject-button">{t("Reject with reason")}</button></form>
                     </div>}
                   </article>
                 );
