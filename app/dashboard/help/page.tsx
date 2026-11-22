@@ -7,7 +7,6 @@ import { ArrowLeft, MessageCircle, Send, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createSupportRequest } from "./actions";
 import { SupportLiveChat } from "./support-live-chat";
-import { CustomerReceiptViewer } from "./customer-receipt-viewer";
 import { PaymentProcedureCard } from "./payment-procedure-card";
 
 export const dynamic = "force-dynamic";
