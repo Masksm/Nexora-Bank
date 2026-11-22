@@ -331,3 +331,34 @@ html[data-theme="dark"] .support-receipt-upload small,html[data-theme="dark"] .s
 .support-receipt-preview{overflow:auto;padding:16px 22px}.support-receipt-preview img,.support-receipt-preview iframe{display:block;width:100%;height:min(52vh,520px);object-fit:contain;border:1px solid #e4ebe6;border-radius:12px;background:#f6f8f6}
 .support-receipt-preview-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:12px 0;color:#68786e;font-size:12px}.support-receipt-preview-meta a{display:inline-flex;align-items:center;gap:5px;color:#176b4d}.support-receipt-back{border:1px solid #d7e4da;border-radius:10px;padding:9px 12px;background:#f6faf7;color:#175b43;cursor:pointer}
 @media(max-width:640px){.support-live-messages .support-message{max-width:94%}.support-receipt-modal{border-radius:16px}.support-receipt-modal>header{padding:17px}.support-receipt-preview{padding:12px}}
+
+
+/* Internal / international transfer selector */
+.transfer-destination-panel{overflow:hidden}
+.transfer-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:7px;margin:-2px 0 23px;border:1px solid #e1ebe4;border-radius:16px;background:#f3f8f4}
+.transfer-mode-switch button{display:flex;align-items:center;gap:12px;min-width:0;text-align:left;padding:13px 15px;border:1px solid transparent;border-radius:12px;background:transparent;color:#526b5c;cursor:pointer}
+.transfer-mode-switch button.active{background:#fff;border-color:#cfe2d5;box-shadow:0 5px 15px rgba(24,78,54,.08);color:#15583e}
+.transfer-mode-switch button>span{display:grid;gap:3px}.transfer-mode-switch strong{font-size:13px}.transfer-mode-switch small{font-size:11px;color:#77887d}
+.international-transfer-content{display:grid;gap:19px}
+.international-transfer-heading{display:flex;align-items:center;gap:14px}.international-transfer-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:#e1f1e7;color:#176b4d}
+.international-transfer-heading h2{margin:4px 0;font-size:21px}.international-transfer-heading p{margin:0;color:#738178;font-size:13px}
+.international-transfer-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.international-transfer-grid label{display:grid;gap:7px;font-size:13px;font-weight:700;color:#355443}
+.international-transfer-grid select,.international-transfer-actions input{width:100%;min-height:46px;padding:10px 12px;border:1px solid #dce7df;border-radius:11px;background:#fff;color:#20372e;font:inherit}
+.international-recipient-select{grid-column:1/-1}
+.international-recipient-card{padding:17px;border:1px solid #d8e8dd;border-radius:16px;background:linear-gradient(135deg,#f8fcf9,#edf7f0)}
+.international-recipient-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.international-recipient-card-head>span{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:#24533c}
+.international-recipient-card-head .recipient-verified{color:#168052}.international-recipient-card-head .recipient-unverified{color:#9a6a2d}
+.international-recipient-card h3{margin:13px 0 3px;font-size:19px}.international-recipient-card>p{margin:0;color:#748278;font-size:12px}
+.international-recipient-card dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
+.international-recipient-card dl div{padding:10px;border-radius:10px;background:#fff}.international-recipient-card dt{font-size:10px;color:#7b8a80;text-transform:uppercase;letter-spacing:.08em}.international-recipient-card dd{margin:4px 0 0;font-size:13px;font-weight:700;overflow-wrap:anywhere}
+.international-recipient-card>a,.international-recipient-empty>a{display:inline-flex;align-items:center;gap:7px;color:#176b4d;font-size:12px;font-weight:800;text-decoration:none}
+.international-recipient-empty{display:grid;justify-items:center;text-align:center;gap:8px;padding:25px 18px;border:1px dashed #cbdccf;border-radius:16px;background:#f8fbf8;color:#668071}
+.international-recipient-empty strong{color:#2a4a38}.international-recipient-empty p{max-width:520px;margin:0 0 5px;font-size:12px;line-height:1.55}
+.international-transfer-notice{display:flex;gap:12px;padding:14px;border:1px solid #d9e7df;border-radius:14px;background:#f1f7f3;color:#266247}
+.international-transfer-notice>svg{flex:none;margin-top:2px}.international-transfer-notice strong{font-size:13px}.international-transfer-notice p{margin:5px 0 0;color:#62766a;font-size:12px;line-height:1.55}
+.international-transfer-actions{display:grid;grid-template-columns:1fr auto;gap:13px;align-items:end}
+.international-transfer-actions label{display:grid;gap:7px;font-size:13px;font-weight:700;color:#355443}
+.international-transfer-actions button{min-height:46px;padding:10px 15px;border:0;border-radius:11px;background:#9daea3;color:#fff;font-weight:800;cursor:not-allowed}
+@media(max-width:650px){.transfer-mode-switch{grid-template-columns:1fr}.international-transfer-grid{grid-template-columns:1fr}.international-recipient-select{grid-column:auto}.international-recipient-card dl{grid-template-columns:1fr 1fr}.international-transfer-actions{grid-template-columns:1fr}.international-transfer-actions button{width:100%}}
