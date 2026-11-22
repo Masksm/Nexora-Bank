@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
 import { redirect } from "next/navigation";
-import { ArrowLeft, LogOut, MessageCircle, Send, ShieldCheck } from "lucide-react";
+import { ArrowLeft, LogOut, MessageCircle, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { updateSupportStatus, issueSupportPaymentProcedure, reviewSupportPaymentReceipt } from "../actions";
