@@ -54,7 +54,7 @@ export default async function SuperAdminPage({ searchParams }: Props) {
           <a href="#staff"><UserCog size={16}/> {t("Staff administrators")}</a>
           <a href="#assignments"><Users size={16}/> {t("Customer access")}</a>
           <a href="#promote"><UserCog size={16}/> {t("Role management")}</a>
-          <a href="#oversight"><Eye size={16}/> {t("Support oversight")}</a>{t("\\n")}          <a href="#accounts"><Trash2 size={16}/> {t("Account management")}</a>
+          <a href="#oversight"><Eye size={16}/> {t("Support oversight")}</a>          <a href="#accounts"><Trash2 size={16}/> {t("Account management")}</a>
           <Link href="/admin"><LockKeyhole size={16}/> {t("Legacy admin operations")}</Link>
         </nav>
         <div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>{t("Super Admin session")}</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> {t("Sign out")}</button></form></div>
