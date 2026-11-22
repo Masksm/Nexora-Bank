@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
   const { data: document, error: documentError } = await supabase
     .from("identity_documents")
-    .select("id,user_id,review_status")
+    .select("id,user_id,review_status,storage_path,content_type,file_size_bytes")
     .eq("id", documentId)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -31,10 +31,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "This document has already been approved." }, { status: 409 });
   }
 
+  const { data: documentFile, error: downloadError } = await supabase.storage
+    .from("identity-documents")
+    .download(document.storage_path);
+  if (downloadError || !documentFile) {
+    return NextResponse.json({ error: "The uploaded document could not be read. Upload it again." }, { status: 422 });
+  }
+  const bytes = new Uint8Array(await documentFile.arrayBuffer());
+  const prefix = new TextDecoder().decode(bytes.slice(0, 8));
+  const signatureValid = document.content_type === "application/pdf"
+    ? prefix.startsWith("%PDF-")
+    : document.content_type === "image/png"
+      ? bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a
+      : document.content_type === "image/jpeg"
+        ? bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+        : false;
+  const fileCheckSummary = signatureValid
+    ? "File signature check passed."
+    : "File signature did not match the declared document type. Staff review is required.";
+
   let provider: "nexora_sandbox" | "persona_sandbox" = "nexora_sandbox";
   let providerReference: string | null = null;
   let launchUrl: string | null = null;
-  let resultSummary = "Your document has been submitted for review. You will receive an update when the review is complete.";
+  let resultSummary = fileCheckSummary + " Your document has been submitted for review. You will receive an update when the review is complete.";
 
   const personaKey = process.env.PERSONA_API_KEY || "";
   const personaTemplate = process.env.PERSONA_INQUIRY_TEMPLATE_ID || "";
@@ -82,7 +101,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "The identity provider could not be reached. Please try again." }, { status: 503 });
     }
   } else {
-    resultSummary = "Your document has been submitted for review. You will receive an update when the review is complete.";
+    resultSummary = fileCheckSummary + " Your document has been submitted for review. You will receive an update when the review is complete.";
   }
 
   const { data: attempt, error: startError } = await supabase.rpc("start_identity_verification", {
