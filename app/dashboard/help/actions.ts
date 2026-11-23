@@ -3,8 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { User } from "@supabase/supabase-js";
 
-async function customer() {
+type CustomerContext = { supabase: Awaited<ReturnType<typeof createClient>>; user: User };
+
+async function customer(): Promise<CustomerContext> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
