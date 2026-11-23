@@ -37,7 +37,7 @@ export default function BavNameCheck({ beneficiaryId, locale }: {
         no_match: "Name does not match",
         unavailable: "Name check unavailable",
       };
-      setMessage(t(labels[result.status] || "Name check unavailable"));
+      setMessage(t(result.message || labels[result.status] || "Name check unavailable"));
     } catch (error) {
       setMessage(error instanceof Error ? t(error.message) : t("The name check could not be completed."));
     } finally {
