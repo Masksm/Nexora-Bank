@@ -71,12 +71,12 @@ export async function submitExternalTransferRequest(formData: FormData) {
     p_otp_challenge_id: otpCode && challengeId ? challengeId : null,
     p_otp_code: otpCode || null,
   });
-  if (error) return { error: error.message };
-
   const result = Array.isArray(data) ? data[0] : data;
+  const requiresOtp=Boolean(error?.message?.includes("DEVICE_OTP_REQUIRED"))||result?.status==="otp_required";
+  if(error&&!requiresOtp) return {error:error.message};
   if(result?.status==="otp_invalid") return {error:"The verification code is incorrect, expired, or does not match these transfer details."};
 
-  if(result?.status==="otp_required") {
+  if(requiresOtp) {
     if(otpCode) return {error:"Email verification is required before this transfer can be submitted."};
     const fingerprint=await currentDeviceFingerprint();
     if(!fingerprint) return {error:"Your device could not be verified. Sign in again."};
