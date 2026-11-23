@@ -5,6 +5,7 @@ import { ArrowUpRight,Globe2,Landmark,ShieldCheck,Wallet,PlusCircle,LockKeyhole,
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
 import { submitTransferWithPin } from "./secure-actions";
+import { submitExternalTransferRequest } from "./international-actions";
 import { addBeneficiary } from "../beneficiaries/actions";
 import { bankDirectory } from "@/lib/bank-directory";
 
@@ -90,7 +91,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    <label>{t("Description (optional)")}<input name="description" maxLength={160} placeholder={t("What is this transfer for?")}/></label>
    <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required/></label>
    <button type="submit">{t("Review and send transfer")} <ArrowUpRight size={15}/></button>
-   <p>{t("Customer-to-customer Nexora transfers are submitted to the assigned admin for approval. The ledger balance changes only after approval.")}</p>
+
   </form>:<div className="workspace-alert">{t("You need an active Nexora account before sending an internal transfer.")}</div>}</>:<div className="international-transfer-content">
    <div className="international-transfer-heading"><span className="international-transfer-icon"><Globe2 size={22}/></span><div><span className="workspace-kicker">{t("GLOBAL PAYMENTS")}</span><h2>{t("International bank transfer")}</h2><p>{t("Enter recipient bank details manually or choose a saved beneficiary. Saving a new recipient is optional.")}</p></div></div>
    <div className="international-transfer-grid">
@@ -119,7 +120,22 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    </div>}
    <div className="international-transfer-actions"><label>{t("Transfer amount")} ({active.find(a=>a.account_id===sourceId)?.currency??"USD"})<input type="number" min="0.01" step="0.01" value={amount} onChange={e=>{setAmount(e.target.value);setReviewed(false);}} placeholder="250.00"/></label><button type="button" onClick={reviewDetails}>{t("Review transfer details")} <ArrowUpRight size={15}/></button></div>
    {verification&&!reviewed&&<p className="form-hint" role="status">{verification}</p>}
-   {reviewed&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><CheckCircle2 size={17}/>{t("Details ready for review")}</span></div><h3>{recipientName}</h3><p>{bankName} · {t(countries.find(([code])=>code===country)?.[1]??country)}</p><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:active.find(a=>a.account_id===sourceId)?.currency||"USD"}).format(Number(amount))}</strong><p>{t("Your recipient and amount details have been prepared. This review does not submit or execute an external payment.")}</p></div>}
+   {reviewed&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><CheckCircle2 size={17}/>{t("Review transfer")}</span></div><h3>{recipientName}</h3><p>{bankName} · {t(countries.find(([code])=>code===country)?.[1]??country)}</p><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:active.find(a=>a.account_id===sourceId)?.currency||"USD"}).format(Number(amount))}</strong><p>{t("Confirm the recipient and amount, then submit your transfer request for administrator review.")}</p>
+    <form action={submitExternalTransferRequest} className="external-transfer-submit-form">
+     <input type="hidden" name="source_account_id" value={sourceId}/>
+     <input type="hidden" name="country" value={country}/>
+     <input type="hidden" name="bank_name" value={bankName}/>
+     <input type="hidden" name="beneficiary_name" value={recipientName}/>
+     <input type="hidden" name="account_number" value={accountNumber}/>
+     <input type="hidden" name="routing_number" value={routingNumber}/>
+     <input type="hidden" name="sort_code" value={sortCode}/>
+     <input type="hidden" name="iban" value={iban}/>
+     <input type="hidden" name="bic" value={bic}/>
+     <input type="hidden" name="amount" value={amount}/>
+     <label>{t("Transaction PIN")}<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required placeholder={t("Enter your six-digit PIN")}/></label>
+     <div><button type="button" className="external-transfer-back" onClick={()=>setReviewed(false)}>{t("Edit details")}</button><button type="submit">{t("Submit transfer")} <ArrowUpRight size={15}/></button></div>
+    </form>
+   </div>
   </div>}
  </section>;
 }
