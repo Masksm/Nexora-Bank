@@ -59,7 +59,7 @@ export async function completePinRecovery(formData:FormData) {
  const code=String(formData.get("code")||"").trim();
  const next=String(formData.get("new_pin")||"").trim();
  const confirm=String(formData.get("confirm_pin")||"").trim();
- if(!/^\\d{6}$/.test(code)||!/^\\d{6}$/.test(next)||next!==confirm) {
+ if(!/^\d{6}$/.test(code)||!/^\d{6}$/.test(next)||next!==confirm) {
   redirect("/dashboard/security?pin_recovery=verify&error=Enter%20the%20six-digit%20code%20and%20matching%20six-digit%20PINs.");
  }
  const cookieStore=await cookies();
