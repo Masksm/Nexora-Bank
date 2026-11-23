@@ -59,14 +59,15 @@ export async function submitTransferWithPin(formData:FormData) {
   p_otp_challenge_id:null,
   p_otp_code:null,
  });
- if(error) {
+ const result=Array.isArray(data)?data[0]:data;
+ const requiresOtp=Boolean(error?.message?.includes("DEVICE_OTP_REQUIRED"))||result?.status==="otp_required";
+ if(error&&!requiresOtp) {
   await supabase.rpc("record_operations_event",{p_severity:"warning",p_category:"transfer",p_service:"Internal transfers",p_operation:"transfer_rejected",p_error_code:error.code||"TRANSFER_REJECTED",p_request_path:"/dashboard/transfers"});
   return {error:error.message};
  }
- const result=Array.isArray(data)?data[0]:data;
  if(result?.status==="pin_invalid") return {error:"Incorrect PIN or PIN temporarily locked."};
 
- if(result?.status==="otp_required") {
+ if(requiresOtp) {
   const fingerprint=await currentDeviceFingerprint();
   if(!fingerprint) return {error:"Your device could not be verified. Sign in again."};
   const claimsResult=await supabase.auth.getClaims();
