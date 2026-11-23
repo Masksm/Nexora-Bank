@@ -4,7 +4,7 @@ import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
 import { signIn } from "@/app/auth/actions";
 
-type Props = { searchParams: Promise<{ error?: string; next?: string }> };
+type Props = { searchParams: Promise<{ error?: string; success?: string; next?: string }> };
 
 export default async function LoginPage({ searchParams }: Props) {
   const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
@@ -18,6 +18,7 @@ export default async function LoginPage({ searchParams }: Props) {
         <h1>{t("Good to have")}<br /><em>{t("you back.")}</em></h1>
         <p className="auth-intro">{t("Sign in to access your Nexora account.")}</p>
         {params.error && <p className="form-message error" role="alert">{t(params.error)}</p>}
+        {params.success && <p className="form-message success" role="status">{params.success}</p>}
         <form action={signIn} className="auth-form">
           <input type="hidden" name="next" value={params.next ?? "/dashboard"} />
           <label htmlFor="email">{t("Email address")}</label>
