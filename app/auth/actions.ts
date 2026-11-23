@@ -34,6 +34,7 @@ export async function signIn(formData: FormData) {
     redirect("/login?error=Unable%20to%20sign%20in.%20Check%20your%20details.");
   }
 
+  let blockedDevice = false;
   try {
     const cookieStore = await cookies();
     const requestHeaders = await headers();
@@ -59,16 +60,20 @@ export async function signIn(formData: FormData) {
     });
     if (trackingError) {
       if (/device has been blocked/i.test(trackingError.message || "")) {
-        await supabase.auth.signOut({ scope: "local" });
-        redirect("/login?error=This%20device%20has%20been%20blocked.%20Contact%20Nexora%20support.");
-      }
-      await supabase.rpc("record_operations_event", { p_severity: "error", p_category: "database", p_service: "Authentication", p_operation: "login_context_record_failed", p_error_code: trackingError.code || "LOGIN_CONTEXT_FAILED", p_request_path: "/login" });
+        blockedDevice = true;
+      } else {
+        await supabase.rpc("record_operations_event", { p_severity: "error", p_category: "database", p_service: "Authentication", p_operation: "login_context_record_failed", p_error_code: trackingError.code || "LOGIN_CONTEXT_FAILED", p_request_path: "/login" });
       // Keep authentication available, but make tracking failures observable
       // in server logs without recording IPs, tokens, or other personal data.
-      console.error("Nexora login tracking failed:", trackingError.code || "UNKNOWN");
+        console.error("Nexora login tracking failed:", trackingError.code || "UNKNOWN");
+      }
     }
   } catch {
-    // The login remains valid. Transfers fail closed into manual review if no trusted session record exists.
+    // Authentication remains available when device telemetry is temporarily unavailable.
+  }
+  if (blockedDevice) {
+    await supabase.auth.signOut({ scope: "local" });
+    redirect("/login?error=This%20device%20has%20been%20blocked.%20Contact%20Nexora%20support.");
   }
   redirect(next);
 }
