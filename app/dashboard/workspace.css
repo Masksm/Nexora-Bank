@@ -417,3 +417,11 @@ html[data-theme="dark"] .support-receipt-upload small,html[data-theme="dark"] .s
 .virtual-card-bottom>span:last-child{min-width:30px;text-align:right}
 .virtual-card-disclosure{margin-top:12px;color:#b8c9be;font-size:7px;letter-spacing:.35px}
 @media(max-width:600px){.security-dialog-backdrop{padding:10px}.security-dialog{max-height:92vh;padding:13px}.security-dialog-trigger{padding:15px 48px 15px 15px}.virtual-card-preview{padding:16px}.virtual-card-number{font-size:14px!important;letter-spacing:1px!important}}
+
+
+.external-transfer-submit-form{display:grid;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid #dce9df}
+.external-transfer-submit-form label{display:grid;gap:7px;color:#355443;font-size:12px;font-weight:700}
+.external-transfer-submit-form input:not([type=hidden]){width:100%;min-height:43px;padding:10px 12px;border:1px solid #dce7df;border-radius:10px;background:#fff;color:#20372e;font:inherit}
+.external-transfer-submit-form>div{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+.external-transfer-submit-form button{min-height:42px;padding:0 15px;border:0;border-radius:10px;background:#176b4d;color:#fff;font-size:12px;font-weight:800;cursor:pointer}
+.external-transfer-submit-form button.external-transfer-back{border:1px solid #d7e4da;background:#fff;color:#315a40}
