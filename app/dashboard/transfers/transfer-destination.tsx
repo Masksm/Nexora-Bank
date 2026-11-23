@@ -38,6 +38,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const bankOptions=useMemo(()=>bankDirectory.filter(bank=>bank.country===country),[country]);
  const chosen=countryRecipients.find(b=>b.id===beneficiaryId)??null;
  const usesIban=ibanCountries.has(country);
+ const canValidateIban=usesIban||country==="GB";
  function clearRecipient(){setBeneficiaryId("");setBankName("");setRecipientName("");setAccountNumber("");setRoutingNumber("");setSortCode("");setIban("");setBic("");setVerification("");setVerificationStatus("");setVerificationProvider("");setReviewed(false);}
  function changeCountry(value:string){setCountry(value);clearRecipient();setRecipientMode("manual");setConsent(false);}
  function selectBeneficiary(id:string){
@@ -47,7 +48,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  }
  async function verifyRecipient(){
   if(!consent||verificationBusy)return;
-  if(!beneficiaryId&&country!=="NG"&&(!usesIban||!iban)){setVerification("IBAN validation is not available for this account format.");return;}
+  if(!beneficiaryId&&country!=="NG"&&(!canValidateIban||!iban)){setVerification("IBAN validation is not available for this account format.");return;}
   setVerificationBusy(true);setVerification("");setVerificationStatus("");setVerificationProvider("");
   try{
    const payload=beneficiaryId?{beneficiaryId,consent:true}:{manualRecipient:{countryCode:country,name:recipientName,iban,accountNumber,bankName},consent:true};
@@ -110,7 +111,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
     <label>{t("BIC / SWIFT (optional)")}<input value={bic} onChange={e=>setBic(e.target.value.toUpperCase().replace(/\\s/g,"").slice(0,11))} autoCapitalize="characters" placeholder="BIC / SWIFT"/></label>
     <label>{t("Recipient account-holder name")}<input value={recipientName} onChange={e=>{setRecipientName(e.target.value);setVerification("");setReviewed(false);}} maxLength={100} placeholder={t("Full name of the recipient")}/></label>
     <div className="recipient-name-preview"><span><UserRound size={16}/>{t("Recipient")}</span><strong>{recipientName.trim()||t("Recipient name will appear here")}</strong></div>
-    {((usesIban&&iban)||(country==="NG"&&accountNumber.length===10&&bankName.trim()))&&<div className="recipient-verification-box"><label className="directory-consent-row"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>{t(country==="NG"?"I consent to sending the Nigerian account number, bank and recipient name to the live account-name enquiry provider.":"I consent to sending the recipient IBAN to the IBAN validation providers.")}</label><button type="button" onClick={()=>void verifyRecipient()} disabled={!consent||verificationBusy||!recipientName.trim()}>{verificationBusy?t("Checking…"):t("Validate recipient IBAN")}</button>{verification&&<p className={verificationStatus==="match"?"name-check-match":verificationStatus==="no_match"?"name-check-no-match":""} role="status">{verification} {verificationProvider==="IBANforge"&&<span> <a href="https://ibanforge.com" target="_blank" rel="noreferrer">Powered by IBANforge</a></span>} {verificationStatus&&<span>{t("Provider response")}</span>}</p>}</div>}
+    {((canValidateIban&&iban)||(country==="NG"&&accountNumber.length===10&&bankName.trim()))&&<div className="recipient-verification-box"><label className="directory-consent-row"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>{t(country==="NG"?"I consent to sending the Nigerian account number, bank and recipient name to the live account-name enquiry provider.":"I consent to sending the recipient IBAN to the IBAN validation providers.")}</label><button type="button" onClick={()=>void verifyRecipient()} disabled={!consent||verificationBusy||!recipientName.trim()}>{verificationBusy?t("Checking…"):t("Validate recipient IBAN")}</button>{verification&&<p className={verificationStatus==="match"?"name-check-match":verificationStatus==="no_match"?"name-check-no-match":""} role="status">{verification} {verificationProvider==="IBANforge"&&<span> <a href="https://ibanforge.com" target="_blank" rel="noreferrer">Powered by IBANforge</a></span>} {verificationStatus&&<span>{t("Provider response")}</span>}</p>}</div>}
     <form action={addBeneficiary} className="save-manual-beneficiary">
      <input type="hidden" name="country_code" value={country}/><input type="hidden" name="name" value={recipientName}/><input type="hidden" name="bank_name" value={bankName}/><input type="hidden" name="account_number" value={accountNumber}/><input type="hidden" name="routing_number" value={routingNumber}/><input type="hidden" name="sort_code" value={sortCode}/><input type="hidden" name="iban" value={iban}/><input type="hidden" name="bic" value={bic}/>
      <button type="submit" disabled={!recipientName.trim()||!bankName.trim()}><PlusCircle size={15}/>{t("Save these details as a beneficiary (optional)")}</button>
