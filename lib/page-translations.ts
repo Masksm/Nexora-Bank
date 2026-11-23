@@ -768,7 +768,7 @@ const transactionLabelTranslations: Record<SupportedLocale, Record<string,string
   en: {},
   es: {
     "transactions":"Transacciones","transaction":"Transacción","transaction history":"Historial de transacciones",
-    "pharmacy bill":"Factura de farmacia","rent payment":"Pago del alquiler","electricity bill":"Factura de electricidad",
+    "pharmacy bill":"Factura de farmacia","pharmacy purchase":"Compra en farmacia","bonus payment":"Pago de bonificación","vehicle maintenance":"Mantenimiento del vehículo","rent payment":"Pago del alquiler","electricity bill":"Factura de electricidad",
     "grocery purchase":"Compra de alimentos","groceries":"Comestibles","internet bill":"Factura de internet",
     "salary payment":"Pago de salario","monthly subscription":"Suscripción mensual","restaurant bill":"Factura de restaurante",
     "medical expenses":"Gastos médicos","school fees":"Matrícula escolar","fuel purchase":"Compra de combustible",
@@ -778,7 +778,7 @@ const transactionLabelTranslations: Record<SupportedLocale, Record<string,string
   },
   fr: {
     "transactions":"Transactions","transaction":"Transaction","transaction history":"Historique des transactions",
-    "pharmacy bill":"Facture de pharmacie","rent payment":"Paiement du loyer","electricity bill":"Facture d’électricité",
+    "pharmacy bill":"Facture de pharmacie","pharmacy purchase":"Achat en pharmacie","bonus payment":"Prime","vehicle maintenance":"Entretien du véhicule","rent payment":"Paiement du loyer","electricity bill":"Facture d’électricité",
     "grocery purchase":"Achats alimentaires","groceries":"Courses","internet bill":"Facture Internet",
     "salary payment":"Versement de salaire","monthly subscription":"Abonnement mensuel","restaurant bill":"Note de restaurant",
     "medical expenses":"Frais médicaux","school fees":"Frais de scolarité","fuel purchase":"Achat de carburant",
@@ -788,7 +788,7 @@ const transactionLabelTranslations: Record<SupportedLocale, Record<string,string
   },
   pt: {
     "transactions":"Transações","transaction":"Transação","transaction history":"Histórico de transações",
-    "pharmacy bill":"Conta da farmácia","rent payment":"Pagamento do aluguel","electricity bill":"Conta de eletricidade",
+    "pharmacy bill":"Conta da farmácia","pharmacy purchase":"Compra na farmácia","bonus payment":"Pagamento de bônus","vehicle maintenance":"Manutenção do veículo","rent payment":"Pagamento do aluguel","electricity bill":"Conta de eletricidade",
     "grocery purchase":"Compra de alimentos","groceries":"Mantimentos","internet bill":"Conta de internet",
     "salary payment":"Pagamento de salário","monthly subscription":"Assinatura mensal","restaurant bill":"Conta do restaurante",
     "medical expenses":"Despesas médicas","school fees":"Mensalidades escolares","fuel purchase":"Compra de combustível",
@@ -798,7 +798,7 @@ const transactionLabelTranslations: Record<SupportedLocale, Record<string,string
   },
   de: {
     "transactions":"Transaktionen","transaction":"Transaktion","transaction history":"Transaktionsverlauf",
-    "pharmacy bill":"Apothekenrechnung","rent payment":"Mietzahlung","electricity bill":"Stromrechnung",
+    "pharmacy bill":"Apothekenrechnung","pharmacy purchase":"Apothekeneinkauf","bonus payment":"Bonuszahlung","vehicle maintenance":"Fahrzeuginstandhaltung","rent payment":"Mietzahlung","electricity bill":"Stromrechnung",
     "grocery purchase":"Lebensmitteleinkauf","groceries":"Lebensmittel","internet bill":"Internetrechnung",
     "salary payment":"Gehaltszahlung","monthly subscription":"Monatsabonnement","restaurant bill":"Restaurantrechnung",
     "medical expenses":"Medizinische Ausgaben","school fees":"Schulgebühren","fuel purchase":"Kraftstoffkauf",
