@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
+import { setDashboardAccount } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,7 @@ export default async function DashboardPage() {
   if (userError || !user) redirect("/login");
 
   const [{ data: profile }, { data: accounts, error: accountError }, { count: unreadCount }] = await Promise.all([
-    supabase.from("profiles").select("first_name,last_name,display_name").eq("user_id", user.id).maybeSingle(),
+    supabase.from("profiles").select("first_name,last_name,display_name,dashboard_account_id").eq("user_id", user.id).maybeSingle(),
     supabase.from("account_balances")
       .select("account_id,account_number,account_name,nickname,account_type,currency,status,balance_minor")
       .eq("user_id", user.id),
@@ -47,7 +48,8 @@ export default async function DashboardPage() {
   const displayName = profile?.display_name ||
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
     user.email?.split("@")[0] || "there";
-  const primary = accounts?.[0];
+  const activeAccounts = (accounts ?? []).filter(account => account.status === "active");
+  const primary = activeAccounts.find(account => account.account_id === profile?.dashboard_account_id) ?? activeAccounts[0] ?? accounts?.[0];
   const totalMinor = (accounts ?? []).reduce((sum, account) =>
     sum + (account.currency === "USD" ? Number(account.balance_minor ?? 0) : 0), 0);
   const accountIds = (accounts ?? []).map(account => account.account_id);
@@ -168,6 +170,12 @@ export default async function DashboardPage() {
               primary ? <div className="account-row"><div className="account-symbol"><Wallet size={19}/></div><div className="account-details"><strong>{primary.nickname || primary.account_name}</strong><span>{primary.account_type} · {primary.account_number}</span></div><div className="account-balance"><strong>{money(Number(primary.balance_minor), primary.currency, locale)}</strong><span>{primary.status}</span></div></div> :
               <div className="dashboard-empty">{t("dashboard.noAccount")}</div>}
             {primary && <div className="account-card-foot"><span>{t("dashboard.accountNumber")}</span><strong>{primary.account_number}</strong></div>}
+            {activeAccounts.length > 1 && <form action={setDashboardAccount} className="overview-account-picker">
+              <label htmlFor="overview-account-choice">{pt("Account shown on overview")}</label>
+              <div><select id="overview-account-choice" name="account_id" defaultValue={primary?.account_id ?? ""}>
+                {activeAccounts.map(account => <option key={account.account_id} value={account.account_id}>{account.nickname || account.account_name} · {account.currency} · {account.account_number}</option>)}
+              </select><button type="submit">{pt("Save selection")}</button></div>
+            </form>}
           </article>
 
           <article className="dashboard-panel quick-panel">
