@@ -15,15 +15,15 @@ export async function submitExternalTransferRequest(formData: FormData) {
   const beneficiaryName = String(formData.get("beneficiary_name") || "").trim();
   const accountNumber = String(formData.get("account_number") || "").trim();
   const routingNumber = String(formData.get("routing_number") || "").trim();
-  const sortCode = String(formData.get("sort_code") || "").replace(/\\D/g, "");
-  const iban = String(formData.get("iban") || "").replace(/\\s/g, "").toUpperCase();
+  const sortCode = String(formData.get("sort_code") || "").replace(/\D/g, "");
+  const iban = String(formData.get("iban") || "").replace(/\s/g, "").toUpperCase();
   const bic = String(formData.get("bic") || "").trim().toUpperCase();
   const amountText = String(formData.get("amount") || "").trim();
   const pin = String(formData.get("pin") || "").trim();
 
   if (!sourceAccountId || !/^[A-Z]{2}$/.test(country) || bankName.length < 2 ||
-      beneficiaryName.length < 2 || !/^\\d+(\\.\\d{1,2})?$/.test(amountText) ||
-      !/^\\d{6}$/.test(pin)) {
+      beneficiaryName.length < 2 || !/^\d+(\.\d{1,2})?$/.test(amountText) ||
+      !/^\d{6}$/.test(pin)) {
     redirect("/dashboard/transfers?error=" + encodeURIComponent("Check the recipient details, amount and six-digit transaction PIN."));
   }
   const amountMinor = Math.round(Number(amountText) * 100);
