@@ -156,6 +156,26 @@ export async function reviewTransfer(formData: FormData) {
   resultUrl("success", decision === "approve" ? "Transfer approved and posted." : "Transfer rejected.");
 }
 
+export async function reviewExternalTransfer(formData: FormData) {
+  const supabase = await requireAdmin();
+  const requestId = String(formData.get("request_id") || "");
+  const decision = String(formData.get("decision") || "");
+  const reason = String(formData.get("reason") || "").trim();
+  if (!requestId || !["approve", "reject"].includes(decision) || reason.length < 8) {
+    redirect("/admin/reviews?kind=error&message=" + encodeURIComponent("Choose a decision and provide a review reason of at least 8 characters."));
+  }
+  const { data, error } = await supabase.rpc("admin_review_external_transfer", {
+    p_request_id: requestId,
+    p_decision: decision,
+    p_reason: reason,
+  });
+  if (error) redirect("/admin/reviews?kind=error&message=" + encodeURIComponent(error.message));
+  const result = Array.isArray(data) ? data[0] : data;
+  revalidatePath("/admin/reviews");
+  revalidatePath("/dashboard/transfers");
+  redirect("/admin/reviews?external_result=" + decision + "&reference=" + encodeURIComponent(result?.reference || ""));
+}
+
 export async function setDeviceTrust(formData: FormData) {
   const supabase = await requireAdmin();
   const deviceId = String(formData.get("device_id") || "");
