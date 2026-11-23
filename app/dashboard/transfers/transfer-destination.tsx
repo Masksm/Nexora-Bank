@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useMemo,useState } from "react";
+import type { FormEvent } from "react";
 import { ArrowUpRight,Globe2,Landmark,ShieldCheck,Wallet,PlusCircle,LockKeyhole,UserRound,CheckCircle2 } from "lucide-react";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
-import { submitTransferWithPin } from "./secure-actions";
+import { submitTransferWithPin, completeTransferWithOtp } from "./secure-actions";
 import { submitExternalTransferRequest } from "./international-actions";
 import { addBeneficiary } from "../beneficiaries/actions";
 import { bankDirectory } from "@/lib/bank-directory";
@@ -34,6 +35,10 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [verificationStatus,setVerificationStatus]=useState("");
  const [verificationProvider,setVerificationProvider]=useState("");
  const [reviewed,setReviewed]=useState(false);
+ const [transferOtpRequired,setTransferOtpRequired]=useState(false);
+ const [transferOtpCode,setTransferOtpCode]=useState("");
+ const [transferBusy,setTransferBusy]=useState(false);
+ const [transferMessage,setTransferMessage]=useState("");
  const t=(value:string)=>pageText(locale,value),active=accounts.filter(a=>a.status==="active"),usdAccounts=active.filter(a=>a.currency==="USD");
  const countryRecipients=useMemo(()=>beneficiaries.filter(b=>b.country_code===country),[beneficiaries,country]);
  const bankOptions=useMemo(()=>bankDirectory.filter(bank=>bank.country===country),[country]);
@@ -71,6 +76,30 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   }catch(error){setVerification(error instanceof Error?error.message:"The name comparison could not be completed.");}
   finally{setVerificationBusy(false);}
  }
+ async function handleInternalTransferSubmit(event:FormEvent<HTMLFormElement>){
+  event.preventDefault();
+  if(transferBusy)return;
+  setTransferBusy(true);setTransferMessage("");
+  const formData=new FormData(event.currentTarget);
+  try{
+   if(transferOtpRequired){
+    const result=await completeTransferWithOtp(formData);
+    if(result?.error)setTransferMessage(result.error);
+   }else{
+    const result=await submitTransferWithPin(formData);
+    if(result?.status==="otp_required"){
+     setTransferOtpRequired(true);
+     setTransferMessage("A six-digit verification code has been sent to your registered email. Enter it to submit this transfer.");
+    }else if(result?.error){
+     setTransferMessage(result.error);
+    }
+   }
+  }catch(error){
+   setTransferMessage(error instanceof Error?error.message:"The transfer could not be submitted.");
+  }finally{
+   setTransferBusy(false);
+  }
+ }
  function reviewDetails(){
   if(!usdAccounts.some(a=>a.account_id===sourceId)||!recipientName.trim()||!bankName.trim()||!amount||Number(amount)<=0){setVerification("Select an active USD account, then complete the recipient name, bank and a valid amount.");return;}
   if(country==="US"&&(!/^\d{9}$/.test(routingNumber)||!/^\d{4,17}$/.test(accountNumber))){setVerification("Enter a valid 9-digit routing number and account number.");return;}
@@ -84,13 +113,16 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    <button type="button" role="tab" aria-selected={mode==="internal"} className={mode==="internal"?"active":""} onClick={()=>setMode("internal")}><Wallet size={16}/><span><strong>{t("Internal transfer")}</strong><small>{t("Send to another Nexora account")}</small></span></button>
    <button type="button" role="tab" aria-selected={mode==="international"} className={mode==="international"?"active":""} onClick={()=>setMode("international")}><Globe2 size={16}/><span><strong>{t("International transfer")}</strong><small>{t("Prepare a transfer to an overseas bank")}</small></span></button>
   </div>
-  {mode==="internal" ? (<><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("NEW PAYMENT")}</span><h2>{t("Transfer details")}</h2></div></div>{active.length?<form action={submitTransferWithPin} className="transfer-form">
+  {mode==="internal" ? (<><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("NEW PAYMENT")}</span><h2>{t("Transfer details")}</h2></div></div>{active.length?<form onSubmit={handleInternalTransferSubmit} className="transfer-form">
    <label>{t("Pay from")}<select name="account_id" value={sourceId} onChange={e=>setSourceId(e.target.value)} required>{active.map(a=><option key={a.account_id} value={a.account_id}>{a.account_name} · {a.account_number} · {money(Number(a.balance_minor),locale,a.currency)}</option>)}</select></label>
    <label>{t("Recipient account number")}<input name="recipient" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder={t("10-digit Nexora account number")} required/></label>
    <label>{t("Amount")} ({active.find(a=>a.account_id===sourceId)?.currency??active[0]?.currency??"USD"})<input name="amount" type="number" min="0.01" step="0.01" placeholder={t("250.00")} required/></label>
    <label>{t("Description (optional)")}<input name="description" maxLength={160} placeholder={t("What is this transfer for?")}/></label>
    <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required/></label>
-   <button type="submit">{t("Review and send transfer")} <ArrowUpRight size={15}/></button>
+   {transferOtpRequired&&<label>Email verification code<input name="otp_code" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" value={transferOtpCode} onChange={e=>setTransferOtpCode(e.target.value)} required/></label>}
+   {transferMessage&&<p className="form-hint" role="status">{transferMessage}</p>}
+   {transferOtpRequired&&<button type="button" className="external-transfer-back" onClick={()=>{setTransferOtpRequired(false);setTransferOtpCode("");setTransferMessage("");}}>Edit transfer details</button>}
+   <button type="submit" disabled={transferBusy}>{transferBusy?"Processing…":transferOtpRequired?"Verify code and submit transfer":t("Review and send transfer")} <ArrowUpRight size={15}/></button>
 
   </form>:<div className="workspace-alert">{t("You need an active Nexora account before sending an internal transfer.")}</div>}</>) : (<div className="international-transfer-content">
    <div className="international-transfer-heading"><span className="international-transfer-icon"><Globe2 size={22}/></span><div><span className="workspace-kicker">{t("GLOBAL PAYMENTS")}</span><h2>{t("International bank transfer")}</h2><p>{t("Enter recipient bank details manually or choose a saved beneficiary. Saving a new recipient is optional.")}</p></div></div>
