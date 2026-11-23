@@ -90,7 +90,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    <label>{t("Description (optional)")}<input name="description" maxLength={160} placeholder={t("What is this transfer for?")}/></label>
    <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required/></label>
    <button type="submit">{t("Review and send transfer")} <ArrowUpRight size={15}/></button>
-   <p>{t("Transfers from new or unrecognized devices are held for manual security review before processing.")}</p>
+   <p>{t("Customer-to-customer Nexora transfers are submitted to the assigned admin for approval. The ledger balance changes only after approval.")}</p>
   </form>:<div className="workspace-alert">{t("You need an active Nexora account before sending an internal transfer.")}</div>}</>:<div className="international-transfer-content">
    <div className="international-transfer-heading"><span className="international-transfer-icon"><Globe2 size={22}/></span><div><span className="workspace-kicker">{t("GLOBAL PAYMENTS")}</span><h2>{t("International bank transfer")}</h2><p>{t("Enter recipient bank details manually or choose a saved beneficiary. Saving a new recipient is optional.")}</p></div></div>
    <div className="international-transfer-grid">
