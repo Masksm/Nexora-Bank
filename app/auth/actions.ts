@@ -131,6 +131,7 @@ export async function updateRecoveredPassword(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
   if (error) redirect("/forgot-password?step=update&error=The%20password%20could%20not%20be%20updated.%20Verify%20the%20code%20again.");
+  await supabase.auth.signOut({ scope: "local" });
   cookieStore.set("nexora_recovery_email", "", { path: "/", maxAge: 0 });
   cookieStore.set("nexora_recovery_verified", "", { path: "/", maxAge: 0 });
   redirect("/login?success=Your%20password%20has%20been%20updated.%20Sign%20in%20with%20your%20new%20password.");
