@@ -135,7 +135,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
      <label>{t("Transaction PIN")}<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required placeholder={t("Enter your six-digit PIN")}/></label>
      <div><button type="button" className="external-transfer-back" onClick={()=>setReviewed(false)}>{t("Edit details")}</button><button type="submit">{t("Submit transfer")} <ArrowUpRight size={15}/></button></div>
     </form>
-   </div>
+   </div>}
   </div>)}
  </section>);
 }
