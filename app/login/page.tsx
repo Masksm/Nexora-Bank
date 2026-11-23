@@ -22,7 +22,7 @@ export default async function LoginPage({ searchParams }: Props) {
           <input type="hidden" name="next" value={params.next ?? "/dashboard"} />
           <label htmlFor="email">{t("Email address")}</label>
           <input id="email" name="email" type="email" autoComplete="email" placeholder={t("you@example.com")} required />
-          <label htmlFor="password">{t("Password")}</label>
+          <div className="auth-password-label"><label htmlFor="password">{t("Password")}</label><Link href="/forgot-password">Forgot password?</Link></div>
           <input id="password" name="password" type="password" autoComplete="current-password" minLength={8} required />
           <button className="auth-submit" type="submit">{t("Sign in")} <span>↗</span></button>
         </form>
