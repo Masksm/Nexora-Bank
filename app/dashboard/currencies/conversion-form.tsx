@@ -16,7 +16,7 @@ export function ConversionForm({accounts}:{accounts:Account[]}){
  const [error,setError]=useState("");
  const source=sourceAccounts.find(a=>a.account_id===from)||sourceAccounts[0];
  const destination=destinationAccounts.find(a=>a.account_id===to)||destinationAccounts[0];
- function changeFromCurrency(value:string){setFromCurrency(value);setFrom(accounts.find(a=>a.currency===value)?.account_id||"");setQuote(null);setError("");}
+ function changeFromCurrency(value:string){const nextTo=toCurrency===value?(currencies.find(c=>c!==value)||""):toCurrency;setFromCurrency(value);setFrom(accounts.find(a=>a.currency===value)?.account_id||"");if(nextTo!==toCurrency){setToCurrency(nextTo);setTo(accounts.find(a=>a.currency===nextTo)?.account_id||"");}setQuote(null);setError("");}
  function changeToCurrency(value:string){setToCurrency(value);setTo(accounts.find(a=>a.currency===value)?.account_id||"");setQuote(null);setError("");}
  async function getQuote(){
   if(!source||!destination||source.currency===destination.currency){setError("Choose two different currencies with active accounts.");return;}
