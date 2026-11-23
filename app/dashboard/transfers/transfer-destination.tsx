@@ -11,7 +11,7 @@ import { bankDirectory } from "@/lib/bank-directory";
 
 type Account={account_id:string;account_number:string;account_name:string;status:string;balance_minor:number;currency:string};
 type Beneficiary={id:string;beneficiary_name:string;bank_name:string;country_code:string;account_number:string|null;routing_number:string|null;sort_code:string|null;iban:string|null;bic:string|null;verification_status:string};
-const countries=[["US","United States"],["NG","Nigeria"],["GB","United Kingdom"],["DE","Germany"],["FR","France"],["NL","Netherlands"],["ES","Spain"],["IE","Ireland"],["AT","Austria"],["BE","Belgium"],["CH","Switzerland"],["PT","Portugal"],["IT","Italy"],["SE","Sweden"],["DK","Denmark"],["FI","Finland"],["NO","Norway"],["PL","Poland"],["GR","Greece"],["LU","Luxembourg"],["CZ","Czechia"],["HU","Hungary"],["RO","Romania"],["BG","Bulgaria"],["HR","Croatia"],["SK","Slovakia"],["SI","Slovenia"],["CY","Cyprus"],["EE","Estonia"],["LV","Latvia"],["LT","Lithuania"],["MT","Malta"],["IS","Iceland"],["LI","Liechtenstein"],["MC","Monaco"],["RS","Serbia"],["TR","Türkiye"],["UA","Ukraine"]];
+const countries=[["US","United States"],["GB","United Kingdom"],["DE","Germany"],["FR","France"],["NL","Netherlands"],["ES","Spain"],["IE","Ireland"],["AT","Austria"],["BE","Belgium"],["CH","Switzerland"],["PT","Portugal"],["IT","Italy"],["SE","Sweden"],["DK","Denmark"],["FI","Finland"],["NO","Norway"],["PL","Poland"],["GR","Greece"],["LU","Luxembourg"],["CZ","Czechia"],["HU","Hungary"],["RO","Romania"],["BG","Bulgaria"],["HR","Croatia"],["SK","Slovakia"],["SI","Slovenia"],["CY","Cyprus"],["EE","Estonia"],["LV","Latvia"],["LT","Lithuania"],["MT","Malta"],["IS","Iceland"],["LI","Liechtenstein"],["MC","Monaco"],["RS","Serbia"],["TR","Türkiye"],["UA","Ukraine"]];
 const ibanCountries=new Set(countries.map(([code])=>code).filter(code=>code!=="US"&&code!=="GB"));
 function money(minor:number,locale:SupportedLocale,currency:string){return new Intl.NumberFormat(locale,{style:"currency",currency}).format(minor/100);}
 export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Account[];beneficiaries:Beneficiary[];locale:SupportedLocale}){
@@ -19,7 +19,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [country,setCountry]=useState("US");
  const [recipientMode,setRecipientMode]=useState<"manual"|"saved">("manual");
  const [beneficiaryId,setBeneficiaryId]=useState("");
- const [sourceId,setSourceId]=useState(accounts.find(a=>a.status==="active")?.account_id??accounts[0]?.account_id??"");
+ const [sourceId,setSourceId]=useState(accounts.find(a=>a.status==="active"&&a.currency==="USD")?.account_id??accounts.find(a=>a.status==="active")?.account_id??accounts[0]?.account_id??"");
  const [bankName,setBankName]=useState("");
  const [recipientName,setRecipientName]=useState("");
  const [accountNumber,setAccountNumber]=useState("");
@@ -34,7 +34,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [verificationStatus,setVerificationStatus]=useState("");
  const [verificationProvider,setVerificationProvider]=useState("");
  const [reviewed,setReviewed]=useState(false);
- const t=(value:string)=>pageText(locale,value),active=accounts.filter(a=>a.status==="active");
+ const t=(value:string)=>pageText(locale,value),active=accounts.filter(a=>a.status==="active"),usdAccounts=active.filter(a=>a.currency==="USD");
  const countryRecipients=useMemo(()=>beneficiaries.filter(b=>b.country_code===country),[beneficiaries,country]);
  const bankOptions=useMemo(()=>bankDirectory.filter(bank=>bank.country===country),[country]);
  const chosen=countryRecipients.find(b=>b.id===beneficiaryId)??null;
@@ -72,7 +72,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   finally{setVerificationBusy(false);}
  }
  function reviewDetails(){
-  if(!active.some(a=>a.account_id===sourceId)||!recipientName.trim()||!bankName.trim()||!amount||Number(amount)<=0){setVerification("Complete the source account, recipient name, bank and a valid amount before reviewing.");return;}
+  if(!usdAccounts.some(a=>a.account_id===sourceId)||!recipientName.trim()||!bankName.trim()||!amount||Number(amount)<=0){setVerification("Select an active USD account, then complete the recipient name, bank and a valid amount.");return;}
   if(country==="US"&&(!/^\\d{9}$/.test(routingNumber)||!/^\\d{4,17}$/.test(accountNumber))){setVerification("Enter a valid 9-digit routing number and account number.");return;}
   if(country==="GB"&&(!/^\\d{6}$/.test(sortCode)||!/^\\d{8}$/.test(accountNumber))){setVerification("Enter a valid 6-digit sort code and 8-digit account number.");return;}
   if(usesIban&&!iban.trim()){setVerification("Enter the recipient IBAN.");return;}
@@ -95,7 +95,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   </form>:<div className="workspace-alert">{t("You need an active Nexora account before sending an internal transfer.")}</div>}</>:<div className="international-transfer-content">
    <div className="international-transfer-heading"><span className="international-transfer-icon"><Globe2 size={22}/></span><div><span className="workspace-kicker">{t("GLOBAL PAYMENTS")}</span><h2>{t("International bank transfer")}</h2><p>{t("Enter recipient bank details manually or choose a saved beneficiary. Saving a new recipient is optional.")}</p></div></div>
    <div className="international-transfer-grid">
-    <label>{t("Pay from")}<select value={sourceId} onChange={e=>{setSourceId(e.target.value);setReviewed(false);}} disabled={!active.length}><option value="">{t("Select a source account")}</option>{active.map(a=><option key={a.account_id} value={a.account_id}>{a.account_name} · {a.account_number} · {money(Number(a.balance_minor),locale,a.currency)}</option>)}</select></label>
+    <label>{t("Pay from")}<select value={sourceId} onChange={e=>{setSourceId(e.target.value);setReviewed(false);}} disabled={!usdAccounts.length}><option value="">{t("Select a USD source account")}</option>{usdAccounts.map(a=><option key={a.account_id} value={a.account_id}>{a.account_name} · {a.account_number} · {money(Number(a.balance_minor),locale,a.currency)}</option>)}</select></label>
     <label>{t("Destination country")}<select value={country} onChange={e=>changeCountry(e.target.value)}>{countries.map(([code,name])=><option key={code} value={code}>{t(name)}</option>)}</select></label>
     <div className="recipient-entry-mode"><button type="button" className={recipientMode==="manual"?"active":""} onClick={()=>{setRecipientMode("manual");clearRecipient();}}>{t("Enter details manually")}</button><button type="button" className={recipientMode==="saved"?"active":""} onClick={()=>{setRecipientMode("saved");clearRecipient();}}>{t("Use saved beneficiary")}</button></div>
    </div>
@@ -118,9 +118,9 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
      <button type="submit" disabled={!recipientName.trim()||!bankName.trim()}><PlusCircle size={15}/>{t("Save these details as a beneficiary (optional)")}</button>
     </form>
    </div>}
-   <div className="international-transfer-actions"><label>{t("Transfer amount")} ({active.find(a=>a.account_id===sourceId)?.currency??"USD"})<input type="number" min="0.01" step="0.01" value={amount} onChange={e=>{setAmount(e.target.value);setReviewed(false);}} placeholder="250.00"/></label><button type="button" onClick={reviewDetails}>{t("Review transfer details")} <ArrowUpRight size={15}/></button></div>
+   <div className="international-transfer-actions"><label>{t("Transfer amount")} ("USD")<input type="number" min="0.01" step="0.01" value={amount} onChange={e=>{setAmount(e.target.value);setReviewed(false);}} placeholder="250.00"/></label><button type="button" onClick={reviewDetails}>{t("Review transfer details")} <ArrowUpRight size={15}/></button></div>
    {verification&&!reviewed&&<p className="form-hint" role="status">{verification}</p>}
-   {reviewed&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><CheckCircle2 size={17}/>{t("Review transfer")}</span></div><h3>{recipientName}</h3><p>{bankName} · {t(countries.find(([code])=>code===country)?.[1]??country)}</p><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:active.find(a=>a.account_id===sourceId)?.currency||"USD"}).format(Number(amount))}</strong><p>{t("Confirm the recipient and amount, then submit your transfer request for administrator review.")}</p>
+   {reviewed&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><CheckCircle2 size={17}/>{t("Review transfer")}</span></div><h3>{recipientName}</h3><p>{bankName} · {t(countries.find(([code])=>code===country)?.[1]??country)}</p><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:"USD"}).format(Number(amount))}</strong><p>{t("Confirm the recipient and amount, then submit your transfer request for administrator review.")}</p>
     <form action={submitExternalTransferRequest} className="external-transfer-submit-form">
      <input type="hidden" name="source_account_id" value={sourceId}/>
      <input type="hidden" name="country" value={country}/>
