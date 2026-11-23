@@ -174,12 +174,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  if (!ibanCountries.has(countryCode)) {
-    return NextResponse.json({
-      error: "Live account-name confirmation is not currently available for this country's account format. Basic format checks are not bank confirmation.",
-      code: "COUNTRY_NOT_SUPPORTED",
-    }, { status: 422 });
-  }
   if (iban.slice(0, 2) !== countryCode || !validIban(iban)) {
     return NextResponse.json({ error: "Enter a valid recipient IBAN for the selected country." }, { status: 400 });
   }
