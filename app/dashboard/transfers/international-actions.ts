@@ -68,5 +68,19 @@ export async function submitExternalTransferRequest(formData:FormData) {
  }
  cookieStore.set("nexora_transfer_otp_challenge","",{path:"/",maxAge:0});
  revalidatePath("/dashboard");revalidatePath("/dashboard/transfers");revalidatePath("/dashboard/transactions");
- redirect("/dashboard/transfers?external=queued&reference="+encodeURIComponent(result?.reference||""));
+ if(!result?.request_id||!result?.reference)return {error:"The transfer request was submitted, but its tracking reference could not be loaded. Refresh your transfers page."};
+ return {status:"submitted",requestId:String(result.request_id),reference:String(result.reference)};
+}
+
+
+export async function getExternalTransferStatus(requestId:string) {
+ const supabase=await createClient();
+ const {data:{user}}=await supabase.auth.getUser();
+ if(!user)return {error:"Authentication required."};
+ if(!/^[0-9a-f-]{36}$/i.test(requestId))return {error:"Invalid transfer reference."};
+ const {data,error}=await supabase.from("external_transfer_requests")
+  .select("reference,status,admin_reason")
+  .eq("id",requestId).eq("user_id",user.id).maybeSingle();
+ if(error||!data)return {error:"Transfer status is temporarily unavailable."};
+ return {reference:data.reference,status:data.status,reason:data.admin_reason};
 }
