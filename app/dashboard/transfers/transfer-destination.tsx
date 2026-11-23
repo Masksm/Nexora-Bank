@@ -53,8 +53,8 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    const response=await fetch("/api/bank-account-verification/verify-name",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
    const result=await response.json();
    if(!response.ok)throw new Error(result.error||"The name comparison could not be completed.");
-   const labels:Record<string,string>={match:"Recipient name matches the sandbox comparison.",partial_match:"Recipient name is a partial match in the sandbox.",no_match:"Recipient name does not match the sandbox comparison.",unavailable:"The provider returned no name-comparison result."};
-   setVerification(labels[result.status]||"No comparison result is available.");
+   const labels:Record<string,string>={match:"The bank confirmed the account name matches.",partial_match:"The bank returned a partial name match. Review carefully.",no_match:"The bank returned a different account-holder name.",unavailable:"The bank could not confirm the name at this time."};
+   setVerification((labels[result.status]||result.message||"No confirmation result is available.")+(result.accountName?" Account name returned: "+result.accountName:""));
    setVerificationStatus(result.status);
   }catch(error){setVerification(error instanceof Error?error.message:"The name comparison could not be completed.");}
   finally{setVerificationBusy(false);}
@@ -63,7 +63,8 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   if(!active.some(a=>a.account_id===sourceId)||!recipientName.trim()||!bankName.trim()||!amount||Number(amount)<=0){setVerification("Complete the source account, recipient name, bank and a valid amount before reviewing.");return;}
   if(country==="US"&&(!/^\\d{9}$/.test(routingNumber)||!/^\\d{4,17}$/.test(accountNumber))){setVerification("Enter a valid 9-digit routing number and account number.");return;}
   if(country==="GB"&&(!/^\\d{6}$/.test(sortCode)||!/^\\d{8}$/.test(accountNumber))){setVerification("Enter a valid 6-digit sort code and 8-digit account number.");return;}
-  if(usesIban&&!iban.trim()){setVerification("Enter the recipient IBAN.");return;}\n  if(country==="NG"&&(!/^\\d{10}$/.test(accountNumber)||!bankName.trim())){setVerification("Enter a 10-digit Nigerian account number and select the bank.");return;}
+  if(usesIban&&!iban.trim()){setVerification("Enter the recipient IBAN.");return;}
+  if(country==="NG"&&(!/^\\d{10}$/.test(accountNumber)||!bankName.trim())){setVerification("Enter a 10-digit Nigerian account number and select the bank.");return;}
   setVerification("");setReviewed(true);
  }
  return <section className="workspace-panel transfer-destination-panel">
@@ -92,7 +93,8 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
     {!countryRecipients.length&&<p className="form-hint">{t("No saved beneficiaries exist for this country. Switch to manual entry to continue.")}</p>}
    </div>:<div className="international-transfer-grid">
     <label>{t("Bank name")}<input value={bankName} onChange={e=>{setBankName(e.target.value);setReviewed(false);}} list="international-bank-options" maxLength={120} placeholder={t("Enter or select the recipient bank")}/><datalist id="international-bank-options">{bankOptions.map(bank=><option key={bank.name} value={bank.name}/>)}</datalist></label>
-    {country==="NG"&&<label>{t("Account number")}<input value={accountNumber} onChange={e=>setAccountNumber(e.target.value.replace(/\\D/g,"").slice(0,10))} inputMode="numeric" maxLength={10} placeholder="10-digit NUBAN account number"/></label>}\n    {country==="US"&&<><label>{t("Routing number")}<input value={routingNumber} onChange={e=>setRoutingNumber(e.target.value.replace(/\\D/g,"").slice(0,9))} inputMode="numeric" placeholder="9-digit ABA routing number"/></label><label>{t("Account number")}<input value={accountNumber} onChange={e=>setAccountNumber(e.target.value.replace(/\\D/g,"").slice(0,17))} inputMode="numeric" placeholder={t("Recipient bank account number")}/></label></>}
+    {country==="NG"&&<label>{t("Account number")}<input value={accountNumber} onChange={e=>setAccountNumber(e.target.value.replace(/\\D/g,"").slice(0,10))} inputMode="numeric" maxLength={10} placeholder="10-digit NUBAN account number"/></label>}
+    {country==="US"&&<><label>{t("Routing number")}<input value={routingNumber} onChange={e=>setRoutingNumber(e.target.value.replace(/\\D/g,"").slice(0,9))} inputMode="numeric" placeholder="9-digit ABA routing number"/></label><label>{t("Account number")}<input value={accountNumber} onChange={e=>setAccountNumber(e.target.value.replace(/\\D/g,"").slice(0,17))} inputMode="numeric" placeholder={t("Recipient bank account number")}/></label></>}
     {country==="GB"&&<><label>{t("Sort code")}<input value={sortCode} onChange={e=>setSortCode(e.target.value.replace(/\\D/g,"").slice(0,6))} inputMode="numeric" placeholder="6 digits"/></label><label>{t("Account number")}<input value={accountNumber} onChange={e=>setAccountNumber(e.target.value.replace(/\\D/g,"").slice(0,8))} inputMode="numeric" placeholder="8 digits"/></label><label>{t("IBAN (optional)")}<input value={iban} onChange={e=>setIban(e.target.value.toUpperCase().replace(/\\s/g,""))} autoCapitalize="characters" placeholder="GB…"/></label></>}
     {usesIban&&<label>{t("IBAN")}<input value={iban} onChange={e=>setIban(e.target.value.toUpperCase().replace(/\\s/g,""))} autoCapitalize="characters" maxLength={34} placeholder={t("Enter recipient IBAN")}/></label>}
     <label>{t("BIC / SWIFT (optional)")}<input value={bic} onChange={e=>setBic(e.target.value.toUpperCase().replace(/\\s/g,"").slice(0,11))} autoCapitalize="characters" placeholder="BIC / SWIFT"/></label>
