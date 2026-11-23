@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;
+
 function externalPayloadHash(values:string[]) {
  const canonical=values.map(value=>`${Buffer.byteLength(value,"utf8")}:${value}`).join("|");
  return createHash("sha256").update(canonical).digest("hex");
@@ -17,7 +19,7 @@ async function currentDeviceFingerprint() {
  if(!/^[a-f0-9-]{36}$/i.test(deviceId)) return null;
  return createHash("sha256").update(`${deviceId}|${userAgent}`).digest("hex");
 }
-async function pinFailureMessage(supabase:any,status:string) {
+async function pinFailureMessage(supabase:ServerSupabaseClient,status:string) {
  if(status==="pin_locked") return "Your transaction PIN is temporarily blocked after four incorrect attempts. Try again after 15 minutes.";
  const {data}=await supabase.rpc("get_transaction_pin_status");const row=Array.isArray(data)?data[0]:data;
  if(row?.is_locked) return "Your transaction PIN is temporarily blocked after four incorrect attempts. Try again after 15 minutes.";
