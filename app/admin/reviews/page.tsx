@@ -56,7 +56,7 @@ export default async function AdminReviewsPage({searchParams}:Props) {
       </section>
       <section className="admin-panel admin-review-panel external-transfer-review-panel"><div className="admin-panel-heading"><div><span>INTERNATIONAL PAYMENTS</span><h2>International transfer requests</h2></div><span>{externalPending?.length??0} pending</span></div>
         {!externalPending?.length?<p className="admin-empty">No international transfer requests are waiting for approval.</p>:<div className="admin-review-list">{externalPending.map(request=>{const source=externalSourceMap.get(request.source_account_id);return <article className="admin-review-card external-transfer-review-card" key={request.id}>
-          <div className="admin-review-meta"><ShieldAlert size={17}/><span><strong>{money(Number(request.amount_minor),request.currency)}</strong><small>{request.reference} · {new Date(request.created_at).toLocaleString()}</small></span><b className="external-transfer-test-badge">TEST WORKFLOW</b></div>
+          <div className="admin-review-meta"><ShieldAlert size={17}/><span><strong>{money(Number(request.amount_minor),request.currency)}</strong><small>{request.reference} · {new Date(request.created_at).toLocaleString()}</small></span></div>
           <div className="external-transfer-review-details">
             <div><small>RECIPIENT</small><strong>{request.beneficiary_name}</strong></div>
             <div><small>BANK</small><strong>{request.bank_name} · {request.destination_country}</strong></div>
@@ -68,7 +68,7 @@ export default async function AdminReviewsPage({searchParams}:Props) {
             {request.iban&&<div><small>IBAN</small><strong>{request.iban}</strong></div>}
             {request.bic&&<div><small>BIC / SWIFT</small><strong>{request.bic}</strong></div>}
           </div>
-          <form action={reviewExternalTransfer} className="admin-form"><input type="hidden" name="request_id" value={request.id}/><label>Review reason<input name="reason" minLength={8} maxLength={240} placeholder="Reason for approval or rejection" required/></label><div className="admin-review-buttons"><button name="decision" value="approve" type="submit"><Check size={14}/> Approve test request</button><button name="decision" value="reject" type="submit" className="reject"><X size={14}/> Reject request</button></div></form>
+          <form action={reviewExternalTransfer} className="admin-form"><input type="hidden" name="request_id" value={request.id}/><label>Review reason<input name="reason" minLength={8} maxLength={240} placeholder="Reason for approval or rejection" required/></label><div className="admin-review-buttons"><button name="decision" value="approve" type="submit"><Check size={14}/> Approve transfer</button><button name="decision" value="reject" type="submit" className="reject"><X size={14}/> Reject request</button></div></form>
         </article>})}</div>}
       </section>
       <section className="admin-panel admin-device-panel"><div className="admin-panel-heading"><div><span>{t("DEVICE RECOGNITION")}</span><h2>{t("Known and unfamiliar devices")}</h2></div><span>{devices?.length??0} devices</span></div>
