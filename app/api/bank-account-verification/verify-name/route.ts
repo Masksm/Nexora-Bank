@@ -24,30 +24,46 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Sign in to continue." }, { status: 401 });
 
-  let body: { beneficiaryId?: string; consent?: boolean };
+  let body: {
+    beneficiaryId?: string;
+    consent?: boolean;
+    manualRecipient?: { countryCode?: string; name?: string; iban?: string };
+  };
   try { body = await request.json(); } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
-  const beneficiaryId = String(body.beneficiaryId || "");
-  if (!/^[0-9a-f-]{36}$/i.test(beneficiaryId)) {
-    return NextResponse.json({ error: "Select a valid beneficiary." }, { status: 400 });
-  }
   if (body.consent !== true) {
-    return NextResponse.json({ error: "Consent is required before sending the IBAN and recipient name to the verification provider." }, { status: 400 });
+    return NextResponse.json({ error: "Consent is required before sending recipient details to the verification provider." }, { status: 400 });
   }
 
-  const { data: beneficiary, error } = await supabase.from("beneficiaries")
-    .select("beneficiary_name,iban,country_code")
-    .eq("id", beneficiaryId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error || !beneficiary) return NextResponse.json({ error: "Beneficiary not found." }, { status: 404 });
-  if (!beneficiary.iban || !supportedCountries.has(beneficiary.country_code)) {
-    return NextResponse.json({ error: "Account-name verification is currently available for IBANs from the UK and 20 SEPA countries." }, { status: 400 });
+  let countryCode = "";
+  let name = "";
+  let iban = "";
+  if (body.beneficiaryId) {
+    const beneficiaryId = String(body.beneficiaryId);
+    if (!/^[0-9a-f-]{36}$/i.test(beneficiaryId)) {
+      return NextResponse.json({ error: "Select a valid beneficiary." }, { status: 400 });
+    }
+    const { data: beneficiary, error } = await supabase.from("beneficiaries")
+      .select("beneficiary_name,iban,country_code")
+      .eq("id", beneficiaryId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (error || !beneficiary) return NextResponse.json({ error: "Beneficiary not found." }, { status: 404 });
+    countryCode = beneficiary.country_code;
+    name = beneficiary.beneficiary_name;
+    iban = String(beneficiary.iban || "").replace(/\\s/g, "").toUpperCase();
+  } else {
+    countryCode = String(body.manualRecipient?.countryCode || "").toUpperCase();
+    name = String(body.manualRecipient?.name || "").trim().slice(0, 100);
+    iban = String(body.manualRecipient?.iban || "").replace(/\\s/g, "").toUpperCase();
   }
-  if (beneficiary.iban.slice(0, 2) !== beneficiary.country_code || !validIban(beneficiary.iban)) {
-    return NextResponse.json({ error: "Enter a valid IBAN before checking the account-holder name." }, { status: 400 });
+
+  if (!supportedCountries.has(countryCode)) {
+    return NextResponse.json({ error: "Account-name comparison is currently available only for supported UK and SEPA IBAN formats." }, { status: 400 });
+  }
+  if (name.length < 2 || iban.slice(0, 2) !== countryCode || !validIban(iban)) {
+    return NextResponse.json({ error: "Enter a valid recipient name and IBAN for the selected country." }, { status: 400 });
   }
 
   try {
@@ -58,7 +74,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify({ IBAN: beneficiary.iban, name: beneficiary.beneficiary_name }),
+      body: JSON.stringify({ IBAN: iban, name }),
       cache: "no-store",
       signal: AbortSignal.timeout(15000),
     });
@@ -91,6 +107,7 @@ export async function POST(request: NextRequest) {
       bic: result.result?.bic || null,
       provider: "IBAN.com BAV Sandbox",
       sandbox: true,
+      message: "This is a sandbox comparison, not a live confirmation from the recipient's bank.",
     });
   } catch {
     return NextResponse.json({ error: "The account-name service could not be reached. Try again." }, { status: 503 });
