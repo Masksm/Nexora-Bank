@@ -34,6 +34,15 @@ async function currentDeviceFingerprint() {
  return createHash("sha256").update(`${deviceId}|${userAgent}`).digest("hex");
 }
 
+async function pinFailureMessage(supabase:any,status:string) {
+ if(status==="pin_locked") return "Your transaction PIN is temporarily blocked after four incorrect attempts. Try again after 15 minutes.";
+ const {data}=await supabase.rpc("get_transaction_pin_status");
+ const row=Array.isArray(data)?data[0]:data;
+ if(row?.is_locked) return "Your transaction PIN is temporarily blocked after four incorrect attempts. Try again after 15 minutes.";
+ const remaining=Number(row?.attempts_remaining??3);
+ return `Incorrect transaction PIN. ${remaining} attempt${remaining===1?"":"s"} remaining before a 15-minute block.`;
+}
+
 async function finishTransferViews() {
  revalidatePath("/dashboard");
  revalidatePath("/dashboard/accounts");
@@ -48,16 +57,10 @@ export async function submitTransferWithPin(formData:FormData) {
  const parsed=parseTransfer(formData);
  if("error" in parsed) return {error:parsed.error};
  const {accountId,recipient,amountMinor,description,pin}=parsed;
-
  const {data,error}=await supabase.rpc("transfer_funds_with_pin",{
-  p_from_account_id:accountId,
-  p_recipient_account_number:recipient,
-  p_amount_minor:amountMinor,
-  p_description:description||null,
-  p_idempotency_key:randomUUID(),
-  p_pin:pin,
-  p_otp_challenge_id:null,
-  p_otp_code:null,
+  p_from_account_id:accountId,p_recipient_account_number:recipient,p_amount_minor:amountMinor,
+  p_description:description||null,p_idempotency_key:randomUUID(),p_pin:pin,
+  p_otp_challenge_id:null,p_otp_code:null,
  });
  const result=Array.isArray(data)?data[0]:data;
  const requiresOtp=Boolean(error?.message?.includes("DEVICE_OTP_REQUIRED"))||result?.status==="otp_required";
@@ -65,8 +68,7 @@ export async function submitTransferWithPin(formData:FormData) {
   await supabase.rpc("record_operations_event",{p_severity:"warning",p_category:"transfer",p_service:"Internal transfers",p_operation:"transfer_rejected",p_error_code:error.code||"TRANSFER_REJECTED",p_request_path:"/dashboard/transfers"});
   return {error:error.message};
  }
- if(result?.status==="pin_invalid") return {error:"Incorrect PIN or PIN temporarily locked."};
-
+ if(result?.status==="pin_invalid"||result?.status==="pin_locked") return {error:await pinFailureMessage(supabase,result.status)};
  if(requiresOtp) {
   const fingerprint=await currentDeviceFingerprint();
   if(!fingerprint) return {error:"Your device could not be verified. Sign in again."};
@@ -77,16 +79,11 @@ export async function submitTransferWithPin(formData:FormData) {
   const {data:otpData,error:otpError}=await supabase.functions.invoke("nexora-email-otp",{
    body:{purpose:"transfer",device_fingerprint:fingerprint,payload_hash:payloadHash}
   });
-  if(otpError||!otpData?.success||!otpData?.challenge_id) {
-   return {error:otpData?.error||otpError?.message||"The transfer verification email could not be sent."};
-  }
+  if(otpError||!otpData?.success||!otpData?.challenge_id) return {error:otpData?.error||otpError?.message||"The transfer verification email could not be sent."};
   const cookieStore=await cookies();
-  cookieStore.set("nexora_transfer_otp_challenge",String(otpData.challenge_id),{
-   httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"strict",path:"/",maxAge:10*60
-  });
+  cookieStore.set("nexora_transfer_otp_challenge",String(otpData.challenge_id),{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"strict",path:"/",maxAge:10*60});
   return {status:"otp_required"};
  }
-
  await finishTransferViews();
  if(result?.status==="review") redirect("/dashboard/transfers?review=1");
  redirect("/dashboard/transfers?success=1");
@@ -104,20 +101,14 @@ export async function completeTransferWithOtp(formData:FormData) {
  const cookieStore=await cookies();
  const challengeId=cookieStore.get("nexora_transfer_otp_challenge")?.value||"";
  if(!challengeId) return {error:"Your transfer verification has expired. Submit the transfer again to request a new code."};
-
  const {data,error}=await supabase.rpc("transfer_funds_with_pin",{
-  p_from_account_id:accountId,
-  p_recipient_account_number:recipient,
-  p_amount_minor:amountMinor,
-  p_description:description||null,
-  p_idempotency_key:randomUUID(),
-  p_pin:pin,
-  p_otp_challenge_id:challengeId,
-  p_otp_code:code,
+  p_from_account_id:accountId,p_recipient_account_number:recipient,p_amount_minor:amountMinor,
+  p_description:description||null,p_idempotency_key:randomUUID(),p_pin:pin,
+  p_otp_challenge_id:challengeId,p_otp_code:code,
  });
  if(error) return {error:error.message};
  const result=Array.isArray(data)?data[0]:data;
- if(result?.status==="pin_invalid") return {error:"Incorrect PIN or PIN temporarily locked."};
+ if(result?.status==="pin_invalid"||result?.status==="pin_locked") return {error:await pinFailureMessage(supabase,result.status)};
  if(result?.status==="otp_invalid") return {error:"The verification code is incorrect, expired, or does not match these transfer details."};
  if(result?.status==="otp_required") return {error:"Email verification is required before this transfer can be submitted."};
  cookieStore.set("nexora_transfer_otp_challenge","",{path:"/",maxAge:0});
