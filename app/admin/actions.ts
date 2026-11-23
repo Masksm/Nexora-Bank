@@ -172,7 +172,10 @@ export async function reviewExternalTransfer(formData: FormData) {
   if (error) redirect("/admin/reviews?kind=error&message=" + encodeURIComponent(error.message));
   const result = Array.isArray(data) ? data[0] : data;
   revalidatePath("/admin/reviews");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/accounts");
   revalidatePath("/dashboard/transfers");
+  revalidatePath("/dashboard/transactions");
   redirect("/admin/reviews?external_result=" + decision + "&reference=" + encodeURIComponent(result?.reference || ""));
 }
 
