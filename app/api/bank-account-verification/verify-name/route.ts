@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
+// The VoP provider notes that some banks can take a while to answer.
+// Keep within the standard Vercel Hobby function-duration ceiling.
+export const maxDuration = 60;
 
 const ibanCountries = new Set([
   "AT","BE","HR","CY","EE","FI","FR","DE","GR","IE","IT","LV","LT","LU",
@@ -110,6 +113,82 @@ async function verifyNigeriaAccount(input: {
   });
 }
 
+async function verifyEuropeanPayee(iban: string, name: string) {
+  const apiKey = process.env.IBAN_BAV_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({
+      status: "unavailable",
+      nameMatch: "unavailable",
+      valid: null,
+      provider: null,
+      sandbox: false,
+      code: "BAV_PROVIDER_NOT_CONFIGURED",
+      error: "European account-holder name verification is not configured. Add the IBAN_BAV_API_KEY from your IBAN.com Bank Account Verification (VoP) subscription to Vercel.",
+    }, { status: 503 });
+  }
+
+  const response = await fetch("https://api.iban.com/clients/api/verify/v3/", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ IBAN: iban, name }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(55000),
+  });
+
+  const payload = await response.json().catch(() => null) as {
+    query?: { IBAN?: string; name?: string; success?: boolean };
+    result?: { valid?: boolean | null; name_match?: "yes" | "partial" | "no" | "unavailable"; bic?: string };
+    error?: string;
+  } | null;
+
+  if (!response.ok || !payload?.query?.success || !payload.result) {
+    const providerError = payload?.error || "";
+    const status = response.status === 400 ? 422 : response.status === 401 ? 502 : response.status === 429 ? 429 : 503;
+    return NextResponse.json({
+      status: "unavailable",
+      nameMatch: "unavailable",
+      valid: null,
+      provider: "IBAN.com Bank Account Verification",
+      sandbox: false,
+      code: providerError || `BAV_HTTP_${response.status}`,
+      error: response.status === 401
+        ? "The IBAN.com verification key was rejected or the BAV subscription is inactive. Check the key and service access in the IBAN.com client area."
+        : response.status === 429
+          ? "The account-name verification service is rate-limited. Wait before trying again."
+          : "The bank could not complete the Verification of Payee request. No name match has been confirmed.",
+    }, { status });
+  }
+
+  const nameMatch = payload.result.name_match || "unavailable";
+  const statusByMatch = {
+    yes: "match",
+    partial: "partial_match",
+    no: "no_match",
+    unavailable: "unavailable",
+  } as const;
+  const status = statusByMatch[nameMatch];
+  const messages = {
+    yes: "The recipient name matches the name returned by the recipient's bank.",
+    partial: "The recipient name is a close match, but not an exact match. Confirm the legal account-holder name before proceeding.",
+    no: "The recipient's bank returned a different account-holder name. Do not proceed until the recipient details are corrected and checked again.",
+    unavailable: "The bank did not provide a name-match verdict. The recipient remains unverified.",
+  } as const;
+
+  return NextResponse.json({
+    status,
+    nameMatch,
+    valid: payload.result.valid ?? null,
+    bic: payload.result.bic || null,
+    provider: "IBAN.com Bank Account Verification (VoP)",
+    sandbox: false,
+    message: messages[nameMatch],
+  });
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -178,152 +257,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Enter a valid recipient IBAN for the selected country." }, { status: 400 });
   }
 
-  const providersAttempted: string[] = [];
-
-  // Provider 1: IBANTEST. Its API key is optional at deployment time,
-  // but the service itself requires a registered key with free credits.
-  const ibanTestKey = process.env.IBANTEST_API_KEY;
-  if (ibanTestKey) {
-    providersAttempted.push("IBANTEST");
-    try {
-      const response = await fetch(
-        `https://api.ibantest.com/v1/validate-iban/${encodeURIComponent(iban)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${ibanTestKey}`,
-            Accept: "application/json",
-          },
-          cache: "no-store",
-          signal: AbortSignal.timeout(12000),
-        },
-      );
-      const result = await response.json() as {
-        valid?: boolean | string;
-        ibanData?: { ibanExt?: string; countryCode?: string };
-        bankData?: { description?: string; bic?: string };
-        countryData?: { name?: string };
-      };
-      if (response.ok && typeof result.valid !== "undefined") {
-        const valid = result.valid === true || result.valid === "true";
-        return NextResponse.json({
-          status: valid ? "valid" : "invalid",
-          valid,
-          provider: "IBANTEST",
-          sandbox: false,
-          bankName: result.bankData?.description || null,
-          bic: result.bankData?.bic || null,
-          formattedIban: result.ibanData?.ibanExt || iban,
-          countryName: result.countryData?.name || null,
-          providersAttempted,
-          message: valid
-            ? "The IBAN passed the provider's format, checksum and available bank-reference checks. This does not prove that the individual account is open or currently able to receive funds."
-            : "The IBAN failed one or more validation checks. Correct the recipient details before continuing.",
-        });
-      }
-    } catch {
-      // Try the next configured provider.
-    }
+  if (!ibanCountries.has(countryCode)) {
+    return NextResponse.json({
+      status: "unavailable",
+      nameMatch: "unavailable",
+      valid: null,
+      code: "COUNTRY_NOT_SUPPORTED",
+      error: "Live Verification of Payee is currently supported only for the UK and the 20 listed SEPA countries. This IBAN cannot receive a name-match result through this provider.",
+    }, { status: 422 });
   }
 
-  // Provider 2: IBANforge. Its keyless trial is used when no key is
-  // configured; a free API key can be added later without code changes.
-  providersAttempted.push("IBANforge");
   try {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-    if (process.env.IBANFORGE_API_KEY) {
-      headers.Authorization = `Bearer ${process.env.IBANFORGE_API_KEY}`;
-    }
-    const response = await fetch("https://api.ibanforge.com/v1/iban/validate", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ iban }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(12000),
-    });
-    const result = await response.json() as {
-      valid?: boolean;
-      error?: string;
-      error_detail?: string;
-      formatted?: string;
-      bic?: { code?: string; bank_name?: string };
-      bank_code_check?: { status?: string; register?: string; authoritative?: boolean };
-      country?: { name?: string; code?: string };
-      attribution?: { text?: string; url?: string };
-    };
-    if (response.ok && typeof result.valid === "boolean") {
-      return NextResponse.json({
-        status: result.valid ? "valid" : "invalid",
-        valid: result.valid,
-        provider: "IBANforge",
-        sandbox: false,
-        bankName: result.bic?.bank_name || null,
-        bic: result.bic?.code || null,
-        formattedIban: result.formatted || iban,
-        countryName: result.country?.name || null,
-        bankCodeStatus: result.bank_code_check?.status || "unknown",
-        bankCodeRegister: result.bank_code_check?.register || null,
-        bankCodeAuthoritative: result.bank_code_check?.authoritative ?? null,
-        attribution: result.attribution || {
-          text: "Powered by IBANforge",
-          url: "https://ibanforge.com",
-        },
-        providersAttempted,
-        message: result.valid
-          ? "The IBAN passed format and checksum validation. Bank-reference information is shown separately where available. This does not prove that the individual account exists or is open."
-          : result.error_detail || "The IBAN failed validation. Correct the recipient details before continuing.",
-      });
-    }
+    return await verifyEuropeanPayee(iban, name);
   } catch {
-    // Try the sandbox fallback.
+    return NextResponse.json({
+      status: "unavailable",
+      nameMatch: "unavailable",
+      valid: null,
+      provider: "IBAN.com Bank Account Verification (VoP)",
+      sandbox: false,
+      code: "BAV_NETWORK_UNAVAILABLE",
+      error: "The Verification of Payee service did not respond in time. No account-holder name has been verified. Try again later.",
+    }, { status: 503 });
   }
-
-  // Provider 3: IBAN.com Sandbox. This is deliberately reported as a
-  // simulation, never as a real validation or bank confirmation.
-  providersAttempted.push("IBAN.com Sandbox");
-  try {
-    const response = await fetch("https://sandbox.iban.com/clients/api/verify/v3/", {
-      method: "POST",
-      headers: {
-        "x-api-key": "testkey",
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ IBAN: iban, name }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(12000),
-    });
-    const result = await response.json() as {
-      query?: { success?: boolean };
-      result?: { valid?: boolean | null; name_match?: "yes" | "partial" | "no" | "unavailable"; bic?: string };
-      error?: string;
-    };
-    if (response.ok && result.query?.success && result.result) {
-      return NextResponse.json({
-        status: "sandbox",
-        valid: null,
-        sandboxResult: result.result.valid ?? null,
-        nameMatch: result.result.name_match || "unavailable",
-        bic: result.result.bic || null,
-        provider: "IBAN.com Sandbox",
-        sandbox: true,
-        providersAttempted,
-        message: "The sandbox returned a simulated test response. It does not confirm that this recipient's real account exists, is open, or can receive a payment.",
-      });
-    }
-  } catch {
-    // All providers are unavailable; report this without guessing.
-  }
-
-  return NextResponse.json({
-    status: "unavailable",
-    valid: null,
-    provider: null,
-    sandbox: false,
-    providersAttempted,
-    error: "IBAN validation services are temporarily unavailable. No validation result was obtained. Try again later.",
-    code: "ALL_PROVIDERS_UNAVAILABLE",
-  }, { status: 503 });
 }
