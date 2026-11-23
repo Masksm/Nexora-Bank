@@ -123,3 +123,35 @@ export async function updateAccountNickname(formData: FormData) {
   revalidatePath("/dashboard");
   redirect("/dashboard/accounts?success=nickname");
 }
+
+
+export async function setDashboardAccount(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const accountId = String(formData.get("account_id") || "");
+  if (!/^[0-9a-f-]{36}$/i.test(accountId)) {
+    redirect("/dashboard/accounts?error=Choose%20a%20valid%20account.");
+  }
+
+  const { data: account, error: accountError } = await supabase
+    .from("account_balances")
+    .select("account_id,status")
+    .eq("account_id", accountId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (accountError || !account || account.status !== "active") {
+    redirect("/dashboard/accounts?error=Only%20your%20active%20accounts%20can%20be%20shown%20on%20the%20overview.");
+  }
+
+  const { error } = await supabase.from("profiles")
+    .update({ dashboard_account_id: accountId, updated_at: new Date().toISOString() })
+    .eq("user_id", user.id);
+
+  if (error) redirect("/dashboard/accounts?error=Unable%20to%20save%20your%20overview%20account.");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/accounts");
+  redirect("/dashboard/accounts?success=overview");
+}
