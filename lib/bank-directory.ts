@@ -45,6 +45,9 @@ export const bankDirectory: BankDirectoryEntry[] = [
     "Swedbank","SEB","Handelsbanken","Nordea","Danske Bank","Länsförsäkringar Bank"
   ].map(name=>({country:"SE",name})),
   ...[
+    "Access bank","Coronation Bank","Diamond bank","Ecobank Nigeria Plc","Fidelity bank","First bank","First City Monument Bank Plc","GTBank","Heritage bank","JAIZ BANK","Keystone bank","Moniepoint MFB","Polaris Bank","Providus Bank","Stanbic IBTC Bank Ltd.","Standard Chartered Bank Nigeria Ltd.","Sterling bank","Suntrust Bank","Union bank","United Bank For Africa Plc","Unity Bank Plc","Wema bank","Zenith bank"
+  ].map(name=>({country:"NG",name})),
+  ...[
     "Nexora Bank"
   ].map(name=>({country:"NX",name})),
 ];
