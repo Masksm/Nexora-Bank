@@ -39,6 +39,10 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [transferOtpCode,setTransferOtpCode]=useState("");
  const [transferBusy,setTransferBusy]=useState(false);
  const [transferMessage,setTransferMessage]=useState("");
+ const [externalOtpRequired,setExternalOtpRequired]=useState(false);
+ const [externalOtpCode,setExternalOtpCode]=useState("");
+ const [externalBusy,setExternalBusy]=useState(false);
+ const [externalMessage,setExternalMessage]=useState("");
  const t=(value:string)=>pageText(locale,value),active=accounts.filter(a=>a.status==="active"),usdAccounts=active.filter(a=>a.currency==="USD");
  const countryRecipients=useMemo(()=>beneficiaries.filter(b=>b.country_code===country),[beneficiaries,country]);
  const bankOptions=useMemo(()=>bankDirectory.filter(bank=>bank.country===country),[country]);
@@ -51,6 +55,24 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   setBeneficiaryId(id);
   const item=countryRecipients.find(b=>b.id===id);
   if(item){setBankName(item.bank_name);setRecipientName(item.beneficiary_name);setAccountNumber(item.account_number||"");setRoutingNumber(item.routing_number||"");setSortCode(item.sort_code||"");setIban(item.iban||"");setBic(item.bic||"");setVerification("");setVerificationStatus("");setReviewed(false);}
+ }
+ async function handleExternalTransferSubmit(event:FormEvent<HTMLFormElement>){
+  event.preventDefault();
+  if(externalBusy)return;
+  setExternalBusy(true);setExternalMessage("");
+  try{
+   const result=await submitExternalTransferRequest(new FormData(event.currentTarget));
+   if(result?.status==="otp_required"){
+    setExternalOtpRequired(true);
+    setExternalMessage("A six-digit verification code has been sent to your registered email. Enter it to submit this international transfer request.");
+   }else if(result?.error){
+    setExternalMessage(result.error);
+   }
+  }catch(error){
+   setExternalMessage(error instanceof Error?error.message:"The international transfer request could not be submitted.");
+  }finally{
+   setExternalBusy(false);
+  }
  }
  async function verifyRecipient(){
   if(!consent||verificationBusy)return;
@@ -153,7 +175,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    <div className="international-transfer-actions"><label>{t("Transfer amount")} (USD)<input type="number" min="0.01" step="0.01" value={amount} onChange={e=>{setAmount(e.target.value);setReviewed(false);}} placeholder="250.00"/></label><button type="button" onClick={reviewDetails}>{t("Review transfer details")} <ArrowUpRight size={15}/></button></div>
    {verification&&!reviewed&&<p className="form-hint" role="status">{verification}</p>}
    {reviewed&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><CheckCircle2 size={17}/>{t("Review transfer")}</span></div><h3>{recipientName}</h3><p>{bankName} · {t(countries.find(([code])=>code===country)?.[1]??country)}</p><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:"USD"}).format(Number(amount))}</strong><p>{t("Confirm the recipient and amount, then submit your transfer request for administrator review.")}</p>
-    <form action={submitExternalTransferRequest} className="external-transfer-submit-form">
+    <form onSubmit={handleExternalTransferSubmit} className="external-transfer-submit-form">
      <input type="hidden" name="source_account_id" value={sourceId}/>
      <input type="hidden" name="country" value={country}/>
      <input type="hidden" name="bank_name" value={bankName}/>
@@ -165,7 +187,9 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
      <input type="hidden" name="bic" value={bic}/>
      <input type="hidden" name="amount" value={amount}/>
      <label>{t("Transaction PIN")}<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required placeholder={t("Enter your six-digit PIN")}/></label>
-     <div><button type="button" className="external-transfer-back" onClick={()=>setReviewed(false)}>{t("Edit details")}</button><button type="submit">{t("Submit transfer")} <ArrowUpRight size={15}/></button></div>
+     {externalOtpRequired&&<label>Email verification code<input name="otp_code" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" value={externalOtpCode} onChange={e=>setExternalOtpCode(e.target.value)} required/></label>}
+     {externalMessage&&<p className="form-hint" role="status">{externalMessage}</p>}
+     <div><button type="button" className="external-transfer-back" onClick={()=>{setReviewed(false);setExternalOtpRequired(false);setExternalOtpCode("");setExternalMessage("");}}>{t("Edit details")}</button><button type="submit" disabled={externalBusy}>{externalBusy?"Processing…":externalOtpRequired?"Verify code and submit request":t("Submit transfer")} <ArrowUpRight size={15}/></button></div>
     </form>
    </div>}
   </div>)}
