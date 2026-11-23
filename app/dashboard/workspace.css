@@ -376,3 +376,25 @@ html[data-theme="dark"] .support-receipt-upload small,html[data-theme="dark"] .s
 .overview-account-picker button,.account-overview-choice button{min-height:36px;padding:0 12px;border:0;border-radius:6px;background:#174d40;color:#fff;font-size:10px;font-weight:700}
 .account-overview-choice{grid-template-columns:1fr auto;align-items:center}
 .account-overview-choice button:disabled{background:#eaf2eb;color:#55715d;cursor:default}
+
+/* International recipient entry and review */
+.recipient-entry-mode{display:flex;gap:8px;flex-wrap:wrap;grid-column:1/-1}
+.recipient-entry-mode button{padding:9px 13px;border:1px solid #dfe8e1;border-radius:7px;background:#fbfdfb;color:#526b5b;font-size:10px;font-weight:700}
+.recipient-entry-mode button.active{background:#174d40;border-color:#174d40;color:#fff}
+.recipient-name-preview,.recipient-verification-box,.save-manual-beneficiary{display:grid;gap:9px;padding:13px;border:1px solid #e2ebe3;border-radius:8px;background:#fbfdfb}
+.recipient-name-preview span{display:flex;align-items:center;gap:7px;color:#7b8d81;font-size:10px}
+.recipient-name-preview strong{font-size:14px;color:#294c3a}
+.recipient-verification-box{grid-column:1/-1}
+.recipient-verification-box>button,.save-manual-beneficiary button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 12px;border:0;border-radius:6px;background:#174d40;color:#fff;font-size:10px;font-weight:700}
+.recipient-verification-box>button:disabled,.save-manual-beneficiary button:disabled{opacity:.5;cursor:not-allowed}
+.recipient-verification-box p{margin:0;color:#788b7e;font-size:10px;line-height:1.5}
+.save-manual-beneficiary{grid-column:1/-1}
+.save-manual-beneficiary button{background:#edf4ee;color:#315a40}
+.currency-how-it-works{margin-bottom:18px}
+.currency-explanation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:18px}
+.currency-explanation-grid>div{padding:14px;border:1px solid #e5ece6;border-radius:8px;background:#fbfdfb}
+.currency-explanation-grid strong{font-size:11px;color:#315a40}
+.currency-explanation-grid p,.currency-conversion-boundary{margin:7px 0 0;color:#788b7e;font-size:10px;line-height:1.7}
+.currency-conversion-boundary{margin:0 18px 18px;padding:12px;border-radius:7px;background:#f3f8f3}
+.currency-conversion-panel .transfer-form label small{font-size:9px;font-weight:400;color:#829287}
+@media(max-width:600px){.overview-account-picker>div{align-items:stretch;flex-direction:column}.account-overview-choice{grid-template-columns:1fr}.recipient-entry-mode button{flex:1}}
