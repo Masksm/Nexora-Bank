@@ -168,3 +168,25 @@ html[data-theme="dark"] .audit-event pre{background:#101a14;color:#dbe6dd}
 
 /* Super Admin operations monitor */
 .admin-search select{min-width:130px;height:35px;padding:0 9px;border:1px solid #e3eae4;border-radius:4px;background:#fff;color:#52675a;font-size:10px}.admin-table td small{display:block;margin-top:4px;color:#96a49a}.admin-stats article strong{font-size:clamp(13px,1.5vw,21px)}.admin-disclaimer{line-height:1.7}
+
+
+/* International transfer test-review queue and admin-only decision dialog. */
+.external-transfer-review-panel{margin-top:18px}
+.external-transfer-review-card{display:grid;gap:14px}
+.external-transfer-test-badge{margin-left:auto;padding:6px 9px;border-radius:999px;background:#fff3d9;color:#8b5b13;font-size:9px;letter-spacing:.08em;white-space:nowrap}
+.external-transfer-review-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px;border:1px solid #e5ece7;border-radius:10px;background:#f8fbf8}
+.external-transfer-review-details>div{display:grid;gap:4px;min-width:0}
+.external-transfer-review-details small{font-size:9px;letter-spacing:.08em;color:#7d8d82}
+.external-transfer-review-details strong{font-size:12px;color:#294b3a;overflow-wrap:anywhere}
+.external-test-result-backdrop{position:fixed;inset:0;z-index:1500;display:grid;place-items:center;padding:18px;background:rgba(9,24,17,.72);backdrop-filter:blur(5px)}
+.external-test-result-dialog{position:relative;width:min(470px,100%);padding:30px;border-radius:18px;background:#fff;box-shadow:0 28px 90px rgba(0,0,0,.32);color:#284638}
+.external-test-result-close{position:absolute;right:15px;top:15px;width:34px;height:34px;border:0;border-radius:50%;background:#f0f4f1;color:#53695b;display:grid;place-items:center;cursor:pointer}
+.external-test-result-icon{display:grid;place-items:center;width:52px;height:52px;margin-bottom:16px;border-radius:15px}
+.external-test-result-icon.approved{background:#e6f5eb;color:#19804c}
+.external-test-result-icon.rejected{background:#fcebea;color:#b34343}
+.external-test-result-kicker{font-size:9px;font-weight:800;letter-spacing:.13em;color:#708176}
+.external-test-result-dialog h2{margin:8px 0 10px;font-size:23px;color:#254535}
+.external-test-result-dialog p{margin:0;color:#65766b;font-size:13px;line-height:1.7}
+.external-test-result-note{margin:18px 0;padding:10px 12px;border:1px solid #f0d8a8;border-radius:8px;background:#fff8e9;color:#875b17;font-size:9px;font-weight:900;letter-spacing:.12em;text-align:center}
+.external-test-result-dialog>button:last-child{width:100%;min-height:42px;border:0;border-radius:9px;background:#174d40;color:#fff;font-weight:800;cursor:pointer}
+@media(max-width:600px){.external-transfer-review-details{grid-template-columns:1fr}.external-test-result-dialog{padding:24px 20px}}
