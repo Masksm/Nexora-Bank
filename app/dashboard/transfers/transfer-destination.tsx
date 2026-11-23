@@ -45,22 +45,24 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [externalMessage,setExternalMessage]=useState("");
  const [externalReview,setExternalReview]=useState<{requestId:string;reference:string;status:"pending"|"approved"|"rejected";reason:string|null}|null>(null);
  const t=(value:string)=>pageText(locale,value),active=accounts.filter(a=>a.status==="active"),usdAccounts=active.filter(a=>a.currency==="USD");
+ const externalRequestId=externalReview?.requestId;
+ const externalReviewStatus=externalReview?.status;
  useEffect(()=>{
-  if(!externalReview||externalReview.status!=="pending")return;
+  if(!externalRequestId||externalReviewStatus!=="pending")return;
   let stopped=false;
   let timer:ReturnType<typeof setTimeout>|undefined;
   const poll=async()=>{
-   const result=await getExternalTransferStatus(externalReview.requestId);
+   const result=await getExternalTransferStatus(externalRequestId);
    if(stopped)return;
    if(result?.status==="approved"||result?.status==="rejected"){
-    setExternalReview(current=>current&&current.requestId===externalReview.requestId?{...current,status:result.status as "approved"|"rejected",reason:result.reason??null}:current);
+    setExternalReview(current=>current&&current.requestId===externalRequestId?{...current,status:result.status as "approved"|"rejected",reason:result.reason??null}:current);
     return;
    }
    timer=setTimeout(()=>void poll(),3000);
   };
   void poll();
   return()=>{stopped=true;if(timer)clearTimeout(timer);};
- },[externalReview?.requestId,externalReview?.status]);
+ },[externalRequestId,externalReviewStatus]);
 
  const countryRecipients=useMemo(()=>beneficiaries.filter(b=>b.country_code===country),[beneficiaries,country]);
  const bankOptions=useMemo(()=>bankDirectory.filter(bank=>bank.country===country),[country]);
