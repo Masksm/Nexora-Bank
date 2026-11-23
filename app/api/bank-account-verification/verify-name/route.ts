@@ -6,11 +6,6 @@ export const runtime = "nodejs";
 // Keep within the standard Vercel Hobby function-duration ceiling.
 export const maxDuration = 60;
 
-const ibanCountries = new Set([
-  "AT","BE","HR","CY","EE","FI","FR","DE","GR","IE","IT","LV","LT","LU",
-  "MT","NL","PT","SK","SI","ES","GB",
-]);
-
 function validIban(value: string) {
   if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/.test(value)) return false;
   const rearranged = value.slice(4) + value.slice(0, 4);
@@ -237,16 +232,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Enter a valid recipient IBAN for the selected country." }, { status: 400 });
   }
 
-  if (!ibanCountries.has(countryCode)) {
-    return NextResponse.json({
-      status: "unavailable",
-      nameMatch: "unavailable",
-      valid: null,
-      code: "COUNTRY_NOT_SUPPORTED",
-      error: "Live Verification of Payee is currently supported only for the UK and the 20 listed SEPA countries. This IBAN cannot receive a name-match result through this provider.",
-    }, { status: 422 });
-  }
-
   try {
     return await validateEuropeanIban(iban);
   } catch {
@@ -256,7 +241,7 @@ export async function POST(request: NextRequest) {
       valid: null,
       provider: "IBANforge",
       sandbox: false,
-      code: "BAV_NETWORK_UNAVAILABLE",
+      code: "IBANFORGE_NETWORK_UNAVAILABLE",
       error: "The free IBAN validation service did not respond in time. No account-holder name has been verified. Try again later.",
     }, { status: 503 });
   }
