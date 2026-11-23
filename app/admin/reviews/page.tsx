@@ -12,8 +12,8 @@ import { ExternalTransferDecisionDialog } from "./external-transfer-result-dialo
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ kind?: string; message?: string; external_result?: string; reference?: string }> };
 
-function money(minor: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Math.abs(minor)/100);
+function money(minor: number, currency = "USD") {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: currency.trim() || "USD" }).format(Math.abs(minor)/100);
 }
 
 export default async function AdminReviewsPage({searchParams}:Props) {
@@ -24,9 +24,10 @@ export default async function AdminReviewsPage({searchParams}:Props) {
   const {data:claims,error:claimsError}=await supabase.auth.getClaims();
   const meta=claims?.claims?.app_metadata as {role?:string}|undefined;
   if(!user||claimsError||!["admin", "super_admin"].includes(meta?.role ?? "")) redirect("/login");
-  const [{data:pending},{data:devices},{data:sessions},params]=await Promise.all([
+  const [{data:pending},{data:externalPending},{data:devices},{data:sessions},params]=await Promise.all([
     supabase.from("ledger_transactions").select("id,reference,description,metadata,created_at,status").eq("transaction_type","transfer").eq("status","pending").order("created_at",{ascending:true}),
-    supabase.from("external_transfer_requests").select("id,reference,user_id,source_account_id,amount_minor,currency,destination_country,bank_name,beneficiary_name,account_number,routing_number,sort_code,iban,bic,created_at").eq("status","pending").order("created_at",{ascending:true}),\n    supabase.from("trusted_devices").select("id,user_id,device_label,user_agent,ip_address,is_trusted,first_seen_at,last_seen_at").order("last_seen_at",{ascending:false}).limit(100),
+    supabase.from("external_transfer_requests").select("id,reference,user_id,source_account_id,amount_minor,currency,destination_country,bank_name,beneficiary_name,account_number,routing_number,sort_code,iban,bic,created_at").eq("status","pending").order("created_at",{ascending:true}),
+    supabase.from("trusted_devices").select("id,user_id,device_label,user_agent,ip_address,is_trusted,first_seen_at,last_seen_at").order("last_seen_at",{ascending:false}).limit(100),
     supabase.from("user_sessions").select("id,user_id,auth_session_id,device_label,ip_address,approximate_location,last_seen_at,created_at,revoked_at").order("last_seen_at",{ascending:false}).limit(100),
     searchParams,
   ]);
@@ -35,7 +36,10 @@ export default async function AdminReviewsPage({searchParams}:Props) {
   const {data:entries}=ids.length?await supabase.from("ledger_entries").select("transaction_id,account_id,amount_minor").in("transaction_id",ids):{data:[]};
   const accountIds=[...new Set((entries??[]).map(x=>x.account_id))];
   const {data:accounts}=accountIds.length?await supabase.from("bank_accounts").select("id,account_number,user_id,account_name").in("id",accountIds):{data:[]};
-  const externalSourceIds=[...new Set((externalPending??[]).map(x=>x.source_account_id))];\n  const {data:externalSourceAccounts}=externalSourceIds.length?await supabase.from("bank_accounts").select("id,account_number,account_name").in("id",externalSourceIds):{data:[]};\n  const externalSourceMap=new Map((externalSourceAccounts??[]).map(x=>[x.id,x]));\n  const accountMap=new Map((accounts??[]).map(x=>[x.id,x]));
+  const externalSourceIds=[...new Set((externalPending??[]).map(x=>x.source_account_id))];
+  const {data:externalSourceAccounts}=externalSourceIds.length?await supabase.from("bank_accounts").select("id,account_number,account_name").in("id",externalSourceIds):{data:[]};
+  const externalSourceMap=new Map((externalSourceAccounts??[]).map(x=>[x.id,x]));
+  const accountMap=new Map((accounts??[]).map(x=>[x.id,x]));
   const entryMap=new Map<string,{from?:string;to?:string;amount?:number;fromUser?:string}>(); 
   for(const entry of entries??[]){
     const account=accountMap.get(entry.account_id);
@@ -75,5 +79,6 @@ export default async function AdminReviewsPage({searchParams}:Props) {
       </section>
       <p className="admin-disclaimer">{t("Transfers from an unrecognized device remain pending and do not affect account balances until an administrator approves them. Device recognition is based on a persistent browser identifier and user-agent, not biometric identity verification.")}</p>
     </section>
-    {params.external_result === "approve" || params.external_result === "reject" ? <ExternalTransferDecisionDialog decision={params.external_result} reference={params.reference??"N/A"}/> : null}\n  </main>;
+    {params.external_result === "approve" || params.external_result === "reject" ? <ExternalTransferDecisionDialog decision={params.external_result} reference={params.reference??"N/A"}/> : null}
+  </main>;
 }
