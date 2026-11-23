@@ -165,21 +165,10 @@ export async function signUp(formData: FormData) {
 export async function signOut() {
   const supabase = await createClient();
 
-  // Revoke the current app session record before ending only this device's
-  // Supabase session. Other devices remain signed in.
+  // Revoke this session through a scoped database function. Customers cannot
+  // directly edit session fingerprints, trust state, or revocation timestamps.
   try {
-    const { data } = await supabase.auth.getClaims();
-    const claims = data?.claims as { session_id?: string } | undefined;
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (user?.id && claims?.session_id) {
-      await supabase
-        .from("user_sessions")
-        .update({ revoked_at: new Date().toISOString() })
-        .eq("user_id", user.id)
-        .eq("auth_session_id", claims.session_id)
-        .is("revoked_at", null);
-    }
+    await supabase.rpc("revoke_current_user_session");
   } catch {
     // Always complete logout even if the session-history update is unavailable.
   }
