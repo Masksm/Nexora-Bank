@@ -118,7 +118,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
      <button type="submit" disabled={!recipientName.trim()||!bankName.trim()}><PlusCircle size={15}/>{t("Save these details as a beneficiary (optional)")}</button>
     </form>
    </div>}
-   <div className="international-transfer-actions"><label>{t("Transfer amount")} ("USD")<input type="number" min="0.01" step="0.01" value={amount} onChange={e=>{setAmount(e.target.value);setReviewed(false);}} placeholder="250.00"/></label><button type="button" onClick={reviewDetails}>{t("Review transfer details")} <ArrowUpRight size={15}/></button></div>
+   <div className="international-transfer-actions"><label>{t("Transfer amount")} (USD)<input type="number" min="0.01" step="0.01" value={amount} onChange={e=>{setAmount(e.target.value);setReviewed(false);}} placeholder="250.00"/></label><button type="button" onClick={reviewDetails}>{t("Review transfer details")} <ArrowUpRight size={15}/></button></div>
    {verification&&!reviewed&&<p className="form-hint" role="status">{verification}</p>}
    {reviewed&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><CheckCircle2 size={17}/>{t("Review transfer")}</span></div><h3>{recipientName}</h3><p>{bankName} · {t(countries.find(([code])=>code===country)?.[1]??country)}</p><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:"USD"}).format(Number(amount))}</strong><p>{t("Confirm the recipient and amount, then submit your transfer request for administrator review.")}</p>
     <form action={submitExternalTransferRequest} className="external-transfer-submit-form">
