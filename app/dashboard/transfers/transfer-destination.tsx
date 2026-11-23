@@ -79,12 +79,12 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   if(country==="NG"&&(!/^\\d{10}$/.test(accountNumber)||!bankName.trim())){setVerification("Enter a 10-digit Nigerian account number and select the bank.");return;}
   setVerification("");setReviewed(true);
  }
- return <section className="workspace-panel transfer-destination-panel">
+ return (<section className="workspace-panel transfer-destination-panel">
   <div className="transfer-mode-switch" role="tablist" aria-label={t("Transfer type")}>
    <button type="button" role="tab" aria-selected={mode==="internal"} className={mode==="internal"?"active":""} onClick={()=>setMode("internal")}><Wallet size={16}/><span><strong>{t("Internal transfer")}</strong><small>{t("Send to another Nexora account")}</small></span></button>
    <button type="button" role="tab" aria-selected={mode==="international"} className={mode==="international"?"active":""} onClick={()=>setMode("international")}><Globe2 size={16}/><span><strong>{t("International transfer")}</strong><small>{t("Prepare a transfer to an overseas bank")}</small></span></button>
   </div>
-  {mode==="internal"?<><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("NEW PAYMENT")}</span><h2>{t("Transfer details")}</h2></div></div>{active.length?<form action={submitTransferWithPin} className="transfer-form">
+  {mode==="internal" ? (<><div className="workspace-panel-heading"><div><span className="workspace-kicker">{t("NEW PAYMENT")}</span><h2>{t("Transfer details")}</h2></div></div>{active.length?<form action={submitTransferWithPin} className="transfer-form">
    <label>{t("Pay from")}<select name="account_id" value={sourceId} onChange={e=>setSourceId(e.target.value)} required>{active.map(a=><option key={a.account_id} value={a.account_id}>{a.account_name} · {a.account_number} · {money(Number(a.balance_minor),locale,a.currency)}</option>)}</select></label>
    <label>{t("Recipient account number")}<input name="recipient" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder={t("10-digit Nexora account number")} required/></label>
    <label>{t("Amount")} ({active.find(a=>a.account_id===sourceId)?.currency??active[0]?.currency??"USD"})<input name="amount" type="number" min="0.01" step="0.01" placeholder={t("250.00")} required/></label>
@@ -92,7 +92,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required/></label>
    <button type="submit">{t("Review and send transfer")} <ArrowUpRight size={15}/></button>
 
-  </form>:<div className="workspace-alert">{t("You need an active Nexora account before sending an internal transfer.")}</div>}</>:<div className="international-transfer-content">
+  </form>:<div className="workspace-alert">{t("You need an active Nexora account before sending an internal transfer.")}</div>}</>) : (<div className="international-transfer-content">
    <div className="international-transfer-heading"><span className="international-transfer-icon"><Globe2 size={22}/></span><div><span className="workspace-kicker">{t("GLOBAL PAYMENTS")}</span><h2>{t("International bank transfer")}</h2><p>{t("Enter recipient bank details manually or choose a saved beneficiary. Saving a new recipient is optional.")}</p></div></div>
    <div className="international-transfer-grid">
     <label>{t("Pay from")}<select value={sourceId} onChange={e=>{setSourceId(e.target.value);setReviewed(false);}} disabled={!usdAccounts.length}><option value="">{t("Select a USD source account")}</option>{usdAccounts.map(a=><option key={a.account_id} value={a.account_id}>{a.account_name} · {a.account_number} · {money(Number(a.balance_minor),locale,a.currency)}</option>)}</select></label>
@@ -136,6 +136,6 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
      <div><button type="button" className="external-transfer-back" onClick={()=>setReviewed(false)}>{t("Edit details")}</button><button type="submit">{t("Submit transfer")} <ArrowUpRight size={15}/></button></div>
     </form>
    </div>
-  </div>}
- </section>;
+  </div>)}
+ </section>);
 }
