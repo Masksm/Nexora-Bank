@@ -58,6 +58,10 @@ export async function signIn(formData: FormData) {
       p_approximate_location: location || null,
     });
     if (trackingError) {
+      if (/device has been blocked/i.test(trackingError.message || "")) {
+        await supabase.auth.signOut({ scope: "local" });
+        redirect("/login?error=This%20device%20has%20been%20blocked.%20Contact%20Nexora%20support.");
+      }
       await supabase.rpc("record_operations_event", { p_severity: "error", p_category: "database", p_service: "Authentication", p_operation: "login_context_record_failed", p_error_code: trackingError.code || "LOGIN_CONTEXT_FAILED", p_request_path: "/login" });
       // Keep authentication available, but make tracking failures observable
       // in server logs without recording IPs, tokens, or other personal data.
