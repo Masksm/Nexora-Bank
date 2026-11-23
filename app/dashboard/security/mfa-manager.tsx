@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useState} from "react";
+import {useCallback,useEffect,useMemo,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
 import {ShieldCheck,Smartphone,LockKeyhole} from "lucide-react";
 
@@ -9,9 +9,9 @@ export function MfaManager(){
  const [qr,setQr]=useState(""); const [secret,setSecret]=useState("");
  const [factorId,setFactorId]=useState("");
  const [code,setCode]=useState(""); const [message,setMessage]=useState(""); const [busy,setBusy]=useState(false);
- const supabase=createClient();
- async function refresh(){const {data,error}=await supabase.auth.mfa.listFactors();if(error){setMessage(error.message);return;}setFactors((data?.totp??[]) as Factor[]);}
- useEffect(()=>{void refresh();},[]);
+ const supabase=useMemo(()=>createClient(),[]);
+ const refresh=useCallback(async()=>{const {data,error}=await supabase.auth.mfa.listFactors();if(error){setMessage(error.message);return;}setFactors((data?.totp??[]) as Factor[]);},[supabase]);
+ useEffect(()=>{void refresh();},[refresh]);
  async function enroll(){
   setBusy(true);setMessage("");
   const {data,error}=await supabase.auth.mfa.enroll({factorType:"totp",friendlyName:"Nexora authenticator"});
