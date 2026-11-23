@@ -193,6 +193,20 @@ export async function setDeviceTrust(formData: FormData) {
   resultUrl("success", trusted ? "Device marked as trusted." : "Device trust revoked.");
 }
 
+export async function setDeviceBlock(formData: FormData) {
+  const supabase = await requireAdmin();
+  const deviceId = String(formData.get("device_id") || "");
+  const blocked = String(formData.get("blocked") || "") === "true";
+  const reason = String(formData.get("reason") || "").trim();
+  if (!deviceId || reason.length < 8) resultUrl("error", "A device and a reason of at least 8 characters are required.");
+  const { error } = await supabase.rpc("admin_set_device_block", {
+    p_device_id: deviceId, p_blocked: blocked, p_reason: reason,
+  });
+  if (error) resultUrl("error", error.message);
+  revalidatePath("/admin/reviews");
+  resultUrl("success", blocked ? "Device blocked and its active sessions revoked." : "Device block removed.");
+}
+
 export async function adminReplySupport(formData: FormData) {
   const supabase = await requireAdmin();
   const conversationId = String(formData.get("conversation_id") || "");
