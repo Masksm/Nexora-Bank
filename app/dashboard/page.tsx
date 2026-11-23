@@ -49,9 +49,8 @@ export default async function DashboardPage() {
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
     user.email?.split("@")[0] || "there";
   const activeAccounts = (accounts ?? []).filter(account => account.status === "active");
-  const primary = activeAccounts.find(account => account.account_id === profile?.dashboard_account_id) ?? activeAccounts[0] ?? accounts?.[0];
-  const totalMinor = (accounts ?? []).reduce((sum, account) =>
-    sum + (account.currency === "USD" ? Number(account.balance_minor ?? 0) : 0), 0);
+  const primary = activeAccounts.find(account => account.account_id === profile?.dashboard_account_id) ?? activeAccounts[0] ?? null;
+  const availableMinor = primary ? Number(primary.balance_minor ?? 0) : 0;
   const accountIds = (accounts ?? []).map(account => account.account_id);
 
   // Load the complete account ledger in bounded pages. The dashboard's monthly
@@ -147,9 +146,9 @@ export default async function DashboardPage() {
 
         <section className="dashboard-summary-grid">
           <article className="summary-card balance-card">
-            <div className="summary-label">{t("dashboard.totalBalance")} <Wallet size={17}/></div>
-            <div className="summary-amount">{money(totalMinor, "USD", locale)}</div>
-            <div className="summary-foot">{t("dashboard.acrossAccounts")}</div>
+            <div className="summary-label">{pt("Available balance")} <Wallet size={17}/></div>
+            <div className="summary-amount">{primary ? money(availableMinor, primary.currency, locale) : "—"}</div>
+            <div className="summary-foot">{primary ? `${primary.nickname || primary.account_name} · ${primary.currency}` : pt("No active account selected")}</div>
           </article>
           <article className="summary-card">
             <div className="summary-label">{t("dashboard.moneyIn")} <ArrowDownLeft size={17}/></div>
