@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useMemo,useState } from "react";
+import { useEffect,useMemo,useState } from "react";
 import type { FormEvent } from "react";
 import { ArrowUpRight,Globe2,Landmark,ShieldCheck,Wallet,PlusCircle,LockKeyhole,UserRound,CheckCircle2 } from "lucide-react";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
 import { submitTransferWithPin, completeTransferWithOtp } from "./secure-actions";
-import { submitExternalTransferRequest } from "./international-actions";
+import { getExternalTransferStatus,submitExternalTransferRequest } from "./international-actions";
 import { addBeneficiary } from "../beneficiaries/actions";
 import { bankDirectory } from "@/lib/bank-directory";
 
@@ -43,7 +43,25 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [externalOtpCode,setExternalOtpCode]=useState("");
  const [externalBusy,setExternalBusy]=useState(false);
  const [externalMessage,setExternalMessage]=useState("");
+ const [externalReview,setExternalReview]=useState<{requestId:string;reference:string;status:"pending"|"approved"|"rejected";reason:string|null}|null>(null);
  const t=(value:string)=>pageText(locale,value),active=accounts.filter(a=>a.status==="active"),usdAccounts=active.filter(a=>a.currency==="USD");
+ useEffect(()=>{
+  if(!externalReview||externalReview.status!=="pending")return;
+  let stopped=false;
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  const poll=async()=>{
+   const result=await getExternalTransferStatus(externalReview.requestId);
+   if(stopped)return;
+   if(result?.status==="approved"||result?.status==="rejected"){
+    setExternalReview(current=>current&&current.requestId===externalReview.requestId?{...current,status:result.status as "approved"|"rejected",reason:result.reason??null}:current);
+    return;
+   }
+   timer=setTimeout(()=>void poll(),3000);
+  };
+  void poll();
+  return()=>{stopped=true;if(timer)clearTimeout(timer);};
+ },[externalReview?.requestId,externalReview?.status]);
+
  const countryRecipients=useMemo(()=>beneficiaries.filter(b=>b.country_code===country),[beneficiaries,country]);
  const bankOptions=useMemo(()=>bankDirectory.filter(bank=>bank.country===country),[country]);
  const chosen=countryRecipients.find(b=>b.id===beneficiaryId)??null;
@@ -65,6 +83,9 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    if(result?.status==="otp_required"){
     setExternalOtpRequired(true);
     setExternalMessage("A six-digit verification code has been sent to your registered email. Enter it to submit this international transfer request.");
+   }else if(result?.status==="submitted"&&result.requestId&&result.reference){
+    setExternalOtpRequired(false);setExternalOtpCode("");setExternalMessage("");
+    setExternalReview({requestId:result.requestId,reference:result.reference,status:"pending",reason:null});
    }else if(result?.error){
     setExternalMessage(result.error);
    }
@@ -193,5 +214,11 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
     </form>
    </div>}
   </div>)}
+  {externalReview&&<div className="external-review-overlay" role="dialog" aria-modal="true" aria-labelledby="external-review-title">
+   <div className="external-review-modal">
+    {externalReview.status==="pending"?<div className="external-review-loader" aria-label="Processing"><span className="external-review-spinner"/><h2 id="external-review-title">Processing transfer</h2><p>Your request is being processed. Please keep this window open.</p></div>:externalReview.status==="approved"?<div className="external-review-result"><span className="external-review-result-icon approved"><CheckCircle2 size={26}/></span><h2 id="external-review-title">Transfer approved</h2><p>Your request has been approved and the amount has been debited from your Nexora account.</p><small>External bank payment execution is not connected.</small><button type="button" onClick={()=>setExternalReview(null)}>Close</button></div>:<div className="external-review-result"><span className="external-review-result-icon declined"><ShieldCheck size={26}/></span><h2 id="external-review-title">Transfer declined</h2><p>Your request was declined. No amount was debited from your account.</p><div className="external-review-reason"><strong>Reason</strong><span>{externalReview.reason||"No reason was provided."}</span></div><button type="button" onClick={()=>setExternalReview(null)}>Close</button></div>}
+    <div className="external-review-reference">Reference: {externalReview.reference}</div>
+   </div>
+  </div>}
  </section>);
 }
