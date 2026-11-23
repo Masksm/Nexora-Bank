@@ -100,7 +100,7 @@ export async function verifyPasswordRecoveryCode(formData: FormData) {
   const token = String(formData.get("token") ?? "").trim();
   const cookieStore = await cookies();
   const email = cookieStore.get("nexora_recovery_email")?.value ?? "";
-  if (!validEmail(email) || !/^\\d{6}$/.test(token)) {
+  if (!validEmail(email) || !/^\d{6}$/.test(token)) {
     redirect("/forgot-password?step=verify&error=Enter%20the%20six-digit%20code%20sent%20to%20your%20email.");
   }
   const supabase = await createClient();
