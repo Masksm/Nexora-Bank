@@ -1,5 +1,5 @@
 "use server";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -54,7 +54,7 @@ export async function submitTransferWithPin(formData:FormData) {
   p_recipient_account_number:recipient,
   p_amount_minor:amountMinor,
   p_description:description||null,
-  p_idempotency_key:crypto.randomUUID(),
+  p_idempotency_key:randomUUID(),
   p_pin:pin,
   p_otp_challenge_id:null,
   p_otp_code:null,
@@ -109,7 +109,7 @@ export async function completeTransferWithOtp(formData:FormData) {
   p_recipient_account_number:recipient,
   p_amount_minor:amountMinor,
   p_description:description||null,
-  p_idempotency_key:crypto.randomUUID(),
+  p_idempotency_key:randomUUID(),
   p_pin:pin,
   p_otp_challenge_id:challengeId,
   p_otp_code:code,
