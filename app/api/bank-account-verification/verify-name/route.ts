@@ -113,79 +113,60 @@ async function verifyNigeriaAccount(input: {
   });
 }
 
-async function verifyEuropeanPayee(iban: string, name: string) {
-  const apiKey = process.env.IBAN_BAV_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({
-      status: "unavailable",
-      nameMatch: "unavailable",
-      valid: null,
-      provider: null,
-      sandbox: false,
-      code: "BAV_PROVIDER_NOT_CONFIGURED",
-      error: "European account-holder name verification is not configured. Add the IBAN_BAV_API_KEY from your IBAN.com Bank Account Verification (VoP) subscription to Vercel.",
-    }, { status: 503 });
-  }
+async function validateEuropeanIban(iban: string) {
+  const apiKey = process.env.IBANFORGE_API_KEY;
+  const headers: Record<string,string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
 
-  const response = await fetch("https://api.iban.com/clients/api/verify/v3/", {
+  const response = await fetch("https://api.ibanforge.com/v1/iban/validate", {
     method: "POST",
-    headers: {
-      "x-api-key": apiKey,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({ IBAN: iban, name }),
+    headers,
+    body: JSON.stringify({ iban }),
     cache: "no-store",
-    signal: AbortSignal.timeout(55000),
+    signal: AbortSignal.timeout(20000),
   });
-
   const payload = await response.json().catch(() => null) as {
-    query?: { IBAN?: string; name?: string; success?: boolean };
-    result?: { valid?: boolean | null; name_match?: "yes" | "partial" | "no" | "unavailable"; bic?: string };
+    valid?: boolean;
+    iban?: string;
+    bic?: string | null;
+    bank?: { name?: string; bic?: string | null };
+    bank_name?: string;
     error?: string;
+    error_detail?: string;
+    trial?: { calls_left_this_week?: number; resets_at?: string };
+    attribution?: { text?: string; url?: string };
   } | null;
 
-  if (!response.ok || !payload?.query?.success || !payload.result) {
-    const providerError = payload?.error || "";
-    const status = response.status === 400 ? 422 : response.status === 401 ? 502 : response.status === 429 ? 429 : 503;
+  if (!response.ok || typeof payload?.valid !== "boolean") {
+    const exhausted = response.status === 402;
     return NextResponse.json({
       status: "unavailable",
-      nameMatch: "unavailable",
       valid: null,
-      provider: "IBAN.com Bank Account Verification",
-      sandbox: false,
-      code: providerError || `BAV_HTTP_${response.status}`,
-      error: response.status === 401
-        ? "The IBAN.com verification key was rejected or the BAV subscription is inactive. Check the key and service access in the IBAN.com client area."
-        : response.status === 429
-          ? "The account-name verification service is rate-limited. Wait before trying again."
-          : "The bank could not complete the Verification of Payee request. No name match has been confirmed.",
-    }, { status });
+      nameMatch: "unavailable",
+      provider: "IBANforge",
+      code: exhausted ? "FREE_IBAN_QUOTA_EXHAUSTED" : `IBANFORGE_HTTP_${response.status}`,
+      error: exhausted
+        ? "The free IBAN validation allowance has been used. It resets according to the provider's quota; no account-holder name has been verified."
+        : "The free IBAN validation service is temporarily unavailable. No account-holder name has been verified.",
+    }, { status: exhausted ? 429 : 503 });
   }
 
-  const nameMatch = payload.result.name_match || "unavailable";
-  const statusByMatch = {
-    yes: "match",
-    partial: "partial_match",
-    no: "no_match",
-    unavailable: "unavailable",
-  } as const;
-  const status = statusByMatch[nameMatch];
-  const messages = {
-    yes: "The recipient name matches the name returned by the recipient's bank.",
-    partial: "The recipient name is a close match, but not an exact match. Confirm the legal account-holder name before proceeding.",
-    no: "The recipient's bank returned a different account-holder name. Do not proceed until the recipient details are corrected and checked again.",
-    unavailable: "The bank did not provide a name-match verdict. The recipient remains unverified.",
-  } as const;
-
+  const valid = payload.valid;
   return NextResponse.json({
-    status,
-    nameMatch,
-    valid: payload.result.valid ?? null,
-    bic: payload.result.bic || null,
-    provider: "IBAN.com Bank Account Verification (VoP)",
-    sandbox: false,
-    message: messages[nameMatch],
+    status: valid ? "valid" : "invalid",
+    valid,
+    nameMatch: "unavailable",
+    bic: payload.bic || payload.bank?.bic || null,
+    bankName: payload.bank?.name || payload.bank_name || null,
+    provider: "IBANforge",
+    trial: payload.trial || null,
+    attribution: payload.attribution || { text: "Powered by IBANforge", url: "https://ibanforge.com" },
+    message: valid
+      ? "The IBAN passed structural and checksum validation. This does not confirm that the account exists or verify its account holder."
+      : payload.error_detail || "The IBAN failed structural or checksum validation. Check the recipient details.",
   });
 }
 
@@ -238,11 +219,10 @@ export async function POST(request: NextRequest) {
     bankName = String(body.manualRecipient?.bankName || "").trim().slice(0, 120);
   }
 
-  if (name.length < 2) {
-    return NextResponse.json({ error: "Enter the recipient account-holder name." }, { status: 400 });
-  }
-
   if (countryCode === "NG") {
+    if (name.length < 2) {
+      return NextResponse.json({ error: "Enter the recipient account-holder name." }, { status: 400 });
+    }
     if (!/^\d{10}$/.test(accountNumber) || !bankName) {
       return NextResponse.json({ error: "Enter a valid 10-digit Nigerian account number and select a bank." }, { status: 400 });
     }
@@ -268,16 +248,16 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    return await verifyEuropeanPayee(iban, name);
+    return await validateEuropeanIban(iban);
   } catch {
     return NextResponse.json({
       status: "unavailable",
       nameMatch: "unavailable",
       valid: null,
-      provider: "IBAN.com Bank Account Verification (VoP)",
+      provider: "IBANforge",
       sandbox: false,
       code: "BAV_NETWORK_UNAVAILABLE",
-      error: "The Verification of Payee service did not respond in time. No account-holder name has been verified. Try again later.",
+      error: "The free IBAN validation service did not respond in time. No account-holder name has been verified. Try again later.",
     }, { status: 503 });
   }
 }
