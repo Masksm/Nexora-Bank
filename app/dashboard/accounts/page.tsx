@@ -27,6 +27,9 @@ export default async function AccountsPage({ searchParams }: Props) {
     .select("account_id,account_number,account_name,nickname,account_type,currency,status,balance_minor")
     .eq("user_id", user.id), supabase.from("profiles").select("dashboard_account_id").eq("user_id", user.id).maybeSingle()]);
 
+  const activeAccounts = (accounts ?? []).filter(account => account.status === "active");
+  const selectedOverviewAccountId = activeAccounts.some(account => account.account_id === profile?.dashboard_account_id) ? profile?.dashboard_account_id : activeAccounts[0]?.account_id;
+
   const total = (accounts ?? []).filter(account => account.currency === "USD").reduce((sum, account) => sum + Number(account.balance_minor ?? 0), 0);
 
   return (
@@ -54,7 +57,7 @@ export default async function AccountsPage({ searchParams }: Props) {
               <div className="account-detail-foot"><span>{account.currency} · {account.account_type}</span><Link href="/dashboard/transfers">{t("Make a transfer")} <ArrowUpRight size={14}/></Link></div>
               {account.status === "active" && <form action={setDashboardAccount} className="account-overview-choice">
                 <input type="hidden" name="account_id" value={account.account_id}/>
-                <span>{profile?.dashboard_account_id === account.account_id ? t("Shown on your overview") : t("Choose this account for your overview")}</span>
+                <span>{selectedOverviewAccountId === account.account_id ? t("Shown on your overview") : t("Choose this account for your overview")}</span>
                 <button type="submit" disabled={profile?.dashboard_account_id === account.account_id}>{profile?.dashboard_account_id === account.account_id ? t("Currently selected") : t("Show on overview")}</button>
               </form>}
             </article>
