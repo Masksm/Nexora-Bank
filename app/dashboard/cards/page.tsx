@@ -61,8 +61,6 @@ export default async function CardsPage({ searchParams }: Props) {
               network={card.network}
               last4={card.last4}
               cardholder={card.cardholder_name}
-              expiryMonth={card.expiry_month}
-              expiryYear={card.expiry_year}
             />
             <div className="virtual-card-controls">
               <span className={card.status === "active" ? "account-status" : "account-status inactive"}>{t(card.status)}</span>
