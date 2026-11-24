@@ -46,7 +46,13 @@ export async function adjustBalance(formData: FormData) {
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/transactions");
   } catch (error) {
-    resultUrl("error", error instanceof Error ? error.message : "The adjustment could not be completed.");
+    const details = error instanceof Error
+      ? error.message
+      : typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message: unknown }).message)
+        : "Unknown database error.";
+    console.error("Ledger adjustment failed:", error);
+    resultUrl("error", details.slice(0, 500));
   }
   resultUrl("success", "Ledger adjustment posted successfully.");
 }
