@@ -116,17 +116,33 @@ export async function verifyPasswordRecoveryCode(formData: FormData) {
   const cookieStore = await cookies();
   const email = cookieStore.get("nexora_recovery_email")?.value ?? "";
   const expiresAt = Number(cookieStore.get("nexora_recovery_expires_at")?.value ?? 0);
-  if (!/^\d{6}$/.test(token)) {
-    redirect("/forgot-password?step=verify&error=Enter%20the%20six-digit%20code%20sent%20to%20your%20email.");
+  const diagnosticId = randomUUID();
+  const attemptedAt = new Date().toISOString();
+
+  // Supabase Auth OTP length is configurable. Accept numeric codes from 4 to
+  // 12 digits instead of assuming that every project uses the six-digit default.
+  if (!/^\d{4,12}$/.test(token)) {
+    console.info("NEXORA_RECOVERY_VERIFY_INPUT_REJECTED", JSON.stringify({
+      diagnosticId, timestamp: attemptedAt, stage: "input_validation",
+      tokenLength: token.length, tokenIsNumeric: /^\d+$/.test(token),
+      acceptedNumericLength: "4-12",
+    }));
+    redirect("/forgot-password?step=verify&error=Enter%20the%20numeric%20recovery%20code%20from%20your%20newest%20email.");
   }
+
   if (!validEmail(email) || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+    console.info("NEXORA_RECOVERY_VERIFY_SESSION_REJECTED", JSON.stringify({
+      diagnosticId, timestamp: attemptedAt, stage: "local_session_validation",
+      hasRecoveryEmail: validEmail(email),
+      hasValidExpiry: Number.isFinite(expiresAt),
+      localRecoveryWindowRemainingMs: Number.isFinite(expiresAt) ? expiresAt - Date.now() : null,
+    }));
     cookieStore.set("nexora_recovery_email", "", { path: "/", maxAge: 0 });
     cookieStore.set("nexora_recovery_expires_at", "", { path: "/", maxAge: 0 });
     redirect("/forgot-password?step=request&error=Your%20recovery%20code%20has%20expired.%20Request%20a%20new%20code.");
   }
 
   const supabase = await createClient();
-  const diagnosticId = randomUUID();
   const startedAt = Date.now();
   let verificationError: { name?: string; message?: string; status?: number; code?: string; details?: string; hint?: string } | null = null;
 
@@ -145,16 +161,15 @@ export async function verifyPasswordRecoveryCode(formData: FormData) {
     };
   }
 
-  // Diagnostic listener: record Supabase's complete non-secret error metadata.
-  // Never log the OTP, email address, access/refresh tokens, or request headers.
+  // Record Supabase's full non-secret error metadata. Never log the OTP,
+  // email address, access/refresh tokens, or request headers.
   console.info("NEXORA_RECOVERY_VERIFY_ATTEMPT", JSON.stringify({
     diagnosticId,
-    stage: "verifyOtp",
+    stage: "supabase_verifyOtp",
     timestamp: new Date(startedAt).toISOString(),
     durationMs: Date.now() - startedAt,
     tokenLength: token.length,
-    tokenIsNumeric: /^\\d+$/.test(token),
-    tokenFormatAcceptedByApp: /^\\d{4,12}$/.test(token),
+    tokenIsNumeric: /^\d+$/.test(token),
     tokenType: "recovery",
     localRecoveryWindowRemainingMs: expiresAt - startedAt,
     supabaseResult: verificationError ? "rejected" : "accepted",
@@ -172,8 +187,9 @@ export async function verifyPasswordRecoveryCode(formData: FormData) {
     const message = Date.now() >= expiresAt
       ? "Your%20recovery%20code%20has%20expired%20in%20this%20session.%20Request%20a%20new%20one."
       : "Supabase%20rejected%20this%20code.%20The%20diagnostic%20has%20been%20recorded.%20Request%20a%20fresh%20code%20and%20try%20again.";
-    redirect(`/forgot-password?step=verify&error=${message}&ref=${diagnosticId}`);
+    redirect(\`/forgot-password?step=verify&error=\${message}&ref=\${diagnosticId}\`);
   }
+
   cookieStore.set("nexora_recovery_verified", "1", {
     httpOnly: true, secure: process.env.NODE_ENV === "production",
     sameSite: "strict", path: "/", maxAge: RECOVERY_CODE_TTL_SECONDS,
