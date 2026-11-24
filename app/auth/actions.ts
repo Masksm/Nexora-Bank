@@ -85,18 +85,13 @@ export async function sendPasswordRecoveryCode(formData: FormData) {
   if (!validEmail(email)) redirect("/forgot-password?step=request&error=Enter%20a%20valid%20email%20address.");
 
   const supabase = await createClient();
-  // The Edge Function asks Supabase Auth to generate the recovery OTP,
-  // then sends that exact email_otp through Resend without any clickable
-  // confirmation URL. verifyOtp({ type: "recovery" }) checks the same token.
-  const { data, error } = await supabase.functions.invoke("nexora-password-recovery", {
-    body: { email },
-  });
-  const deliveryStatus = (error as { context?: { status?: number } } | null)?.context?.status;
-  if (deliveryStatus === 429) {
-    redirect("/forgot-password?step=request&error=Please%20wait%20before%20requesting%20another%20code.");
-  }
-  if (error || !data?.success) {
-    redirect("/forgot-password?step=request&error=" + encodeURIComponent(data?.error || error?.message || "Unable to send a recovery code. Please try again later."));
+  // Restore the original delivery path: Supabase Auth sends the recovery OTP
+  // through the project's configured Auth SMTP provider. The Reset Password
+  // email template must render {{ .Token }} for the six-digit code.
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  if (error) {
+    console.error("Nexora password recovery request failed:", error.code || "UNKNOWN");
+    redirect("/forgot-password?step=request&error=Unable%20to%20send%20a%20recovery%20code.%20Please%20try%20again%20later.");
   }
 
   const cookieStore = await cookies();
