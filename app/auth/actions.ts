@@ -78,6 +78,8 @@ export async function signIn(formData: FormData) {
   redirect(next);
 }
 
+const RECOVERY_CODE_TTL_SECONDS = 10 * 60;
+
 export async function sendPasswordRecoveryCode(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   if (!validEmail(email)) redirect("/forgot-password?step=request&error=Enter%20a%20valid%20email%20address.");
@@ -90,9 +92,14 @@ export async function sendPasswordRecoveryCode(formData: FormData) {
   if (error) redirect("/forgot-password?step=request&error=Unable%20to%20send%20a%20recovery%20code.%20Please%20try%20again%20later.");
 
   const cookieStore = await cookies();
+  const expiresAt = Date.now() + RECOVERY_CODE_TTL_SECONDS * 1000;
   cookieStore.set("nexora_recovery_email", email, {
     httpOnly: true, secure: process.env.NODE_ENV === "production",
-    sameSite: "strict", path: "/", maxAge: 10 * 60,
+    sameSite: "strict", path: "/", maxAge: RECOVERY_CODE_TTL_SECONDS,
+  });
+  cookieStore.set("nexora_recovery_expires_at", String(expiresAt), {
+    httpOnly: true, secure: process.env.NODE_ENV === "production",
+    sameSite: "strict", path: "/", maxAge: RECOVERY_CODE_TTL_SECONDS,
   });
   cookieStore.set("nexora_recovery_verified", "", {
     httpOnly: true, secure: process.env.NODE_ENV === "production",
@@ -105,15 +112,31 @@ export async function verifyPasswordRecoveryCode(formData: FormData) {
   const token = String(formData.get("token") ?? "").trim();
   const cookieStore = await cookies();
   const email = cookieStore.get("nexora_recovery_email")?.value ?? "";
+  const expiresAt = Number(cookieStore.get("nexora_recovery_expires_at")?.value ?? 0);
   if (!validEmail(email) || !/^\d{6}$/.test(token)) {
     redirect("/forgot-password?step=verify&error=Enter%20the%20six-digit%20code%20sent%20to%20your%20email.");
   }
+  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+    cookieStore.set("nexora_recovery_email", "", { path: "/", maxAge: 0 });
+    cookieStore.set("nexora_recovery_expires_at", "", { path: "/", maxAge: 0 });
+    redirect("/forgot-password?step=request&error=Your%20recovery%20code%20has%20expired.%20Request%20a%20new%20code.");
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.verifyOtp({ email, token, type: "recovery" });
-  if (error) redirect("/forgot-password?step=verify&error=That%20code%20is%20invalid%20or%20has%20expired.");
+  if (error) {
+    // Supabase deliberately reports wrong, already-used and expired OTPs with
+    // the same otp_expired response. Our server-side 10-minute deadline lets
+    // the app distinguish an expired Nexora code from a rejected code while
+    // never treating the client countdown as proof of identity.
+    const message = Date.now() >= expiresAt
+      ? "Your%20recovery%20code%20has%20expired.%20Request%20a%20new%20one."
+      : "That%20code%20is%20incorrect%20or%20is%20no%20longer%20the%20latest%20code.%20Check%20the%20newest%20email.";
+    redirect(`/forgot-password?step=verify&error=${message}`);
+  }
   cookieStore.set("nexora_recovery_verified", "1", {
     httpOnly: true, secure: process.env.NODE_ENV === "production",
-    sameSite: "strict", path: "/", maxAge: 10 * 60,
+    sameSite: "strict", path: "/", maxAge: RECOVERY_CODE_TTL_SECONDS,
   });
   redirect("/forgot-password?step=update");
 }
@@ -133,6 +156,7 @@ export async function updateRecoveredPassword(formData: FormData) {
   if (error) redirect("/forgot-password?step=update&error=The%20password%20could%20not%20be%20updated.%20Verify%20the%20code%20again.");
   await supabase.auth.signOut({ scope: "local" });
   cookieStore.set("nexora_recovery_email", "", { path: "/", maxAge: 0 });
+  cookieStore.set("nexora_recovery_expires_at", "", { path: "/", maxAge: 0 });
   cookieStore.set("nexora_recovery_verified", "", { path: "/", maxAge: 0 });
   redirect("/login?success=Your%20password%20has%20been%20updated.%20Sign%20in%20with%20your%20new%20password.");
 }
