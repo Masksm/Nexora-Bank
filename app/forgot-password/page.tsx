@@ -41,7 +41,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
         <Link className="brand" href="/"><span className="brand-mark">N</span><span>NEXORA<span className="brand-light"> BANK</span></span></Link>
         <div className="auth-kicker">ACCOUNT RECOVERY</div>
         <h1>{step === "request" ? <>Reset your<br /><em>password.</em></> : step === "verify" ? <>Check your<br /><em>email.</em></> : <>Choose a new<br /><em>password.</em></>}</h1>
-        <p className="auth-intro">{step === "request" ? "Enter the email address registered to your Nexora account." : step === "verify" ? "Enter the six-digit recovery code sent to your registered email." : "Your email has been verified. Set a new password for your account."}</p>
+        <p className="auth-intro">{step === "request" ? "Enter the email address registered to your Nexora account." : step === "verify" ? "Enter the numeric recovery code sent to your registered email." : "Your email has been verified. Set a new password for your account."}</p>
         {params.error && <p className="form-message error" role="alert">{params.error}</p>}
         {step === "request" ? (
           <form action={sendPasswordRecoveryCode} className="auth-form">
