@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { reviewTransfer, reviewExternalTransfer, setDeviceTrust, setDeviceBlock, revokeUserSession } from "../actions";
 import { ExternalTransferDecisionDialog } from "./external-transfer-result-dialog";
+import { AdminReviewAutoRefresh } from "./auto-refresh";
 
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ kind?: string; message?: string; external_result?: string; reference?: string }> };
@@ -48,7 +49,7 @@ export default async function AdminReviewsPage({searchParams}:Props) {
     else item.to=account?.account_number;
     entryMap.set(entry.transaction_id,item);
   }
-  return <main className="admin-shell"><aside className="admin-sidebar"><Link className="admin-brand" href="/admin"><span>N</span>{t("NEXORA")} <i>{t("ADMIN")}</i></Link><div className="admin-side-label">{t("CONTROL CENTRE")}</div><nav><Link href="/admin">{t("Overview")}</Link><Link className="selected" href="/admin/reviews">{t("Security reviews")}</Link><Link href="/admin/support">{t("Support inbox")}</Link></nav><div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>{t("Administrator session")}</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> {t("Sign out")}</button></form></div></aside>
+  return <main className="admin-shell"><AdminReviewAutoRefresh/><aside className="admin-sidebar"><Link className="admin-brand" href="/admin"><span>N</span>{t("NEXORA")} <i>{t("ADMIN")}</i></Link><div className="admin-side-label">{t("CONTROL CENTRE")}</div><nav><Link href="/admin">{t("Overview")}</Link><Link className="selected" href="/admin/reviews">{t("Security reviews")}</Link><Link href="/admin/support">{t("Support inbox")}</Link></nav><div className="admin-sidebar-foot"><ShieldCheck size={16}/><span>{t("Administrator session")}</span><form action={signOut}><button className="admin-logout-button" type="submit"><LogOut size={15}/> {t("Sign out")}</button></form></div></aside>
     <section className="admin-main"><header className="admin-topbar"><div><span>{t("ADMINISTRATION / SECURITY")}</span><h1>{t("Security reviews")}</h1></div><Link href="/admin"><ArrowLeft size={15}/> {t("Overview")}</Link></header>
       {params.message&&<div className={params.kind==="error"?"admin-alert error":"admin-alert success"}>{params.message}</div>}
       <section className="admin-panel admin-review-panel"><div className="admin-panel-heading"><div><span>{t("TRANSFER MONITORING")}</span><h2>{t("Transfers awaiting approval")}</h2></div><span>{reviewItems.length} pending</span></div>
