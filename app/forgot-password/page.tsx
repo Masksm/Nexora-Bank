@@ -6,9 +6,9 @@ import { pageText } from "@/lib/page-translations";
 import { createClient } from "@/lib/supabase/server";
 import {
   sendPasswordRecoveryCode,
-  verifyPasswordRecoveryCode,
   updateRecoveredPassword,
 } from "@/app/auth/actions";
+import RecoveryCodeForm from "@/app/forgot-password/recovery-code-form";
 
 type Props = { searchParams: Promise<{ step?: string; error?: string }> };
 
@@ -20,6 +20,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
   const params = await searchParams;
   const cookieStore = await cookies();
   const hasRecoveryEmail = Boolean(cookieStore.get("nexora_recovery_email")?.value);
+  const recoveryExpiresAt = Number(cookieStore.get("nexora_recovery_expires_at")?.value ?? 0);
   const verified = cookieStore.get("nexora_recovery_verified")?.value === "1";
   const step = params.step === "update" && verified ? "update"
     : params.step === "verify" && hasRecoveryEmail ? "verify" : "request";
@@ -45,11 +46,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
             <button className="auth-submit" type="submit">Send recovery code <span>↗</span></button>
           </form>
         ) : step === "verify" ? (
-          <form action={verifyPasswordRecoveryCode} className="auth-form">
-            <label htmlFor="token">Six-digit recovery code</label>
-            <input id="token" name="token" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" placeholder="000000" required />
-            <button className="auth-submit" type="submit">Verify code <span>↗</span></button>
-          </form>
+          <RecoveryCodeForm expiresAt={recoveryExpiresAt} />
         ) : (
           <form action={updateRecoveredPassword} className="auth-form">
             <label htmlFor="password">New password</label>
