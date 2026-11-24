@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Copy, Eye, EyeOff, LockKeyhole, ShieldCheck, X } from "lucide-react";
 
 type CardDetails = {
@@ -15,8 +15,6 @@ type Props = {
   network: string;
   last4: string;
   cardholder: string;
-  expiryMonth: number;
-  expiryYear: number;
 };
 
 export function CardReveal({
@@ -24,8 +22,6 @@ export function CardReveal({
   network,
   last4,
   cardholder,
-  expiryMonth,
-  expiryYear,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [pin, setPin] = useState("");
@@ -35,6 +31,15 @@ export function CardReveal({
   const [copied, setCopied] = useState("");
   const [showPin, setShowPin] = useState(false);
   const pinInput = useRef<HTMLInputElement>(null);
+
+  const closeDialog = useCallback(() => {
+    setOpen(false);
+    setPin("");
+    setDetails(null);
+    setError("");
+    setCopied("");
+    setShowPin(false);
+  }, []);
 
   useEffect(() => {
     if (open && !details) pinInput.current?.focus();
@@ -47,22 +52,13 @@ export function CardReveal({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, details]);
+  }, [open, closeDialog]);
 
   useEffect(() => {
     if (!details) return;
     const timeout = window.setTimeout(() => closeDialog(), 30_000);
     return () => window.clearTimeout(timeout);
-  }, [details]);
-
-  function closeDialog() {
-    setOpen(false);
-    setPin("");
-    setDetails(null);
-    setError("");
-    setCopied("");
-    setShowPin(false);
-  }
+  }, [details, closeDialog]);
 
   async function reveal(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -138,14 +134,14 @@ export function CardReveal({
             className="card-reveal-dialog"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="card-reveal-title"
-            aria-describedby="card-reveal-description"
+            aria-labelledby={`card-reveal-title-${cardId}`}
+            aria-describedby={`card-reveal-description-${cardId}`}
           >
             <header className="card-reveal-header">
               <div className="card-reveal-heading-icon"><ShieldCheck size={19}/></div>
               <div>
-                <h2 id="card-reveal-title">{details ? "Card details" : "Verify your identity"}</h2>
-                <p id="card-reveal-description">
+                <h2 id={`card-reveal-title-${cardId}`}>{details ? "Card details" : "Verify your identity"}</h2>
+                <p id={`card-reveal-description-${cardId}`}>
                   {details
                     ? "Your protected card preview details are visible temporarily."
                     : `Enter your transaction PIN to view the card ending in ${last4}.`}
