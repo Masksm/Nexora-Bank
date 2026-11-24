@@ -32,8 +32,8 @@ export default function RecoveryCodeForm({ expiresAt }: Props) {
 
   return (
     <form action={verifyPasswordRecoveryCode} className="auth-form">
-      <label htmlFor="token">Six-digit recovery code</label>
-      <input id="token" name="token" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" placeholder="000000" required />
+      <label htmlFor="token">Recovery code</label>
+      <input id="token" name="token" type="text" inputMode="numeric" pattern="[0-9]{4,12}" maxLength={12} autoComplete="one-time-code" placeholder="Enter code" required />
       <p className="auth-intro" aria-live="polite">
         Code expires in <strong>{minutes}:{seconds}</strong>. Only the newest code emailed to you can be used.
       </p>
