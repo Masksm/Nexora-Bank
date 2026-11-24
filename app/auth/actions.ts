@@ -83,10 +83,10 @@ export async function sendPasswordRecoveryCode(formData: FormData) {
   if (!validEmail(email)) redirect("/forgot-password?step=request&error=Enter%20a%20valid%20email%20address.");
 
   const supabase = await createClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: new URL("/forgot-password", siteUrl).toString(),
-  });
+  // Supabase sends the recovery OTP from its configured "Reset Password"
+  // email template. That template must render {{ .Token }}, not
+  // {{ .ConfirmationURL }}, so the customer receives a six-digit code.
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
   if (error) redirect("/forgot-password?step=request&error=Unable%20to%20send%20a%20recovery%20code.%20Please%20try%20again%20later.");
 
   const cookieStore = await cookies();
