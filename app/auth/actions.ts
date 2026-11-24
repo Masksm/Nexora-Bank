@@ -113,10 +113,10 @@ export async function verifyPasswordRecoveryCode(formData: FormData) {
   const cookieStore = await cookies();
   const email = cookieStore.get("nexora_recovery_email")?.value ?? "";
   const expiresAt = Number(cookieStore.get("nexora_recovery_expires_at")?.value ?? 0);
-  if (!validEmail(email) || !/^\d{6}$/.test(token)) {
+  if (!/^\d{6}$/.test(token)) {
     redirect("/forgot-password?step=verify&error=Enter%20the%20six-digit%20code%20sent%20to%20your%20email.");
   }
-  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+  if (!validEmail(email) || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
     cookieStore.set("nexora_recovery_email", "", { path: "/", maxAge: 0 });
     cookieStore.set("nexora_recovery_expires_at", "", { path: "/", maxAge: 0 });
     redirect("/forgot-password?step=request&error=Your%20recovery%20code%20has%20expired.%20Request%20a%20new%20code.");
