@@ -23,11 +23,19 @@ export default async function LoginPage({ searchParams }: Props) {
           <input type="hidden" name="next" value={params.next ?? "/dashboard"} />
           <label htmlFor="email">{t("Email address")}</label>
           <input id="email" name="email" type="email" autoComplete="email" placeholder={t("you@example.com")} required />
-          <div className="auth-password-label"><label htmlFor="password">{t("Password")}</label><Link href="/forgot-password">Forgot password?</Link></div>
+          <label htmlFor="password">{t("Password")}</label>
           <input id="password" name="password" type="password" autoComplete="current-password" minLength={8} required />
           <button className="auth-submit" type="submit">{t("Sign in")} <span>↗</span></button>
         </form>
         <p className="auth-switch">{t("New to Nexora?")} <Link href="/register">{t("Create an account")}</Link></p>
+        <div className="auth-recovery-card">
+          <span className="auth-recovery-icon" aria-hidden="true">↻</span>
+          <div className="auth-recovery-copy">
+            <strong>Forgot your password?</strong>
+            <span>Recover access securely with a six-digit email code.</span>
+            <Link href="/forgot-password">Reset your password <span aria-hidden="true">↗</span></Link>
+          </div>
+        </div>
       
       </div>
       <aside className="auth-aside"><div className="auth-aside-mark">N</div><p>{t("Banking should feel")}<br /><em>{t("clear, calm and in control.")}</em></p><span>{t("THE NEXORA EXPERIENCE")}</span></aside>
