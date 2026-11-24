@@ -25,6 +25,10 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
   const step = params.step === "update" && verified ? "update"
     : params.step === "verify" && hasRecoveryEmail ? "verify" : "request";
 
+  if (params.step === "verify" && !hasRecoveryEmail) {
+    redirect("/forgot-password?step=request&error=Your%20recovery%20code%20has%20expired.%20Request%20a%20new%20code.");
+  }
+
   if (step === "update") {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
