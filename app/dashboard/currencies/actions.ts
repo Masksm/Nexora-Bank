@@ -2,7 +2,8 @@
 import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
 import {createClient} from "@/lib/supabase/server";
-async function pinFailure(supabase:any){
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;
+async function pinFailure(supabase:ServerSupabaseClient){
  const {data}=await supabase.rpc("get_transaction_pin_status");
  const row=Array.isArray(data)?data[0]:data;
  if(row?.is_locked)return "Your transaction PIN is temporarily blocked after four incorrect attempts. Try again after 15 minutes.";
