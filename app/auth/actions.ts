@@ -187,7 +187,7 @@ export async function verifyPasswordRecoveryCode(formData: FormData) {
     const message = Date.now() >= expiresAt
       ? "Your%20recovery%20code%20has%20expired%20in%20this%20session.%20Request%20a%20new%20one."
       : "Supabase%20rejected%20this%20code.%20The%20diagnostic%20has%20been%20recorded.%20Request%20a%20fresh%20code%20and%20try%20again.";
-    redirect(\`/forgot-password?step=verify&error=\${message}&ref=\${diagnosticId}\`);
+    redirect("/forgot-password?step=verify&error=" + message + "&ref=" + diagnosticId);
   }
 
   cookieStore.set("nexora_recovery_verified", "1", {
