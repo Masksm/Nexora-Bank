@@ -71,6 +71,6 @@ export async function getInternalTransferStatus(transactionId:string) {
  if(error||!data)return {error:"Transfer status is temporarily unavailable."};
  const reviewRequired=(data.metadata as Record<string,unknown>|null)?.review_required===true;
  const status=reviewRequired||data.status==="pending"?"pending":data.status==="posted"?"approved":"rejected";
- return {reference:data.reference,status};
+ return {reference:data.reference,status,reason:((data.metadata as Record<string,unknown>|null)?.review_reason as string|null)??null};
 }
 
