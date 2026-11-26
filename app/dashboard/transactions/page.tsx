@@ -79,7 +79,7 @@ export default async function TransactionsPage() {
         amount_minor: entry?.amount_minor ?? 0,
         currency: entry?.currency ?? "USD",
       };
-    });
+    }).slice(0, 1000);
 
   return (
     <main className="workspace-shell">
