@@ -83,10 +83,13 @@ export async function updateCardStatus(formData:FormData) {
   const cardId=String(formData.get("card_id")||"");
   const status=String(formData.get("status")||"");
   if(!cardId||!["active","frozen"].includes(status)) redirect("/dashboard/cards?error=Invalid%20card%20request.");
-  const {error}=await supabase.rpc("set_virtual_card_status",{p_card_id:cardId,p_status:status});
+  const rpc = status === "active"
+    ? await supabase.rpc("request_virtual_card_unfreeze", { p_card_id: cardId })
+    : await supabase.rpc("set_virtual_card_status", { p_card_id: cardId, p_status: "frozen" });
+  const error = rpc.error;
   if(error) redirect(`/dashboard/cards?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard/cards");
-  redirect("/dashboard/cards?success=1");
+  redirect(status === "active" ? "/dashboard/cards?request=pending" : "/dashboard/cards?success=1");
 }
 
 export async function signOutOtherSessions() {
