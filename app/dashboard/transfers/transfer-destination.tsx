@@ -85,30 +85,6 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    setExternalBusy(false);
   }
  }
- async function verifyRecipient(){
-  if(!consent||verificationBusy)return;
-  if(!beneficiaryId&&country!=="NG"&&(!canValidateIban||!iban)){setVerification("IBAN validation is not available for this account format.");return;}
-  setVerificationBusy(true);setVerification("");
-  try{
-   const payload=beneficiaryId?{beneficiaryId,consent:true}:{manualRecipient:{countryCode:country,name:recipientName,iban,accountNumber,bankName},consent:true};
-   const response=await fetch("/api/bank-account-verification/verify-name",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-   const result=await response.json();
-   if(!response.ok)throw new Error(result.error||"The name comparison could not be completed.");
-   const labels:Record<string,string>={
-    valid:"The IBAN passed validation. Account ownership has not been confirmed.",
-    invalid:"The IBAN failed validation. Check the recipient details.",
-    sandbox:"Sandbox simulation only. This is not a real bank verification.",
-    match:"The provider returned a matching account-name result.",
-    partial_match:"The provider returned a partial account-name result.",
-    no_match:"The provider returned a different account-name result.",
-    unavailable:"The provider could not complete the check."
-   };
-   setVerification((result.message||labels[result.status]||"No verification result is available.")+(result.provider?" Provider: "+result.provider+".":"")+(result.accountName?" Account name returned: "+result.accountName:""));
-   setVerificationStatus(result.status);
-   setVerificationProvider(result.provider||"");
-  }catch(error){setVerification(error instanceof Error?error.message:"The name comparison could not be completed.");}
-  finally{setVerificationBusy(false);}
- }
  async function handleInternalTransferSubmit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();
   if(transferBusy)return;
