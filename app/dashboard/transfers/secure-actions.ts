@@ -46,7 +46,6 @@ export async function submitTransferWithPin(formData:FormData) {
  const {data,error}=await supabase.rpc("transfer_funds_with_pin",{
   p_from_account_id:accountId,p_recipient_account_number:recipient,p_amount_minor:amountMinor,
   p_description:description||null,p_idempotency_key:randomUUID(),p_pin:pin,
-  p_otp_challenge_id:null,p_otp_code:null,
  });
  const result=Array.isArray(data)?data[0]:data;
  const requiresOtp=Boolean(error?.message?.includes("DEVICE_OTP_REQUIRED"))||result?.status==="otp_required";
