@@ -2,10 +2,10 @@
 import Link from "next/link";
 import { useEffect,useMemo,useState } from "react";
 import type { FormEvent } from "react";
-import { ArrowUpRight,Globe2,Landmark,ShieldCheck,Wallet,PlusCircle,LockKeyhole,UserRound,CheckCircle2 } from "lucide-react";
+import { ArrowUpRight,Globe2,Landmark,ShieldCheck,Wallet,PlusCircle,UserRound,CheckCircle2 } from "lucide-react";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
-import { submitTransferWithPin, completeTransferWithOtp } from "./secure-actions";
+import { submitTransferWithPin } from "./secure-actions";
 import { getExternalTransferStatus,submitExternalTransferRequest } from "./international-actions";
 import { addBeneficiary } from "../beneficiaries/actions";
 import { bankDirectory } from "@/lib/bank-directory";
@@ -29,18 +29,10 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [iban,setIban]=useState("");
  const [bic,setBic]=useState("");
  const [amount,setAmount]=useState("");
- const [consent,setConsent]=useState(false);
  const [verification,setVerification]=useState("");
- const [verificationBusy,setVerificationBusy]=useState(false);
- const [verificationStatus,setVerificationStatus]=useState("");
- const [verificationProvider,setVerificationProvider]=useState("");
  const [reviewed,setReviewed]=useState(false);
- const [transferOtpRequired,setTransferOtpRequired]=useState(false);
- const [transferOtpCode,setTransferOtpCode]=useState("");
  const [transferBusy,setTransferBusy]=useState(false);
  const [transferMessage,setTransferMessage]=useState("");
- const [externalOtpRequired,setExternalOtpRequired]=useState(false);
- const [externalOtpCode,setExternalOtpCode]=useState("");
  const [externalBusy,setExternalBusy]=useState(false);
  const [externalMessage,setExternalMessage]=useState("");
  const [externalReview,setExternalReview]=useState<{requestId:string;reference:string;status:"pending"|"approved"|"rejected";reason:string|null}|null>(null);
@@ -68,9 +60,8 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const bankOptions=useMemo(()=>bankDirectory.filter(bank=>bank.country===country),[country]);
  const chosen=countryRecipients.find(b=>b.id===beneficiaryId)??null;
  const usesIban=ibanCountries.has(country);
- const canValidateIban=usesIban||country==="GB";
- function clearRecipient(){setBeneficiaryId("");setBankName("");setRecipientName("");setAccountNumber("");setRoutingNumber("");setSortCode("");setIban("");setBic("");setVerification("");setVerificationStatus("");setVerificationProvider("");setReviewed(false);}
- function changeCountry(value:string){setCountry(value);clearRecipient();setRecipientMode("manual");setConsent(false);}
+  function clearRecipient(){setBeneficiaryId("");setBankName("");setRecipientName("");setAccountNumber("");setRoutingNumber("");setSortCode("");setIban("");setBic("");setVerification("");setReviewed(false);}
+ function changeCountry(value:string){setCountry(value);clearRecipient();setRecipientMode("manual");}
  function selectBeneficiary(id:string){
   setBeneficiaryId(id);
   const item=countryRecipients.find(b=>b.id===id);
@@ -82,11 +73,8 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   setExternalBusy(true);setExternalMessage("");
   try{
    const result=await submitExternalTransferRequest(new FormData(event.currentTarget));
-   if(result?.status==="otp_required"){
-    setExternalOtpRequired(true);
-    setExternalMessage("A six-digit verification code has been sent to your registered email. Enter it to submit this international transfer request.");
-   }else if(result?.status==="submitted"&&result.requestId&&result.reference){
-    setExternalOtpRequired(false);setExternalOtpCode("");setExternalMessage("");
+   if(result?.status==="submitted"&&result.requestId&&result.reference){
+    setExternalMessage("");
     setExternalReview({requestId:result.requestId,reference:result.reference,status:"pending",reason:null});
    }else if(result?.error){
     setExternalMessage(result.error);
@@ -100,7 +88,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  async function verifyRecipient(){
   if(!consent||verificationBusy)return;
   if(!beneficiaryId&&country!=="NG"&&(!canValidateIban||!iban)){setVerification("IBAN validation is not available for this account format.");return;}
-  setVerificationBusy(true);setVerification("");setVerificationStatus("");setVerificationProvider("");
+  setVerificationBusy(true);setVerification("");
   try{
    const payload=beneficiaryId?{beneficiaryId,consent:true}:{manualRecipient:{countryCode:country,name:recipientName,iban,accountNumber,bankName},consent:true};
    const response=await fetch("/api/bank-account-verification/verify-name",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -125,20 +113,9 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   event.preventDefault();
   if(transferBusy)return;
   setTransferBusy(true);setTransferMessage("");
-  const formData=new FormData(event.currentTarget);
   try{
-   if(transferOtpRequired){
-    const result=await completeTransferWithOtp(formData);
-    if(result?.error)setTransferMessage(result.error);
-   }else{
-    const result=await submitTransferWithPin(formData);
-    if(result?.status==="otp_required"){
-     setTransferOtpRequired(true);
-     setTransferMessage("A six-digit verification code has been sent to your registered email. Enter it to submit this transfer.");
-    }else if(result?.error){
-     setTransferMessage(result.error);
-    }
-   }
+   const result=await submitTransferWithPin(new FormData(event.currentTarget));
+   if(result?.error)setTransferMessage(result.error);
   }catch(error){
    setTransferMessage(error instanceof Error?error.message:"The transfer could not be submitted.");
   }finally{
@@ -164,10 +141,8 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    <label>{t("Amount")} ({active.find(a=>a.account_id===sourceId)?.currency??active[0]?.currency??"USD"})<input name="amount" type="number" min="0.01" step="0.01" placeholder={t("250.00")} required/></label>
    <label>{t("Description (optional)")}<input name="description" maxLength={160} placeholder={t("What is this transfer for?")}/></label>
    <label>Transaction PIN<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required/></label>
-   {transferOtpRequired&&<label>Email verification code<input name="otp_code" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" value={transferOtpCode} onChange={e=>setTransferOtpCode(e.target.value)} required/></label>}
    {transferMessage&&<p className="form-hint" role="status">{transferMessage}</p>}
-   {transferOtpRequired&&<button type="button" className="external-transfer-back" onClick={()=>{setTransferOtpRequired(false);setTransferOtpCode("");setTransferMessage("");}}>Edit transfer details</button>}
-   <button type="submit" disabled={transferBusy}>{transferBusy?"Processing…":transferOtpRequired?"Verify code and submit transfer":t("Review and send transfer")} <ArrowUpRight size={15}/></button>
+   <button type="submit" disabled={transferBusy}>{transferBusy?"Processing…":t("Review and send transfer")} <ArrowUpRight size={15}/></button>
 
   </form>:<div className="workspace-alert">{t("You need an active Nexora account before sending an internal transfer.")}</div>}</>) : (<div className="international-transfer-content">
    <div className="international-transfer-heading"><span className="international-transfer-icon"><Globe2 size={22}/></span><div><span className="workspace-kicker">{t("GLOBAL PAYMENTS")}</span><h2>{t("International bank transfer")}</h2><p>{t("Enter recipient bank details manually or choose a saved beneficiary. Saving a new recipient is optional.")}</p></div></div>
@@ -178,7 +153,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
    </div>
    {recipientMode==="saved"?<div className="international-transfer-grid">
     <label className="international-recipient-select">{t("Saved beneficiary")}<select value={beneficiaryId} onChange={e=>selectBeneficiary(e.target.value)}><option value="">{t("Select a saved recipient")}</option>{countryRecipients.map(b=><option key={b.id} value={b.id}>{b.bank_name} · {b.beneficiary_name}</option>)}</select></label>
-    {chosen&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><Landmark size={17}/>{chosen.bank_name}</span><span className={chosen.verification_status==="verified"?"recipient-verified":"recipient-unverified"}>{chosen.verification_status==="verified"?<ShieldCheck size={13}/>:<LockKeyhole size={13}/>} {t(chosen.verification_status==="verified"?"Name verified by provider":"Verification status not confirmed")}</span></div><h3>{chosen.beneficiary_name}</h3><p>{t(countries.find(([code])=>code===chosen.country_code)?.[1]??chosen.country_code)}</p><dl>{chosen.iban&&<div><dt>IBAN</dt><dd>{chosen.iban.slice(0,4)}••••••••{chosen.iban.slice(-4)}</dd></div>}{chosen.account_number&&<div><dt>Account number</dt><dd>••••{chosen.account_number.slice(-4)}</dd></div>}{chosen.routing_number&&<div><dt>Routing number</dt><dd>{chosen.routing_number}</dd></div>}{chosen.sort_code&&<div><dt>Sort code</dt><dd>{chosen.sort_code}</dd></div>}{chosen.bic&&<div><dt>BIC / SWIFT</dt><dd>{chosen.bic}</dd></div>}</dl><Link href="/dashboard/beneficiaries">{t("Manage this beneficiary")} <ArrowUpRight size={14}/></Link></div>}
+    {chosen&&<div className="international-recipient-card"><div className="international-recipient-card-head"><span><Landmark size={17}/>{chosen.bank_name}</span><span className={chosen.verification_status==="verified"?"recipient-verified":"recipient-unverified"}><ShieldCheck size={13}/> {t(chosen.verification_status==="verified"?"Verified":"Not verified")}</span></div><h3>{chosen.beneficiary_name}</h3><p>{t(countries.find(([code])=>code===chosen.country_code)?.[1]??chosen.country_code)}</p><dl>{chosen.iban&&<div><dt>IBAN</dt><dd>{chosen.iban.slice(0,4)}••••••••{chosen.iban.slice(-4)}</dd></div>}{chosen.account_number&&<div><dt>Account number</dt><dd>••••{chosen.account_number.slice(-4)}</dd></div>}{chosen.routing_number&&<div><dt>Routing number</dt><dd>{chosen.routing_number}</dd></div>}{chosen.sort_code&&<div><dt>Sort code</dt><dd>{chosen.sort_code}</dd></div>}{chosen.bic&&<div><dt>BIC / SWIFT</dt><dd>{chosen.bic}</dd></div>}</dl><Link href="/dashboard/beneficiaries">{t("Manage this beneficiary")} <ArrowUpRight size={14}/></Link></div>}
     {!countryRecipients.length&&<p className="form-hint">{t("No saved beneficiaries exist for this country. Switch to manual entry to continue.")}</p>}
    </div>:<div className="international-transfer-grid">
     <label>{t("Bank name")}<input value={bankName} onChange={e=>{setBankName(e.target.value);setReviewed(false);}} list="international-bank-options" maxLength={120} placeholder={t("Enter or select the recipient bank")}/><datalist id="international-bank-options">{bankOptions.map(bank=><option key={bank.name} value={bank.name}/>)}</datalist></label>
@@ -189,7 +164,6 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
     <label>{t("BIC / SWIFT (optional)")}<input value={bic} onChange={e=>setBic(e.target.value.toUpperCase().replace(/\s/g,"").slice(0,11))} autoCapitalize="characters" placeholder="BIC / SWIFT"/></label>
     <label>{t("Recipient account-holder name")}<input value={recipientName} onChange={e=>{setRecipientName(e.target.value);setVerification("");setReviewed(false);}} maxLength={100} placeholder={t("Full name of the recipient")}/></label>
     <div className="recipient-name-preview"><span><UserRound size={16}/>{t("Recipient")}</span><strong>{recipientName.trim()||t("Recipient name will appear here")}</strong></div>
-    {((canValidateIban&&iban)||(country==="NG"&&accountNumber.length===10&&bankName.trim()))&&<div className="recipient-verification-box"><label className="directory-consent-row"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>{t(country==="NG"?"I consent to sending the Nigerian account number, bank and recipient name to the live account-name enquiry provider.":"I consent to sending the recipient IBAN to IBANforge for structural and checksum validation. This does not verify account ownership.")}</label><button type="button" onClick={()=>void verifyRecipient()} disabled={!consent||verificationBusy||(country==="NG"&&!recipientName.trim())}>{verificationBusy?t("Checking…"):t(country==="NG"?"Verify account-holder name":"Validate IBAN")}</button>{verification&&<p className={verificationStatus==="match"?"name-check-match":verificationStatus==="no_match"?"name-check-no-match":""} role="status">{verification} {verificationProvider==="IBANforge"&&<span> <a href="https://ibanforge.com" target="_blank" rel="noreferrer">Powered by IBANforge</a></span>} {verificationStatus&&<span>{t("Provider response")}</span>}</p>}</div>}
     <form action={addBeneficiary} className="save-manual-beneficiary">
      <input type="hidden" name="country_code" value={country}/><input type="hidden" name="name" value={recipientName}/><input type="hidden" name="bank_name" value={bankName}/><input type="hidden" name="account_number" value={accountNumber}/><input type="hidden" name="routing_number" value={routingNumber}/><input type="hidden" name="sort_code" value={sortCode}/><input type="hidden" name="iban" value={iban}/><input type="hidden" name="bic" value={bic}/>
      <button type="submit" disabled={!recipientName.trim()||!bankName.trim()}><PlusCircle size={15}/>{t("Save these details as a beneficiary (optional)")}</button>
@@ -210,9 +184,8 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
      <input type="hidden" name="bic" value={bic}/>
      <input type="hidden" name="amount" value={amount}/>
      <label>{t("Transaction PIN")}<input name="pin" type="password" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="off" required placeholder={t("Enter your six-digit PIN")}/></label>
-     {externalOtpRequired&&<label>Email verification code<input name="otp_code" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" value={externalOtpCode} onChange={e=>setExternalOtpCode(e.target.value)} required/></label>}
      {externalMessage&&<p className="form-hint" role="status">{externalMessage}</p>}
-     <div><button type="button" className="external-transfer-back" onClick={()=>{setReviewed(false);setExternalOtpRequired(false);setExternalOtpCode("");setExternalMessage("");}}>{t("Edit details")}</button><button type="submit" disabled={externalBusy}>{externalBusy?"Processing…":externalOtpRequired?"Verify code and submit request":t("Submit transfer")} <ArrowUpRight size={15}/></button></div>
+     <div><button type="button" className="external-transfer-back" onClick={()=>{setReviewed(false);setExternalMessage("");}}>{t("Edit details")}</button><button type="submit" disabled={externalBusy}>{externalBusy?"Processing…":t("Submit transfer")} <ArrowUpRight size={15}/></button></div>
     </form>
    </div>}
   </div>)}
