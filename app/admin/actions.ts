@@ -173,7 +173,7 @@ export async function reviewExternalTransfer(formData: FormData) {
   const { data, error } = await supabase.rpc("admin_review_external_transfer", {
     p_request_id: requestId,
     p_decision: decision,
-    p_reason: reason,
+    p_reason: reason || null,
   });
   if (error) redirect("/admin/reviews?kind=error&message=" + encodeURIComponent(error.message));
   const result = Array.isArray(data) ? data[0] : data;
