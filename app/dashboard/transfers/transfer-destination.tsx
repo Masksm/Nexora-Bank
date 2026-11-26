@@ -5,7 +5,7 @@ import type { FormEvent } from "react";
 import { ArrowUpRight,Globe2,Landmark,ShieldCheck,Wallet,PlusCircle,UserRound,CheckCircle2 } from "lucide-react";
 import type { SupportedLocale } from "@/lib/locale";
 import { pageText } from "@/lib/page-translations";
-import { submitTransferWithPin } from "./secure-actions";
+import { getInternalTransferStatus,submitTransferWithPin } from "./secure-actions";
 import { getExternalTransferStatus,submitExternalTransferRequest } from "./international-actions";
 import { addBeneficiary } from "../beneficiaries/actions";
 import { bankDirectory } from "@/lib/bank-directory";
@@ -33,10 +33,29 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  const [reviewed,setReviewed]=useState(false);
  const [transferBusy,setTransferBusy]=useState(false);
  const [transferMessage,setTransferMessage]=useState("");
+ const [internalReview,setInternalReview]=useState<{transactionId:string;reference:string;status:"pending"|"approved"|"rejected";reason:string|null;amount:string;recipient:string;submittedAt:string}|null>(null);
  const [externalBusy,setExternalBusy]=useState(false);
  const [externalMessage,setExternalMessage]=useState("");
  const [externalReview,setExternalReview]=useState<{requestId:string;reference:string;status:"pending"|"approved"|"rejected";reason:string|null;amount:string;recipient:string;bank:string;country:string;submittedAt:string}|null>(null);
  const t=(value:string)=>pageText(locale,value),active=accounts.filter(a=>a.status==="active"),usdAccounts=active.filter(a=>a.currency==="USD");
+ const internalTransactionId=internalReview?.transactionId;
+ const internalReviewStatus=internalReview?.status;
+ useEffect(()=>{
+  if(!internalTransactionId||internalReviewStatus!=="pending")return;
+  let stopped=false;
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  const poll=async()=>{
+   const result=await getInternalTransferStatus(internalTransactionId);
+   if(stopped)return;
+   if(result?.status==="approved"||result?.status==="rejected"){
+    setInternalReview(current=>current&&current.transactionId===internalTransactionId?{...current,status:result.status as "approved"|"rejected",reason:result.reason??null}:current);
+    return;
+   }
+   timer=setTimeout(()=>void poll(),1500);
+  };
+  void poll();
+  return()=>{stopped=true;if(timer)clearTimeout(timer);};
+ },[internalTransactionId,internalReviewStatus]);
  const externalRequestId=externalReview?.requestId;
  const externalReviewStatus=externalReview?.status;
  useEffect(()=>{
@@ -90,8 +109,11 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
   if(transferBusy)return;
   setTransferBusy(true);setTransferMessage("");
   try{
-   const result=await submitTransferWithPin(new FormData(event.currentTarget));
-   if(result?.error)setTransferMessage(result.error);
+   const formData=new FormData(event.currentTarget);
+   const result=await submitTransferWithPin(formData);
+   if(result?.status==="submitted"&&result.transactionId&&result.reference){
+    setInternalReview({transactionId:result.transactionId,reference:result.reference,status:"pending",reason:null,amount:String(formData.get("amount")||"0"),recipient:String(formData.get("recipient")||""),submittedAt:new Date().toLocaleString()});
+   }else if(result?.error)setTransferMessage(result.error);
   }catch(error){
    setTransferMessage(error instanceof Error?error.message:"The transfer could not be submitted.");
   }finally{
@@ -165,6 +187,12 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
     </form>
    </div></div></div>}
   </div>)}
+  {internalReview&&<div className="external-review-overlay" role="dialog" aria-modal="true" aria-labelledby="internal-review-title">
+   <div className="external-review-modal">
+    {internalReview.status==="pending"?<div className="external-review-loader" role="status" aria-live="polite"><span className="external-review-spinner"/><h2 id="internal-review-title">Transfer processing</h2><p>Your Nexora transfer is being reviewed. This screen updates automatically when the administrator makes a decision.</p></div>:internalReview.status==="approved"?<div className="external-review-result"><span className="external-review-result-icon approved"><CheckCircle2 size={26}/></span><h2 id="internal-review-title">Transfer approved</h2><p>Your internal transfer has been posted to both Nexora accounts.</p><div className="external-transfer-slip"><div><small>STATUS</small><strong className="slip-approved">APPROVED</strong></div><div><small>AMOUNT</small><strong>{money(Math.round(Number(internalReview.amount)*100),locale,active.find(a=>a.account_id===sourceId)?.currency??"USD")}</strong></div><div><small>RECIPIENT ACCOUNT</small><strong>{internalReview.recipient}</strong></div><div><small>DATE</small><strong>{internalReview.submittedAt}</strong></div></div><button type="button" onClick={()=>setInternalReview(null)}>Close</button></div>:<div className="external-review-result"><span className="external-review-result-icon declined"><ShieldCheck size={26}/></span><h2 id="internal-review-title">Transfer declined</h2><p>Your internal transfer was not approved. No funds were moved.</p><div className="external-transfer-slip"><div><small>STATUS</small><strong className="slip-rejected">DECLINED</strong></div><div><small>AMOUNT</small><strong>{money(Math.round(Number(internalReview.amount)*100),locale,active.find(a=>a.account_id===sourceId)?.currency??"USD")}</strong></div><div><small>RECIPIENT ACCOUNT</small><strong>{internalReview.recipient}</strong></div></div>{internalReview.reason?.trim()&&<div className="external-review-reason"><strong>Reason</strong><span>{internalReview.reason.trim()}</span></div>}<button type="button" onClick={()=>setInternalReview(null)}>Close</button></div>}
+    <div className="external-review-reference">Reference: {internalReview.reference}</div>
+   </div>
+  </div>}
   {externalReview&&<div className="external-review-overlay" role="dialog" aria-modal="true" aria-labelledby="external-review-title">
    <div className="external-review-modal">
     {externalReview.status==="pending"?<div className="external-review-loader" role="status" aria-live="polite"><span className="external-review-spinner"/><h2 id="external-review-title">Transfer processing</h2><p>Transfer request is processing. Security bot scanning request and review screen updates automatically.</p></div>:externalReview.status==="approved"?<div className="external-review-result"><span className="external-review-result-icon approved"><CheckCircle2 size={26}/></span><h2 id="external-review-title">Transfer approved</h2><p>Your transfer request was approved.</p><div className="external-transfer-slip"><div><small>STATUS</small><strong className="slip-approved">APPROVED</strong></div><div><small>AMOUNT</small><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:"USD"}).format(Number(externalReview.amount))}</strong></div><div><small>RECIPIENT</small><strong>{externalReview.recipient}</strong></div><div><small>BANK</small><strong>{externalReview.bank}</strong></div><div><small>COUNTRY</small><strong>{externalReview.country}</strong></div><div><small>DATE</small><strong>{externalReview.submittedAt}</strong></div></div><button type="button" onClick={()=>setExternalReview(null)}>Close</button></div>:<div className="external-review-result"><span className="external-review-result-icon declined"><ShieldCheck size={26}/></span><h2 id="external-review-title">Transfer rejected</h2><p>Your transfer request was not approved.</p><div className="external-transfer-slip"><div><small>STATUS</small><strong className="slip-rejected">REJECTED</strong></div><div><small>AMOUNT</small><strong>{new Intl.NumberFormat(locale,{style:"currency",currency:"USD"}).format(Number(externalReview.amount))}</strong></div><div><small>RECIPIENT</small><strong>{externalReview.recipient}</strong></div><div><small>BANK</small><strong>{externalReview.bank}</strong></div><div><small>COUNTRY</small><strong>{externalReview.country}</strong></div><div><small>DATE</small><strong>{externalReview.submittedAt}</strong></div></div>{externalReview.reason?.trim()&&<div className="external-review-reason"><strong>Reason</strong><span>{externalReview.reason.trim()}</span></div>}<button type="button" onClick={()=>setExternalReview(null)}>Close</button></div>}
