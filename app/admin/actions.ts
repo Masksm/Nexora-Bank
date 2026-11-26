@@ -38,7 +38,7 @@ export async function adjustBalance(formData: FormData) {
       throw new Error("Choose an account, direction and a reason of at least 8 characters.");
     }
     const { error } = await supabase.rpc("admin_adjust_balance", {
-      p_account_id: accountId, p_direction: direction, p_amount_minor: amountMinor, p_reason: reason,
+      p_account_id: accountId, p_direction: direction, p_amount_minor: amountMinor, p_reason: reason || null,
     });
     if (error) throw error;
     revalidatePath("/admin");
@@ -148,11 +148,11 @@ export async function reviewTransfer(formData: FormData) {
   const transactionId = String(formData.get("transaction_id") || "");
   const decision = String(formData.get("decision") || "");
   const reason = String(formData.get("reason") || "").trim();
-  if (!transactionId || !["approve","reject"].includes(decision) || reason.length < 8) {
-    resultUrl("error", "Choose a decision and provide a reason of at least 8 characters.");
+  if (!transactionId || !["approve","reject"].includes(decision) || reason.length > 240 || (decision === "reject" && reason.length > 0 && reason.length < 8)) {
+    resultUrl("error", "Choose a valid decision. A rejection reason is optional, but if entered it must contain at least 8 characters.");
   }
   const { error } = await supabase.rpc("admin_review_transfer", {
-    p_transaction_id: transactionId, p_decision: decision, p_reason: reason,
+    p_transaction_id: transactionId, p_decision: decision, p_reason: reason || null,
   });
   if (error) resultUrl("error", error.message);
   revalidatePath("/admin");
@@ -167,8 +167,8 @@ export async function reviewExternalTransfer(formData: FormData) {
   const requestId = String(formData.get("request_id") || "");
   const decision = String(formData.get("decision") || "");
   const reason = String(formData.get("reason") || "").trim();
-  if (!requestId || !["approve", "reject"].includes(decision) || reason.length < 8) {
-    redirect("/admin/reviews?kind=error&message=" + encodeURIComponent("Choose a decision and provide a review reason of at least 8 characters."));
+  if (!requestId || !["approve", "reject"].includes(decision) || reason.length > 240 || (decision === "reject" && reason.length > 0 && reason.length < 8)) {
+    redirect("/admin/reviews?kind=error&message=" + encodeURIComponent("Choose a valid decision. A rejection reason is optional, but if entered it must contain at least 8 characters."));
   }
   const { data, error } = await supabase.rpc("admin_review_external_transfer", {
     p_request_id: requestId,
