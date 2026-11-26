@@ -10,7 +10,7 @@ import { CardReveal } from "./card-reveal";
 
 export const dynamic = "force-dynamic";
 
-type Props = { searchParams: Promise<{ error?: string; success?: string }> };
+type Props = { searchParams: Promise<{ error?: string; success?: string; request?: string }> };
 
 export default async function CardsPage({ searchParams }: Props) {
   const locale = ((await cookies()).get("nexora_locale")?.value || "en") as SupportedLocale;
@@ -32,6 +32,16 @@ export default async function CardsPage({ searchParams }: Props) {
     searchParams,
   ]);
 
+  const cardIds = (cards ?? []).map((card) => card.id);
+  const { data: unfreezeRequests } = cardIds.length
+    ? await supabase.from("virtual_card_unfreeze_requests")
+        .select("id,card_id,status,review_reason,requested_at,reviewed_at")
+        .in("card_id", cardIds).order("requested_at", { ascending: false })
+    : { data: [] };
+  const latestRequestByCard = new Map<string, NonNullable<typeof unfreezeRequests>[number]>();
+  for (const request of unfreezeRequests ?? []) {
+    if (!latestRequestByCard.has(request.card_id)) latestRequestByCard.set(request.card_id, request);
+  }
   const activeAccounts = (accounts ?? []).filter((account) => account.status === "active");
 
   return (
@@ -51,6 +61,7 @@ export default async function CardsPage({ searchParams }: Props) {
 
       {params.error && <div className="workspace-alert">{params.error}</div>}
       {params.success && <div className="transfer-success">{t("Card settings updated.")}</div>}
+      {params.request === "pending" && <div className="transfer-success">Your unfreeze request has been submitted. The card remains frozen until an administrator approves it.</div>}
       {cardsError && <div className="workspace-alert">Your cards could not be loaded. Refresh the page and try again.</div>}
 
       <section className="card-preview-grid" aria-label="Your virtual cards">
@@ -64,14 +75,27 @@ export default async function CardsPage({ searchParams }: Props) {
             />
             <div className="virtual-card-controls">
               <span className={card.status === "active" ? "account-status" : "account-status inactive"}>{t(card.status)}</span>
-              <form action={updateCardStatus}>
-                <input type="hidden" name="card_id" value={card.id}/>
-                <input type="hidden" name="status" value={card.status === "active" ? "frozen" : "active"}/>
-                <button type="submit" aria-label={t(card.status === "active" ? "Freeze card" : "Activate card")}>
-                  {card.status === "active" ? <Lock size={15}/> : <Unlock size={15}/>}
-                  <span>{card.status === "active" ? "Freeze" : "Unfreeze"}</span>
-                </button>
-              </form>
+              {card.status === "active" ? (
+                <form action={updateCardStatus}>
+                  <input type="hidden" name="card_id" value={card.id}/>
+                  <input type="hidden" name="status" value="frozen"/>
+                  <button type="submit" aria-label="Freeze card"><Lock size={15}/><span>Freeze</span></button>
+                </form>
+              ) : card.status === "frozen" ? (() => {
+                const request = latestRequestByCard.get(card.id);
+                return request?.status === "pending" ? (
+                  <span className="account-status inactive">Unfreeze request pending admin review</span>
+                ) : (
+                  <form action={updateCardStatus}>
+                    <input type="hidden" name="card_id" value={card.id}/>
+                    <input type="hidden" name="status" value="active"/>
+                    <button type="submit" aria-label="Request card unfreeze"><Unlock size={15}/><span>Request unfreeze</span></button>
+                  </form>
+                );
+              })() : <span className="account-status inactive">{t(card.status)}</span>}
+              {latestRequestByCard.get(card.id)?.status === "rejected" && latestRequestByCard.get(card.id)?.review_reason && (
+                <small className="workspace-disclaimer">Previous request declined: {latestRequestByCard.get(card.id)?.review_reason}</small>
+              )}
             </div>
           </article>
         ))}
