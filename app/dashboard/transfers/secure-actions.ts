@@ -54,7 +54,23 @@ export async function submitTransferWithPin(formData:FormData) {
  }
  if(result?.status==="pin_invalid"||result?.status==="pin_locked") return {error:await pinFailureMessage(supabase,result.status)};
  await finishTransferViews();
- if(result?.status==="review") redirect("/dashboard/transfers?review=1");
- redirect("/dashboard/transfers?success=1");
+ if(result?.status==="review"&&result?.transaction_id&&result?.reference) {
+  return {status:"submitted",transactionId:String(result.transaction_id),reference:String(result.reference)};
+ }
+ return {status:"completed",reference:String(result?.reference??"")};
+}
+
+export async function getInternalTransferStatus(transactionId:string) {
+ const supabase=await createClient();
+ const {data:{user}}=await supabase.auth.getUser();
+ if(!user)return {error:"Authentication required."};
+ if(!/^[0-9a-f-]{36}$/i.test(transactionId))return {error:"Invalid transfer reference."};
+ const {data,error}=await supabase.from("ledger_transactions")
+  .select("reference,status,metadata")
+  .eq("id",transactionId).eq("initiated_by",user.id).maybeSingle();
+ if(error||!data)return {error:"Transfer status is temporarily unavailable."};
+ const reviewRequired=(data.metadata as Record<string,unknown>|null)?.review_required===true;
+ const status=reviewRequired||data.status==="pending"?"pending":data.status==="posted"?"approved":"rejected";
+ return {reference:data.reference,status};
 }
 
