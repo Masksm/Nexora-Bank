@@ -48,8 +48,7 @@ export async function submitTransferWithPin(formData:FormData) {
   p_description:description||null,p_idempotency_key:randomUUID(),p_pin:pin,
  });
  const result=Array.isArray(data)?data[0]:data;
- const requiresOtp=Boolean(error?.message?.includes("DEVICE_OTP_REQUIRED"))||result?.status==="otp_required";
- if(error&&!requiresOtp) {
+ if(error) {
   await supabase.rpc("record_operations_event",{p_severity:"warning",p_category:"transfer",p_service:"Internal transfers",p_operation:"transfer_rejected",p_error_code:error.code||"TRANSFER_REJECTED",p_request_path:"/dashboard/transfers"});
   return {error:error.message};
  }
