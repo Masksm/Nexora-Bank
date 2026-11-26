@@ -16,7 +16,26 @@ function buildPreviewDetails(id: string, network: string, last4: string) {
   // These are preview-only numbers. Keep the persisted last4 as the actual
   // final four digits instead of appending a Luhn digit after it.
   const prefixLength = 16 - prefix.length - suffix.length;
-  const number = prefix + digits.slice(0, prefixLength) + suffix;
+  const numberPrefix = (prefix + digits.slice(0, prefixLength)).split("");
+  let number = "";
+  for (let candidate = 0; candidate <= 9; candidate += 1) {
+    numberPrefix[numberPrefix.length - 1] = String(candidate);
+    const attempt = numberPrefix.join("") + suffix;
+    let sum = 0;
+    for (let index = 0; index < attempt.length; index += 1) {
+      let digit = Number(attempt[attempt.length - 1 - index]);
+      if (index % 2 === 1) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+    }
+    if (sum % 10 === 0) {
+      number = attempt;
+      break;
+    }
+  }
+  if (!number) throw new Error("Unable to generate a valid preview card number.");
   return {
     number: number.replace(/(.{4})/g, "$1 ").trim(),
     cvv: digits.slice(10, 13),
