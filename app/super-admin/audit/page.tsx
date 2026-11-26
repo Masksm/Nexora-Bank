@@ -38,7 +38,8 @@ export default async function SuperAdminAuditPage({searchParams}:{searchParams:P
   if(!sessionUser||error||meta?.role!=="super_admin") redirect("/login");
   const params=await searchParams;
   const role=params.role==="staff"?"staff":"member";
-  const allowedCategories:AuditCategory[]=["all","customer","transactions","admin","transfer_approvals","admin_chat","balance_history","authentication","security"];\n  const category=allowedCategories.includes(params.category as AuditCategory)?params.category as AuditCategory:"all";
+  const allowedCategories:AuditCategory[]=["all","customer","transactions","admin","transfer_approvals","admin_chat","balance_history","authentication","security"];
+  const category=allowedCategories.includes(params.category as AuditCategory)?params.category as AuditCategory:"all";
   const locale=((await cookies()).get("nexora_locale")?.value||"en") as SupportedLocale;
   const t=(value:string)=>pageText(locale,value);
   const {data:directory,error:directoryError}=await supabase.rpc("super_admin_directory");
