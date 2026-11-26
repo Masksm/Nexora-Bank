@@ -12,24 +12,13 @@ function buildPreviewDetails(id: string, network: string, last4: string) {
     .map((character) => (parseInt(character, 16) % 10).toString())
     .join("");
   const prefix = network === "mastercard" ? "55" : "4";
-  const base =
-    prefix +
-    digits.slice(0, network === "mastercard" ? 9 : 10) +
-    last4.padStart(4, "0").slice(-4);
-
-  let sum = 0;
-  for (let index = 0; index < base.length; index += 1) {
-    let digit = Number(base[base.length - 1 - index]);
-    if (index % 2 === 0) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-    sum += digit;
-  }
-
-  const checkDigit = (10 - (sum % 10)) % 10;
+  const suffix = last4.padStart(4, "0").slice(-4);
+  // These are preview-only numbers. Keep the persisted last4 as the actual
+  // final four digits instead of appending a Luhn digit after it.
+  const prefixLength = 16 - prefix.length - suffix.length;
+  const number = prefix + digits.slice(0, prefixLength) + suffix;
   return {
-    number: (base + checkDigit).replace(/(.{4})/g, "$1 ").trim(),
+    number: number.replace(/(.{4})/g, "$1 ").trim(),
     cvv: digits.slice(10, 13),
   };
 }
