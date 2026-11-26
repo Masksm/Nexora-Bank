@@ -148,8 +148,8 @@ export async function reviewTransfer(formData: FormData) {
   const transactionId = String(formData.get("transaction_id") || "");
   const decision = String(formData.get("decision") || "");
   const reason = String(formData.get("reason") || "").trim();
-  if (!transactionId || !["approve","reject"].includes(decision) || reason.length > 240) {
-    resultUrl("error", "Choose a valid decision. A rejection reason is optional, but if entered it must contain at least 8 characters.");
+  if (!transactionId || !["approve","reject"].includes(decision) || reason.length < 8 || reason.length > 240) {
+    resultUrl("error", "Choose a valid decision and provide a review reason between 8 and 240 characters.");
   }
   const { error } = await supabase.rpc("admin_review_transfer", {
     p_transaction_id: transactionId, p_decision: decision, p_reason: reason || null,
@@ -167,8 +167,8 @@ export async function reviewExternalTransfer(formData: FormData) {
   const requestId = String(formData.get("request_id") || "");
   const decision = String(formData.get("decision") || "");
   const reason = String(formData.get("reason") || "").trim();
-  if (!requestId || !["approve", "reject"].includes(decision) || reason.length > 240 || (decision === "reject" && reason.length > 0 && reason.length < 8)) {
-    redirect("/admin/reviews?kind=error&message=" + encodeURIComponent("Choose a valid decision. A rejection reason is optional, but if entered it must contain at least 8 characters."));
+  if (!requestId || !["approve", "reject"].includes(decision) || reason.length < 8 || reason.length > 240) {
+    redirect("/admin/reviews?kind=error&message=" + encodeURIComponent("Choose a valid decision and provide a review reason between 8 and 240 characters."));
   }
   const { data, error } = await supabase.rpc("admin_review_external_transfer", {
     p_request_id: requestId,
@@ -183,6 +183,26 @@ export async function reviewExternalTransfer(formData: FormData) {
   revalidatePath("/dashboard/transfers");
   revalidatePath("/dashboard/transactions");
   redirect("/admin/reviews?external_result=" + decision + "&reference=" + encodeURIComponent(result?.reference || ""));
+}
+
+export async function reviewVirtualCardUnfreeze(formData: FormData) {
+  const supabase = await requireAdmin();
+  const requestId = String(formData.get("request_id") || "");
+  const decision = String(formData.get("decision") || "");
+  const reason = String(formData.get("reason") || "").trim();
+  if (!requestId || !["approve", "reject"].includes(decision) || reason.length < 8 || reason.length > 500) {
+    redirect("/admin/reviews?kind=error&message=" + encodeURIComponent("Choose a card decision and provide a reason between 8 and 500 characters."));
+  }
+  const { error } = await supabase.rpc("admin_review_virtual_card_unfreeze", {
+    p_request_id: requestId,
+    p_decision: decision,
+    p_reason: reason,
+  });
+  if (error) redirect("/admin/reviews?kind=error&message=" + encodeURIComponent(error.message));
+  revalidatePath("/admin/reviews");
+  revalidatePath("/dashboard/cards");
+  revalidatePath("/dashboard/notifications");
+  redirect("/admin/reviews?kind=success&message=" + encodeURIComponent(decision === "approve" ? "Card unfreeze approved. The card is now active." : "Card unfreeze declined. The card remains frozen."));
 }
 
 export async function setDeviceTrust(formData: FormData) {
