@@ -64,7 +64,7 @@ export async function generateDemoHistory(formData: FormData) {
     const targetMinor = amountToMinor(formData.get("target_amount"));
     const startYear = Number(formData.get("start_year") || 2019);
     const transactionCount = Number(formData.get("transactions") || 100);
-    if (!accountId || !Number.isInteger(startYear) || !Number.isInteger(transactionCount) || transactionCount < 3 || transactionCount > 250) {
+    if (!accountId || !Number.isInteger(startYear) || !Number.isInteger(transactionCount) || transactionCount < 3 || transactionCount > 400) {
       throw new Error("Check the selected account, start year and activity count.");
     }
     const { error } = await supabase.rpc("admin_generate_demo_history", {
