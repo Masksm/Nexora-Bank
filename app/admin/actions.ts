@@ -148,7 +148,7 @@ export async function reviewTransfer(formData: FormData) {
   const transactionId = String(formData.get("transaction_id") || "");
   const decision = String(formData.get("decision") || "");
   const reason = String(formData.get("reason") || "").trim();
-  if (!transactionId || !["approve","reject"].includes(decision) || reason.length > 240 || (decision === "reject" && reason.length > 0 && reason.length < 8)) {
+  if (!transactionId || !["approve","reject"].includes(decision) || reason.length > 240) {
     resultUrl("error", "Choose a valid decision. A rejection reason is optional, but if entered it must contain at least 8 characters.");
   }
   const { error } = await supabase.rpc("admin_review_transfer", {
