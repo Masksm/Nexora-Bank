@@ -65,7 +65,7 @@ export function TransferDestination({accounts,beneficiaries,locale}:{accounts:Ac
  function selectBeneficiary(id:string){
   setBeneficiaryId(id);
   const item=countryRecipients.find(b=>b.id===id);
-  if(item){setBankName(item.bank_name);setRecipientName(item.beneficiary_name);setAccountNumber(item.account_number||"");setRoutingNumber(item.routing_number||"");setSortCode(item.sort_code||"");setIban(item.iban||"");setBic(item.bic||"");setVerification("");setVerificationStatus("");setReviewed(false);}
+  if(item){setBankName(item.bank_name);setRecipientName(item.beneficiary_name);setAccountNumber(item.account_number||"");setRoutingNumber(item.routing_number||"");setSortCode(item.sort_code||"");setIban(item.iban||"");setBic(item.bic||"");setVerification("");setReviewed(false);}
  }
  async function handleExternalTransferSubmit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();
