@@ -34,7 +34,7 @@ export async function submitExternalTransferRequest(formData:FormData) {
   p_source_account_id:sourceAccountId,p_amount_minor:amountMinor,p_destination_country:country,
   p_bank_name:bankName,p_beneficiary_name:beneficiaryName,p_account_number:accountNumber||null,
   p_routing_number:routingNumber||null,p_sort_code:sortCode||null,p_iban:iban||null,p_bic:bic||null,
-  p_pin:pin,p_otp_challenge_id:null,p_otp_code:null
+  p_pin:pin
  });
  const result=Array.isArray(data)?data[0]:data;
  if(error)return {error:error.message};
