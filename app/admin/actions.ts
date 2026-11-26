@@ -318,31 +318,56 @@ export async function issueSupportPaymentProcedure(formData: FormData) {
   const walletAddress = String(formData.get("wallet_address") || "").trim();
   const amountRaw = String(formData.get("expected_amount") || "").trim();
   const purpose = String(formData.get("purpose") || "").trim();
-  const selected = pair === "USDT_TRON" ? { cryptocurrency: "USDT", network: "TRON (TRC20)", decimals: 6, addressPattern: /^T[1-9A-HJ-NP-Za-km-z]{33}$/ } : pair === "BTC_BITCOIN" ? { cryptocurrency: "BTC", network: "BITCOIN", decimals: 8, addressPattern: /^(bc1[ac-hj-np-z02-9]{11,87}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/ } : null;
+  const platformName = String(formData.get("platform_name") || "").trim();
+  const otherCurrency = String(formData.get("other_currency") || "").trim().toUpperCase();
+  const selected = pair === "USDT_TRON"
+    ? { cryptocurrency: "USDT", network: "TRON (TRC20)", decimals: 6, addressPattern: /^T[1-9A-HJ-NP-Za-km-z]{33}$/ }
+    : pair === "BTC_BITCOIN"
+      ? { cryptocurrency: "BTC", network: "BITCOIN", decimals: 8, addressPattern: /^(bc1[ac-hj-np-z02-9]{11,87}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/ }
+      : pair === "OTHER"
+        ? { cryptocurrency: "OTHER", network: "MANUAL", decimals: 18, addressPattern: null }
+        : null;
+  const currency = pair === "OTHER" ? otherCurrency : selected?.cryptocurrency ?? "";
   const parts = amountRaw.split(".");
-  const validAmount = parts.length <= 2 && /^(0|[1-9]\d*)$/.test(parts[0] || "") && (parts.length === 1 || (parts[1].length > 0 && parts[1].length <= (selected?.decimals ?? 0) && /^\d+$/.test(parts[1])));
+  const validAmount = parts.length <= 2
+    && /^(0|[1-9]\d*)$/.test(parts[0] || "")
+    && (parts.length === 1 || (parts[1].length > 0 && parts[1].length <= (selected?.decimals ?? 0) && /^\d+$/.test(parts[1])));
   const amount = Number(amountRaw);
-  if (!conversationId || !selected || !selected.addressPattern.test(walletAddress) || !validAmount || !Number.isFinite(amount) || amount <= 0 || purpose.length < 3 || purpose.length > 500) {
-    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("Choose a supported asset/network, enter an address in the accepted format, and provide a valid amount and purpose."));
+  const validOther = pair !== "OTHER" || (platformName.length >= 2 && platformName.length <= 80 && /^[A-Z0-9._-]{2,12}$/.test(otherCurrency));
+  if (!conversationId || !selected || !walletAddress || walletAddress.length > 256 || !validOther
+      || !validAmount || !Number.isFinite(amount) || amount <= 0
+      || purpose.length < 3 || purpose.length > 500) {
+    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("Complete the payment method, destination, amount, purpose and any required Other details."));
   }
-  let addressChecksumValid = false;
-  try {
-    const validationResponse = selected.cryptocurrency === "USDT"
-      ? await fetch("https://api.trongrid.io/wallet/validateaddress", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address: walletAddress, visible: true }) })
-      : await fetch("https://mempool.space/api/v1/validate-address/" + encodeURIComponent(walletAddress));
-    if (!validationResponse.ok) throw new Error("Address validation service unavailable.");
-    const validation = await validationResponse.json();
-    addressChecksumValid = selected.cryptocurrency === "USDT" ? validation.result === true : validation.isvalid === true;
-  } catch {
-    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("The network address validator is temporarily unavailable. No payment instruction was issued; try again later."));
+  if (selected.addressPattern) {
+    let addressChecksumValid = false;
+    try {
+      const validationResponse = selected.cryptocurrency === "USDT"
+        ? await fetch("https://api.trongrid.io/wallet/validateaddress", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address: walletAddress, visible: true }) })
+        : await fetch("https://mempool.space/api/v1/validate-address/" + encodeURIComponent(walletAddress));
+      if (!validationResponse.ok) throw new Error("Address validation service unavailable.");
+      const validation = await validationResponse.json();
+      addressChecksumValid = selected.cryptocurrency === "USDT" ? validation.result === true : validation.isvalid === true;
+    } catch {
+      redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("The network address validator is temporarily unavailable. No payment instruction was issued; try again later."));
+    }
+    if (!addressChecksumValid) {
+      redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("The address checksum or network format is invalid. Recheck the receiving address in the selected wallet."));
+    }
   }
-  if (!addressChecksumValid) {
-    redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent("The address checksum or network format is invalid. Recheck the receiving address in the selected wallet."));
-  }
-  const { error } = await supabase.rpc("create_support_payment_procedure", { p_conversation_id: conversationId, p_cryptocurrency: selected.cryptocurrency, p_network: selected.network, p_wallet_address: walletAddress, p_expected_amount: amountRaw, p_amount_currency: selected.cryptocurrency, p_purpose: purpose });
+  const { error } = await supabase.rpc("create_support_payment_procedure", {
+    p_conversation_id: conversationId,
+    p_cryptocurrency: selected.cryptocurrency,
+    p_network: selected.network,
+    p_wallet_address: walletAddress,
+    p_expected_amount: amountRaw,
+    p_amount_currency: currency,
+    p_purpose: purpose,
+    p_platform_name: pair === "OTHER" ? platformName : null,
+  });
   if (error) redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=error&message=" + encodeURIComponent(error.message));
   revalidatePath("/admin/support");
-  redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=success&message=" + encodeURIComponent("Payment instruction issued. The selected network and address format were validated."));
+  redirect("/admin/support?ticket=" + encodeURIComponent(conversationId) + "&kind=success&message=" + encodeURIComponent(pair === "OTHER" ? "Manual payment instruction issued." : "Payment instruction issued and network address validated."));
 }
 
 export async function reviewSupportPaymentReceipt(formData: FormData) {
