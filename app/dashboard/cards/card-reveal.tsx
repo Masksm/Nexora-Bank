@@ -169,7 +169,7 @@ export function CardReveal({
                     <button type="button" onClick={() => copyValue("cvv", details.cvv)}><Copy size={14}/>{copied === "cvv" ? "Copied" : "Copy"}</button>
                   </div>
                 </div>
-                <p className="card-reveal-preview-note">Preview credentials only. This card is not issued to a payment network and cannot be used for purchases. Details automatically hide after 30 seconds.</p>
+                <p className="card-reveal-preview-note"></p>
                 <button type="button" className="card-reveal-primary" onClick={closeDialog}><EyeOff size={15}/> Hide card details</button>
               </div>
             ) : (
