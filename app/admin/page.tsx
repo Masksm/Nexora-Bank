@@ -78,7 +78,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
 
           <article className="admin-panel">
             <div className="admin-panel-heading"><div><span>{t("ACCOUNT HISTORY MANAGEMENT")}</span><h2>{t("Generate account activity")}</h2></div><Activity size={18}/></div>
-            <p className="admin-help">{t("Creates synthetic historical activity using the selected customer profile. Lifestyle controls the transaction descriptions and spending mix; gender and age are recorded as profile context without assuming that everyone in a demographic spends the same way. Ledger totals remain balanced and the final balance matches the target.")}</p>
+            <p className="admin-help">{t("Creates synthetic historical activity using the selected customer profile. Lifestyle and age range shape the transaction mix; gender is recorded as profile context without assuming that everyone in a demographic spends the same way. Ledger totals remain balanced and the final balance matches the target.")}</p>
             <form action={generateDemoHistory} className="admin-form">
               <label>{t("Empty customer account")}<select name="account_id" required defaultValue=""><option value="" disabled>{t("Select an account")}</option>{rows.filter((row)=>Number(row.balance_minor)===0).map((row)=><option key={row.account_id} value={row.account_id}>{row.account_number} · {row.account_name}</option>)}</select></label>
               <label>{t("Target opening and final balance (account currency)")}<input name="target_amount" type="number" min="0.01" step="0.01" placeholder={t("100000000.00")} required/></label>
