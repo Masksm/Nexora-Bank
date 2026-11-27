@@ -895,7 +895,7 @@ export function pageText(locale: SupportedLocale, value: string): string {
   if (transferPrefix && locale !== "en") {
     const remainder = value.trim().slice(transferPrefix === "to" ? 11 : 14);
     const translatedRemainder = transactionLabelTranslations[locale]?.[remainder.toLocaleLowerCase("en")]
-      ?? (remainder.toLocaleLowerCase("en") === "nexora payment"
+      ?? (["nexora payment","nezura payment"].includes(remainder.toLocaleLowerCase("en"))
         ? ({es:"pago Nexora",fr:"paiement Nexora",pt:"pagamento Nexora",de:"Nexora-Zahlung"} as const)[locale]
         : remainder);
     const prefix = ({es:{to:"Transferencia a ",from:"Transferencia desde "},fr:{to:"Virement vers ",from:"Virement depuis "},pt:{to:"Transferência para ",from:"Transferência de "},de:{to:"Überweisung an ",from:"Überweisung von "}} as const)[locale][transferPrefix];
