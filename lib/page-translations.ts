@@ -872,6 +872,11 @@ Object.assign(interfaceLabelTranslations.es, {"recipient":"Destinatario","bank":
 Object.assign(interfaceLabelTranslations.fr, {"recipient":"Bénéficiaire","bank":"Banque","country":"Pays","approved":"Approuvé","rejected":"Rejeté"});
 Object.assign(interfaceLabelTranslations.pt, {"recipient":"Destinatário","bank":"Banco","country":"País","approved":"Aprovado","rejected":"Rejeitado"});
 Object.assign(interfaceLabelTranslations.de, {"recipient":"Empfänger","bank":"Bank","country":"Land","approved":"Genehmigt","rejected":"Abgelehnt"});
+
+Object.assign(interfaceLabelTranslations.es, {"declined":"Rechazado"});
+Object.assign(interfaceLabelTranslations.fr, {"declined":"Refusé"});
+Object.assign(interfaceLabelTranslations.pt, {"declined":"Recusado"});
+Object.assign(interfaceLabelTranslations.de, {"declined":"Abgelehnt"});
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
