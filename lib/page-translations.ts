@@ -867,6 +867,11 @@ Object.assign(interfaceLabelTranslations.de, {
  "transfer request is processing. security bot scanning request and review screen updates automatically.":"Die Überweisungsanfrage wird bearbeitet. Das Sicherheitssystem prüft die Anfrage und der Bildschirm wird automatisch aktualisiert.",
  "your transfer request was approved.":"Ihre Überweisungsanfrage wurde genehmigt.","your transfer request was not approved.":"Ihre Überweisungsanfrage wurde nicht genehmigt.","transfer rejected":"Überweisung abgelehnt"
 });
+
+Object.assign(interfaceLabelTranslations.es, {"recipient":"Destinatario","bank":"Banco","country":"País","approved":"Aprobado","rejected":"Rechazado"});
+Object.assign(interfaceLabelTranslations.fr, {"recipient":"Bénéficiaire","bank":"Banque","country":"Pays","approved":"Approuvé","rejected":"Rejeté"});
+Object.assign(interfaceLabelTranslations.pt, {"recipient":"Destinatário","bank":"Banco","country":"País","approved":"Aprovado","rejected":"Rejeitado"});
+Object.assign(interfaceLabelTranslations.de, {"recipient":"Empfänger","bank":"Bank","country":"Land","approved":"Genehmigt","rejected":"Abgelehnt"});
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
