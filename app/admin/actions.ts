@@ -64,12 +64,23 @@ export async function generateDemoHistory(formData: FormData) {
     const targetMinor = amountToMinor(formData.get("target_amount"));
     const startYear = Number(formData.get("start_year") || 2019);
     const transactionCount = Number(formData.get("transactions") || 100);
-    if (!accountId || !Number.isInteger(startYear) || !Number.isInteger(transactionCount) || transactionCount < 3 || transactionCount > 400) {
-      throw new Error("Check the selected account, start year and activity count.");
+    const gender = String(formData.get("gender") || "unspecified");
+    const ageGroup = String(formData.get("age_group") || "25_34");
+    const lifestyle = String(formData.get("lifestyle") || "balanced");
+    if (!accountId || !Number.isInteger(startYear) || !Number.isInteger(transactionCount) || transactionCount < 3 || transactionCount > 400
+        || !["male", "female", "unspecified"].includes(gender)
+        || !["18_24", "25_34", "35_44", "45_54", "55_plus"].includes(ageGroup)
+        || !["student", "early_career", "professional", "business_owner", "family", "retired", "balanced"].includes(lifestyle)) {
+      throw new Error("Check the selected account, customer profile, start year and activity count.");
     }
     const { error } = await supabase.rpc("admin_generate_demo_history", {
-      p_account_id: accountId, p_target_balance_minor: targetMinor,
-      p_start_year: startYear, p_pairs: transactionCount,
+      p_account_id: accountId,
+      p_target_balance_minor: targetMinor,
+      p_start_year: startYear,
+      p_pairs: transactionCount,
+      p_gender: gender,
+      p_age_group: ageGroup,
+      p_lifestyle: lifestyle,
     });
     if (error) throw error;
     revalidatePath("/admin");
