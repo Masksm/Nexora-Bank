@@ -824,6 +824,32 @@ const interfaceLabelTranslations: Record<SupportedLocale, Record<string,string>>
  }
 };
 
+
+Object.assign(interfaceLabelTranslations.es, {
+ "transfer processing":"Transferencia en proceso","your nexora transfer is being reviewed. this screen updates automatically when the administrator makes a decision.":"Tu transferencia Nexora está siendo revisada. Esta pantalla se actualizará automáticamente cuando el administrador tome una decisión.","transfer approved":"Transferencia aprobada","your internal transfer has been posted to both nexora accounts.":"Tu transferencia interna se ha registrado en ambas cuentas Nexora.","transfer declined":"Transferencia rechazada","your internal transfer was not approved. no funds were moved.":"Tu transferencia interna no fue aprobada. No se movieron fondos.","status":"ESTADO","amount":"IMPORTE","recipient account":"CUENTA DEL DESTINATARIO","date":"FECHA","reason":"Motivo","close":"Cerrar"
+});
+Object.assign(interfaceLabelTranslations.fr, {
+ "transfer processing":"Virement en cours","your nexora transfer is being reviewed. this screen updates automatically when the administrator makes a decision.":"Votre virement Nexora est en cours d’examen. Cet écran se mettra automatiquement à jour lorsque l’administrateur aura pris une décision.","transfer approved":"Virement approuvé","your internal transfer has been posted to both nexora accounts.":"Votre virement interne a été enregistré sur les deux comptes Nexora.","transfer declined":"Virement refusé","your internal transfer was not approved. no funds were moved.":"Votre virement interne n’a pas été approuvé. Aucun fonds n’a été déplacé.","status":"STATUT","amount":"MONTANT","recipient account":"COMPTE BÉNÉFICIAIRE","date":"DATE","reason":"Motif","close":"Fermer"
+});
+Object.assign(interfaceLabelTranslations.pt, {
+ "transfer processing":"Transferência em processamento","your nexora transfer is being reviewed. this screen updates automatically when the administrator makes a decision.":"Sua transferência Nexora está sendo analisada. Esta tela será atualizada automaticamente quando o administrador tomar uma decisão.","transfer approved":"Transferência aprovada","your internal transfer has been posted to both nexora accounts.":"Sua transferência interna foi registrada nas duas contas Nexora.","transfer declined":"Transferência recusada","your internal transfer was not approved. no funds were moved.":"Sua transferência interna não foi aprovada. Nenhum valor foi movimentado.","status":"STATUS","amount":"VALOR","recipient account":"CONTA DO DESTINATÁRIO","date":"DATA","reason":"Motivo","close":"Fechar"
+});
+Object.assign(interfaceLabelTranslations.de, {
+ "transfer processing":"Überweisung wird bearbeitet","your nexora transfer is being reviewed. this screen updates automatically when the administrator makes a decision.":"Ihre Nexora-Überweisung wird geprüft. Dieser Bildschirm wird automatisch aktualisiert, sobald der Administrator eine Entscheidung getroffen hat.","transfer approved":"Überweisung genehmigt","your internal transfer has been posted to both nexora accounts.":"Ihre interne Überweisung wurde auf beiden Nexora-Konten verbucht.","transfer declined":"Überweisung abgelehnt","your internal transfer was not approved. no funds were moved.":"Ihre interne Überweisung wurde nicht genehmigt. Es wurde kein Geld bewegt.","status":"STATUS","amount":"BETRAG","recipient account":"EMPFÄNGERKONTO","date":"DATUM","reason":"Grund","close":"Schließen"
+});
+Object.assign(transactionLabelTranslations.es, {
+ "transfer to nexora payment":"Transferencia a pago Nexora","transfer from nexora payment":"Transferencia desde pago Nexora"
+});
+Object.assign(transactionLabelTranslations.fr, {
+ "transfer to nexora payment":"Virement vers un paiement Nexora","transfer from nexora payment":"Virement depuis un paiement Nexora"
+});
+Object.assign(transactionLabelTranslations.pt, {
+ "transfer to nexora payment":"Transferência para pagamento Nexora","transfer from nexora payment":"Transferência de pagamento Nexora"
+});
+Object.assign(transactionLabelTranslations.de, {
+ "transfer to nexora payment":"Überweisung an Nexora-Zahlung","transfer from nexora payment":"Überweisung von Nexora-Zahlung"
+});
+
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
@@ -831,8 +857,23 @@ export function pageText(locale: SupportedLocale, value: string): string {
     ?? extra[locale]?.[value]
     ?? dictionaries[locale]?.[value];
   if (exact !== undefined) return exact;
-  const transactionLabel = transactionLabelTranslations[locale]?.[value.trim().toLocaleLowerCase("en")];
+  const normalizedLabel = value.trim().toLocaleLowerCase("en");
+  const transactionLabel = transactionLabelTranslations[locale]?.[normalizedLabel];
   if (transactionLabel) return transactionLabel;
+  const transferPrefix = normalizedLabel.startsWith("transfer to ")
+    ? "to"
+    : normalizedLabel.startsWith("transfer from ")
+      ? "from"
+      : null;
+  if (transferPrefix && locale !== "en") {
+    const remainder = value.trim().slice(transferPrefix === "to" ? 11 : 13);
+    const translatedRemainder = transactionLabelTranslations[locale]?.[remainder.toLocaleLowerCase("en")]
+      ?? (remainder.toLocaleLowerCase("en") === "nexora payment"
+        ? ({es:"pago Nexora",fr:"paiement Nexora",pt:"pagamento Nexora",de:"Nexora-Zahlung"} as const)[locale]
+        : remainder);
+    const prefix = ({es:{to:"Transferencia a ",from:"Transferencia desde "},fr:{to:"Virement vers ",from:"Virement depuis "},pt:{to:"Transferência para ",from:"Transferência de "},de:{to:"Überweisung an ",from:"Überweisung von "}} as const)[locale][transferPrefix];
+    return prefix + translatedRemainder;
+  }
   const interfaceLabel = interfaceLabelTranslations[locale]?.[value.trim().toLocaleLowerCase("en")];
   if (interfaceLabel) return interfaceLabel;
   const composites: Array<[string,string]> = [
