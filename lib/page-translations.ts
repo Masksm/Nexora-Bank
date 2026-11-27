@@ -850,6 +850,23 @@ Object.assign(transactionLabelTranslations.de, {
  "transfer to nexora payment":"Überweisung an Nexora-Zahlung","transfer from nexora payment":"Überweisung von Nexora-Zahlung"
 });
 
+
+Object.assign(interfaceLabelTranslations.es, {
+ "transfer request is processing. security bot scanning request and review screen updates automatically.":"La solicitud de transferencia está en proceso. El sistema de seguridad está analizando la solicitud y la pantalla se actualizará automáticamente.",
+ "your transfer request was approved.":"Tu solicitud de transferencia fue aprobada.","your transfer request was not approved.":"Tu solicitud de transferencia no fue aprobada.","transfer rejected":"Transferencia rechazada"
+});
+Object.assign(interfaceLabelTranslations.fr, {
+ "transfer request is processing. security bot scanning request and review screen updates automatically.":"La demande de virement est en cours de traitement. Le système de sécurité analyse la demande et l’écran se mettra automatiquement à jour.",
+ "your transfer request was approved.":"Votre demande de virement a été approuvée.","your transfer request was not approved.":"Votre demande de virement n’a pas été approuvée.","transfer rejected":"Virement rejeté"
+});
+Object.assign(interfaceLabelTranslations.pt, {
+ "transfer request is processing. security bot scanning request and review screen updates automatically.":"A solicitação de transferência está sendo processada. O sistema de segurança está analisando a solicitação e a tela será atualizada automaticamente.",
+ "your transfer request was approved.":"Sua solicitação de transferência foi aprovada.","your transfer request was not approved.":"Sua solicitação de transferência não foi aprovada.","transfer rejected":"Transferência rejeitada"
+});
+Object.assign(interfaceLabelTranslations.de, {
+ "transfer request is processing. security bot scanning request and review screen updates automatically.":"Die Überweisungsanfrage wird bearbeitet. Das Sicherheitssystem prüft die Anfrage und der Bildschirm wird automatisch aktualisiert.",
+ "your transfer request was approved.":"Ihre Überweisungsanfrage wurde genehmigt.","your transfer request was not approved.":"Ihre Überweisungsanfrage wurde nicht genehmigt.","transfer rejected":"Überweisung abgelehnt"
+});
 export function pageText(locale: SupportedLocale, value: string): string {
   const exact = dashboardLabels[locale]?.[value]
     ?? identityUiTranslations[locale]?.[value]
@@ -866,7 +883,7 @@ export function pageText(locale: SupportedLocale, value: string): string {
       ? "from"
       : null;
   if (transferPrefix && locale !== "en") {
-    const remainder = value.trim().slice(transferPrefix === "to" ? 11 : 13);
+    const remainder = value.trim().slice(transferPrefix === "to" ? 11 : 14);
     const translatedRemainder = transactionLabelTranslations[locale]?.[remainder.toLocaleLowerCase("en")]
       ?? (remainder.toLocaleLowerCase("en") === "nexora payment"
         ? ({es:"pago Nexora",fr:"paiement Nexora",pt:"pagamento Nexora",de:"Nexora-Zahlung"} as const)[locale]
