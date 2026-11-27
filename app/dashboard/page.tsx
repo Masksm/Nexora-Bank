@@ -203,7 +203,7 @@ export default async function DashboardPage() {
                 const review = (transaction.metadata as { review_required?: boolean; synthetic_demo?: boolean } | null)?.review_required === true;
                 return <article className="dashboard-recent-row" key={transaction.id}>
                   <span className={incoming ? "recent-transaction-icon incoming" : "recent-transaction-icon"}>{incoming ? <ArrowDownLeft size={17}/> : <ArrowUpRight size={17}/>}</span>
-                  <div className="recent-transaction-description"><strong>{transaction.description || pt(transaction.transaction_type.replaceAll("_", " "))}</strong><span>{dateLabel(transaction.created_at, locale)} · Ref {transaction.reference}</span></div>
+                  <div className="recent-transaction-description"><strong>{pt(transaction.description || transaction.transaction_type.replaceAll("_", " "))}</strong><span>{dateLabel(transaction.created_at, locale)} · Ref {transaction.reference}</span></div>
                   <div className="recent-transaction-amount"><strong className={incoming ? "positive" : ""}>{incoming ? "+" : "−"}{money(amount, entry?.currency ?? "USD", locale)}</strong><span className={"transaction-status " + (review ? "review" : transaction.status)}>{review ? t("dashboard.underReview") : pt(transaction.status)}</span></div>
                 </article>;
               })}
